@@ -16,6 +16,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+
 #ifndef AUTH_H
 #define AUTH_H
 
@@ -49,7 +50,7 @@ private:
 	int tries;
 	QTime *started;
 
-	const static int max_check_time = 7000; //in ms
+	const static int max_check_time = 60000; //in ms
 	//limits for short/long lines
 	const static int short_limit = 10;
 	const static int long_limit = 200;
