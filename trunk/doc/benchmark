@@ -1,0 +1,33 @@
+6 strokes horizontal (tablet)
+
+rev 20
+	number of strokes:  22 
+	input:  "7_0_7_0_7#4_0_4#0_7_0_0#4_0_4#4_0_7_0_0#4_0_" 
+	Processing timed out, could not match pattern 
+	480891  tries in  60.001 s, or  8014.72 tries/s 
+
+	number of strokes:  19 
+	input:  "7_0_7_0_7#4_0_4#0_7_0_0#4_4#7_0_0#4_0_" 
+	Processing timed out, could not match pattern 
+	1073809  tries in  60.001 s, or  17896.5 tries/s
+
+	number of strokes:  23 
+	input:  "7_0_7_0_0#4_0_4#0_7_0_7_0_0#4_0_4#0_7_0_0#4_0_" 
+	Processing timed out, could not match pattern 
+	486659  tries in  60.001 s, or  8110.85 tries/s 
+rev 21, 2x tries/s!
+	number of strokes:  19 
+	input:  "0_7_0_3#4_0_4#0_0#4_0_4#7_0_7_0_0#4_0_" 
+	Processing timed out, could not match pattern 
+	2187156  tries in  60.001 s, or  36452 tries/s 
+
+	number of strokes:  19 
+	input:  "7_0_0#4_0_4#7_0_0#4_0_4#7_0_7_0_0#4_0_" 
+	Processing timed out, could not match pattern 
+	2247348  tries in  60.001 s, or  37455.2 tries/s 
+
+	number of strokes:  22 
+	input:  "7_0_7_0_1#5_4_0_3#7_0_0#4_0_4#7_0_7_0_7#4_0_" 
+	Processing timed out, could not match pattern 
+	1965164  tries in  60.001 s, or  32752.2 tries/s 
+
