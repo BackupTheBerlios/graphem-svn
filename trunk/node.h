@@ -31,7 +31,9 @@ public:
 		separator(s),
 		pressure(pressure)
 	{ }
-	static Node makeSeparator() { return Node(QPointF(), QTime(QTime::currentTime()), 0, true); }
+	static Node makeSeparator() {
+		return Node(QPointF(), QTime(QTime::currentTime()), 0, true);
+	}
 	bool isSeparator() const { return separator; }
 
 	QPointF pos;

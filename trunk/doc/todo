@@ -1,5 +1,4 @@
 0.1:
-return correct status code
 use hashed pattern
 config file?
 can i iterate to possible combinations (instead of recursion)?
@@ -8,7 +7,6 @@ can i iterate to possible combinations (instead of recursion)?
 0.2:
 make Auth a base class
 check if input is valid when using --pattern
-decrease timeout, check how much time is required
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
 current brute force algorithm is quite slow
 	maybe generate possible patterns directly from input,

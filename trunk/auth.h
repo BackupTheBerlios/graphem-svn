@@ -25,41 +25,38 @@
 #include <QList>
 #include <QString>
 
+#include "node.h"
 #include "stroke.h"
 
-class InputWidget;
 class QTime;
 
 class Auth : public QObject {
 	Q_OBJECT
 public:
-	Auth(InputWidget *i); 
+	Auth(QObject *parent);
+	void check();
+	void preprocess(const QList<Node> &path);
+	void printPattern();
 	void setAuthPattern(QString pattern);
 private:
-	void preprocess();
 	void combineStrokes(QList<Stroke> &s);
 	bool tryPattern(QList<Stroke> s, int i = 0);
 	bool matchesAuthPattern(const QList<Stroke> &s);
 	int convertToFCC(QLineF l);
 	QString strokesToString(QList<Stroke> l);
 
-	InputWidget *input;
 	QString auth_pattern;
 	QList<Stroke> strokes;
 	QList<int> indices;
 	int tries;
 	QTime *started;
 
-	const static int max_check_time = 60000; //in ms
+	const static int max_check_time = 6000; //in ms
 	//limits for short/long lines
 	const static int short_limit = 10;
 	const static int long_limit = 200;
 signals:
 	void failed();
 	void passed();
-public slots:
-	void check();
-	void printData();
-	void printPattern();
 };
 #endif

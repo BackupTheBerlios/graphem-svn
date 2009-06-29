@@ -17,6 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <iostream>
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QPainter>
@@ -89,7 +91,7 @@ void InputWidget::show()
 
 		grabKeyboard();
 		grabMouse();
-		activateWindow();//make sure we catch keyboard events
+		activateWindow(); //make sure we catch keyboard events
 		raise();
 	} else {
 		showMaximized();
@@ -134,7 +136,7 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 
 void InputWidget::tabletEvent(QTabletEvent *ev)
 {
-	if(mouse_down) {//mouse events shouldn't interfere with tablet events
+	if(mouse_down) { //mouse events shouldn't interfere with tablet events
 		ev->ignore();
 		return;
 	}
@@ -160,7 +162,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 	QPainter painter(this);
 	painter.setPen(Qt::white);
 	painter.fillRect(rect(), QBrush(Qt::black));
-	painter.drawText(width()/2-100, height()/2, msg);
+	painter.drawText(width()/2 - 100, height()/2, msg);
 	if(!show_input or path.isEmpty())
 		return; //nothing to paint
 
@@ -174,8 +176,25 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 			painter_path.moveTo(path.at(i).pos);
 		else
 			painter_path.lineTo(path.at(i).pos);
-		painter.drawEllipse(path.at(i).pos, 2,2);
+		painter.drawEllipse(path.at(i).pos, 2, 2);
 	}
 	painter.setPen(Qt::blue);
 	painter.drawPath(painter_path);
+}
+
+//print pressure and velocity over time
+void InputWidget::printData()
+{
+	if(path.empty())
+		return;
+	QTime start = path.at(0).time;
+	double length = 0;
+	for(int i = 0; i< path.count(); i++) {
+		if(i > 0)
+			length = QLineF(path.at(i-1).pos, path.at(i).pos).length();
+		double time = start.msecsTo(path.at(i).time);
+		std::cout << time << "\t";
+		std::cout << path.at(i).pressure << "\t";
+		std::cout << length/time << "\n";
+	}
 }

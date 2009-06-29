@@ -17,37 +17,27 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef STROKE_H
-#define STROKE_H
+#ifndef MAIN_H
+#define MAIN_H
 
-/*
-currently stores an improved version of Freeman chain codes:
-directions are converted to integers in 0..7
- ----x--->
- | 3 2 1
- y 4   0
- | 5 6 7
- V
+#include <QApplication>
 
-*/
+class InputWidget;
+class Auth;
 
-class Stroke {
+class Graphem : public QApplication {
+	Q_OBJECT
 public:
-	Stroke(unsigned short direction, int duration, double length, bool up = false) :
-		direction(direction),
-		duration(duration),
-		length(length),
-		//pressure(pressure),
-		up(up),
-		removed(false)
-	{ }
-	double weight() const { return length; }
-
-	short direction; // in [0,7]; start at 0 for a stroke in x-direction, continue counter-clockwise
-	int duration; //in msecs
-	double length; 
-	//double pressure; //how to do this right?
-	bool up; //no actual stroke, just moving the pen
-	bool removed;
+	Graphem(int argc, char* argv[]);
+	int getStatus() { return status; }
+public slots:
+	void failed();
+	void authenticate();
+private:
+	InputWidget* input;
+	Auth* auth;
+	int tries_left;
+	bool print_pattern;
+	int status;
 };
 #endif

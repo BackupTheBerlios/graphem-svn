@@ -38,45 +38,44 @@ QString Auth::strokesToString(QList<Stroke> l)
 	return result;
 }
 
-Auth::Auth(InputWidget *i) :
-	QObject(i),
-	input(i),
+Auth::Auth(QObject *parent):
+	QObject(parent),
 	auth_pattern(""),
 	started(0)
 { }
 
 void Auth::setAuthPattern(QString pattern) { auth_pattern = pattern; } 
 
-void Auth::preprocess()
+void Auth::preprocess(const QList<Node> &path)
 {
 	strokes.clear();
 	indices.clear();
 	int start = 0; //start node
 	bool pen_down = true;
 
-	for(int i = 0; i < input->path.count(); i++) {
-		QPointF a = input->path.at(start).pos;
-		if(pen_down and i > 0 and input->path.at(i).isSeparator()) { //pen up, end stroke here
-			QLineF l = QLineF(input->path.at(start).pos, input->path.at(i-1).pos);
+	for(int i = 0; i < path.count(); i++) {
+		QPointF a = path.at(start).pos;
+		if(pen_down and i > 0 and path.at(i).isSeparator()) { //pen up, end stroke here
+			QLineF l = QLineF(path.at(start).pos, path.at(i-1).pos);
 			strokes.append(Stroke(convertToFCC(l),
-				input->path.at(start).time.msecsTo(input->path.at(i-1).time),
+				path.at(start).time.msecsTo(path.at(i-1).time),
 				l.length()));
 
 			pen_down = false;
 			start = i-1;
 		} else if(!pen_down and i > 1) { //add virtual stroke
-			QLineF l = QLineF(input->path.at(start).pos, input->path.at(i).pos);
+			QLineF l = QLineF(path.at(start).pos, path.at(i).pos);
 			strokes.append(Stroke(convertToFCC(l),
-				input->path.at(start).time.msecsTo(input->path.at(i).time),
+				path.at(start).time.msecsTo(path.at(i).time),
 				l.length(), true));
 
 			pen_down = true;
 			start = i;
-		} else if(pen_down and !input->path.at(i).isSeparator()){
-			QLineF l = QLineF(input->path.at(start).pos, input->path.at(i).pos);
+		} else if(pen_down and !path.at(i).isSeparator()){
+			QLineF l = QLineF(path.at(start).pos, path.at(i).pos);
 			if(l.length() > short_limit) {
 				strokes.append(Stroke(convertToFCC(l),
-					input->path.at(start).time.msecsTo(input->path.at(i-1).time),
+					path.at(start).time.msecsTo(path.at(i-1).time),
 					l.length()));
 				start = i;
 			}
@@ -121,6 +120,7 @@ bool Auth::tryPattern(QList<Stroke> s, int i)
 	if(started->elapsed() > max_check_time)
 		return false;
 
+	//TODO: could be improved by only checking the vicinity of modified strokes (indices[i-1] +- 1)
 	combineStrokes(s);
 	
 	int index = indices.at(i);
@@ -151,7 +151,6 @@ bool Auth::tryPattern(QList<Stroke> s, int i)
 }
 
 //TODO replace this with a cryptographic hash + salt
-//TODO make inline, benchmark
 bool Auth::matchesAuthPattern(const QList<Stroke> &s)
 {
 #ifndef NO_DEBUG
@@ -161,12 +160,6 @@ bool Auth::matchesAuthPattern(const QList<Stroke> &s)
 	return auth_pattern == strokesToString(s);
 }
 
-/*----x--->
- | 3 2 1
- y 4   0
- | 5 6 7
- V
-*/
 int Auth::convertToFCC(QLineF l)
 {
 	qreal angle = l.angle();
@@ -184,7 +177,6 @@ void Auth::check()
 		emit passed();
 		return;
 	}
-	preprocess();
 
 	qDebug() << "number of strokes: " << strokes.count();
 
@@ -217,21 +209,8 @@ void Auth::check()
 	delete started;
 }
 
-void Auth::printData()
-{
-	if(input->path.empty())
-		return;
-	QTime start = input->path.at(0).time;
-	double length = 0;
-	for(int i = 0; i< input->path.count(); i++) {
-		if(i > 0)
-			length = QLineF(input->path.at(i-1).pos, input->path.at(i).pos).length();
-		std::cout << start.msecsTo(input->path.at(i).time) << "\t" << input->path.at(i).pressure << "\t" << length << "\n";
-	}
-}
 
 void Auth::printPattern()
 {
-	preprocess();
 	std::cout << qPrintable(strokesToString(strokes)) << "\n";
 }

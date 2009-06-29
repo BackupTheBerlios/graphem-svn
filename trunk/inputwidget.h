@@ -39,6 +39,11 @@ private:
 	bool touchpad_mode, lock_screen, show_input;
 public:
 	InputWidget(QWidget *parent = 0);
+	void enableLocking(bool b);
+	void enableTouchpadMode(bool b);
+	void reset();
+	void show();
+	void showInput(bool b);
 
 	QList<Node> path;
 protected:
@@ -51,11 +56,7 @@ signals:
 	void finished();
 public slots:
 	void checkFinished();
-	void enableTouchpadMode(bool b);
-	void enableLocking(bool b);
-	void reset();
-	void showInput(bool b);
+	void printData();
 	void showMessage(QString m = "Please enter your auth pattern.", int msecs = 0);
-	void show();
 };
 #endif
