@@ -25,12 +25,17 @@
 #include "inputwidget.h"
 #include "main.h"
 
+using namespace std;
+
+QString version = "Graphem 0.1";
+
 Graphem::Graphem(int argc, char* argv[]) :
 	QApplication(argc, argv),
 	input(new InputWidget()),
 	auth(new Auth(this)),
 	tries_left(0),
 	print_pattern(false),
+	verbose(false),
 	status(-1)
 {
 	connect(input, SIGNAL(finished()),
@@ -40,19 +45,11 @@ Graphem::Graphem(int argc, char* argv[]) :
 	connect(auth, SIGNAL(failed()),
 		this, SLOT(failed()));
 	connect(auth, SIGNAL(passed()),
-		this, SLOT(quit()));
+		this, SLOT(passed()));
 
 	for(int i = 1; i < argc; i++) {
 		if(argv[i] == QString("--help")) {
-			std::cout << "Usage: " << argv[0] << " [options]\n\n";
-			std::cout << "--help\t\t\t Show this text\n";
-			std::cout << "--lock\t\t\t Lock screen (Make sure your auth pattern works!)\n";
-			std::cout << "--pattern [pattern]\t Specify a recorded pattern to check against\n";
-			std::cout << "--print-data\t\t Prints velocity/pressure data to standard output\n";
-			std::cout << "--print-pattern\t\t Prints entered pattern as a string\n";
-			std::cout << "--show-input\t\t Shows input while drawing\n";
-			std::cout << "--touchpad\t\t Touchpad mode, no clicking necessary\n";
-			std::cout << "--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n";
+			printHelp();
 			status = 0;
 			return;
 		} else if(argv[i] == QString("--lock")) {
@@ -78,10 +75,23 @@ Graphem::Graphem(int argc, char* argv[]) :
 
 			tries_left = QString(argv[i+1]).toInt();
 			i++;
+		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
+			verbose = true;
+		} else if(argv[i] == QString("--version")) {
+			cout << qPrintable(version) << "\n";
+			cout << "Copyright (C) 2009 Christian Pulvermacher\n";
+			cout << "Using Qt " << qVersion() << ", compiled against Qt " << QT_VERSION_STR << "\n";
+			status = 0;
+			return;
+		} else {
+			cerr << "Unknown command line option '" << argv[i] << "'\n";
+			printHelp();
+			status = 1;
+			return;
 		}
 	}
 
-	input->setWindowTitle("graphem 0.1");
+	input->setWindowTitle(version);
 	input->show();
 
 	status = exec();
@@ -89,12 +99,21 @@ Graphem::Graphem(int argc, char* argv[]) :
 
 void Graphem::failed()
 {
+	if(verbose)
+		std::cout << "ERROR: Pattern not recognized.\n";
 	if(tries_left == 1) //this try was our last
 		qApp->exit(1);
 
 	if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
 		tries_left--;
 	input->reset();
+}
+
+void Graphem::passed()
+{
+	if(verbose)
+		std::cout << "OK: Correct pattern.\n";
+	quit();
 }
 
 void Graphem::authenticate()
@@ -105,6 +124,20 @@ void Graphem::authenticate()
 	auth->check();
 }
 
+void Graphem::printHelp()
+{
+	cout << "Usage: " << qPrintable(arguments().at(0)) << " [options]\n\n";
+	cout << "--help\t\t\t Show this text\n";
+	cout << "--lock\t\t\t Lock screen (Make sure your auth pattern works!)\n";
+	cout << "--pattern [pattern]\t Specify a recorded pattern to check against\n";
+	cout << "--print-data\t\t Prints velocity/pressure data to standard output\n";
+	cout << "--print-pattern\t\t Prints entered pattern as a string\n";
+	cout << "--show-input\t\t Shows input while drawing\n";
+	cout << "--touchpad\t\t Touchpad mode, no clicking necessary\n";
+	cout << "--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n";
+	cout << "-v, --verbose\t\t Print success/failure messages on stdout\n";
+	cout << "--version\t\t Print the version number and exit\n";
+}
 
 int main(int argc, char* argv[])
 {

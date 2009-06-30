@@ -1,7 +1,7 @@
 0.1:
 use hashed pattern
 config file?
-can i iterate to possible combinations (instead of recursion)?
+can i iterate through possible combinations (instead of recursion)?
 
 
 0.2:
@@ -10,7 +10,8 @@ check if input is valid when using --pattern
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
 current brute force algorithm is quite slow
 	maybe generate possible patterns directly from input,
-	assign probabilities to each pattern,
+	assign probabilities to each pattern
+	iterate through list?
 
 creating a new auth pattern:
 	estimate entropy of input

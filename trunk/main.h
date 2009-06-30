@@ -30,14 +30,16 @@ class Graphem : public QApplication {
 public:
 	Graphem(int argc, char* argv[]);
 	int getStatus() { return status; }
+	void printHelp();
 public slots:
-	void failed();
 	void authenticate();
+	void failed();
+	void passed();
 private:
 	InputWidget* input;
 	Auth* auth;
 	int tries_left;
-	bool print_pattern;
+	bool print_pattern, verbose;
 	int status;
 };
 #endif
