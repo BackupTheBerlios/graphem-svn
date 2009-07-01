@@ -134,6 +134,8 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 	//there are some move events with pressed buttons discarded here, as some mousePress events get lost
 }
 
+/* not used (yet)
+//TODO: note that all tabletEvents get lost when we have a parent widget :/
 void InputWidget::tabletEvent(QTabletEvent *ev)
 {
 	if(mouse_down) { //mouse events shouldn't interfere with tablet events
@@ -156,6 +158,7 @@ void InputWidget::tabletEvent(QTabletEvent *ev)
 		update();
 	}
 }
+*/
 
 void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 {

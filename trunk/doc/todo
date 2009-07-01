@@ -7,7 +7,6 @@ can i iterate through possible combinations (instead of recursion)?
 0.2:
 make Auth a base class
 check if input is valid when using --pattern
-don't show mouse cursor, maybe only record relative movements (except for tablets)?
 current brute force algorithm is quite slow
 	maybe generate possible patterns directly from input,
 	assign probabilities to each pattern
@@ -38,3 +37,4 @@ support real handwriting
 		element: cusp, straight line, loop; also store direction
 		still missing velocity, probably helpful
 use pattern to access encryption key, should be possible with QCA
+don't show mouse cursor, maybe only record relative movements (except for tablets)?

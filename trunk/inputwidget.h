@@ -50,7 +50,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *ev);
 	void mousePressEvent(QMouseEvent *ev);
 	void mouseReleaseEvent(QMouseEvent *ev);
-	void tabletEvent(QTabletEvent *ev);
+//	void tabletEvent(QTabletEvent *ev);
 	void paintEvent(QPaintEvent *ev);
 signals:
 	void finished();

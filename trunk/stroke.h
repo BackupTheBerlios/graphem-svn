@@ -37,7 +37,6 @@ public:
 		direction(direction),
 		duration(duration),
 		length(length),
-		//pressure(pressure),
 		up(up),
 		removed(false)
 	{ }
