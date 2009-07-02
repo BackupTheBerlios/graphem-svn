@@ -1,10 +1,8 @@
 0.1:
-old tryPattern doesn't combine strokes after last round
 use hashed pattern
 does that really make sense? Find out just what part of the total keyspace we have to try on average...
 if a pattern is supposed to be secure, we can only try a number of keys which is many orders of magnitude less
 config file?
-can i iterate through possible combinations (instead of recursion)?
 
 0.2:
 make Auth a base class

@@ -45,7 +45,7 @@ private:
 	double weight;
 
 	//weight factors
-	const static double w_angle = 70;
+	const static double w_angle = 10;
 	const static double w_length = 1;
 };
 #endif

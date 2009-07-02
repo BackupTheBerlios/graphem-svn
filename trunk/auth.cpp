@@ -24,16 +24,22 @@
 #include <QtDebug>
 
 #include "auth.h"
-#include "inputwidget.h"
 
-QString Auth::strokesToString(QList<Stroke> l)
+//converts strokes into a string, omits 'removed' and duplicate strokes
+QString Auth::strokesToString()
 {
 	QString result = "";
-	for(int i = 0; i < l.count(); i++) {
-		if(l.at(i).removed)
+	int lastdir = -1;
+	for(int i = 0; i < strokes.count(); i++) {
+		if(strokes.at(i).removed)
 			continue;
-		result += QString::number(l.at(i).direction);
-		result += (l.at(i).up ? '#': '_');
+		if(!strokes.at(i).up) {
+			if(strokes.at(i).direction == lastdir)	
+				continue;
+			lastdir = strokes.at(i).direction;
+		}
+		result += QString::number(strokes.at(i).direction);
+		result += (strokes.at(i).up ? '#': '_');
 	}
 	return result;
 }
@@ -49,7 +55,6 @@ void Auth::setAuthPattern(QString pattern) { auth_pattern = pattern; }
 void Auth::preprocess(const QList<Node> &path)
 {
 	strokes.clear();
-	indices.clear();
 	int start = 0; //start node
 	bool pen_down = true;
 
@@ -75,39 +80,35 @@ void Auth::preprocess(const QList<Node> &path)
 			}
 		}
 	}
-	combineStrokes(strokes);
-	//actually delete the marked strokes
-	for(int i = 0; i < strokes.count(); ) {
-		if(strokes.at(i).removed)
-			strokes.removeAt(i);
-		else
-			i++;
-	}
-}
 
-void Auth::combineStrokes(QList<Stroke> &s)
-{
+	//remove duplicate strokes
 	int lastdirection = -1; //invalid direction
-	for(int i = 0; i < s.count(); i++) {
-		if(s.at(i).removed)
-			continue; //skip removed strokes
-
-		if(s.at(i).up)
+	for(int i = 0; i < strokes.count(); i++) {
+		if(strokes.at(i).up)
 			lastdirection = -1;
-		else if(s.at(i).direction == lastdirection) {
-			s[i-1] += s.at(i);
-			s[i].removed = true;
+		else if(strokes.at(i).direction == lastdirection) {
+			strokes[i-1] += strokes.at(i);
+			strokes.removeAt(i);
 			i--;
 		} else
-			lastdirection = s.at(i).direction;
+			lastdirection = strokes.at(i).direction;
 	}
 }
 
 bool Auth::tryPattern()
 {
-	if(matchesAuthPattern(strokes))
-		return true;
-	
+	QList<int> indices;
+	//sort stroke indices by weight (ascending)
+	for(int i = 0; i < strokes.count(); i++) {
+		int lowest = -1;
+		for(int j = 0; j < strokes.count(); j++) {
+			if((lowest == -1 or strokes.at(j).getWeight() < strokes.at(lowest).getWeight())
+			and !indices.contains(j))
+				lowest = j;
+		}
+		indices.append(lowest);
+	}
+
 	int strokes_count = strokes.count();
 	int offset[strokes_count]; //stores current permutation
 	for(int i=0; i < strokes_count; i++)
@@ -116,7 +117,7 @@ bool Auth::tryPattern()
 	for(int n = 0; started->elapsed() < max_check_time; n++) {
 		int p = 1;
 		for(int i = 0; i < strokes_count; i++) {
-			if((n % p) != 0) // all changes for this n done
+			if((n % p) != 0 or n==0) // all changes for this n done
 				break;
 
 			offset[i] = (offset[i]+1)%4;
@@ -143,65 +144,21 @@ bool Auth::tryPattern()
 			}
 			p *= 4; // period increases by this amount as we move up the tree
 		}
-		combineStrokes(strokes);
 
-		if(matchesAuthPattern(strokes))
+		if(matchesAuthPattern())
 			return true;
 	}
 	return false;
 }
 
-
-/*
-//tries variations of s, changes occur at indices[i]
-bool Auth::tryPattern(QList<Stroke> s, int i)
-{
-	//TODO: maybe change direction by more than 1
-	if(i == indices.count()) //recursion went through all strokes
-		return matchesAuthPattern(s);
-
-	if(started->elapsed() > max_check_time)
-		return false;
-
-	//TODO: could be improved by only checking the vicinity of modified strokes (indices[i-1] +- 1)
-	combineStrokes(s);
-	
-	int index = indices.at(i);
-	//try unchanged
-	if(tryPattern(s, i+1))
-		return true;
-
-	//try removing stroke
-	if(!s.at(index).up) {
-		s[index].removed = true;
-		if(tryPattern(s, i+1))
-			return true;
-		s[index].removed = false;
-	} 
-
-	//try decreasing direction
-	if(s.at(index).direction == 0)
-		s[index].direction = 7;
-	else
-		s[index].direction--;
-	if(tryPattern(s, i+1))
-		return true;
-	
-	//try increasing direction
-	s[index].direction = (s.at(index).direction + 2) % 8;
-
-	return tryPattern(s, i+1);
-}
-*/
-
 //TODO replace this with a cryptographic hash + salt
-bool Auth::matchesAuthPattern(const QList<Stroke> &s)
+bool Auth::matchesAuthPattern()
 {
 #ifndef NO_DEBUG
 	tries++;
 #endif
 
-	return auth_pattern == strokesToString(s);
+	return auth_pattern == strokesToString();
 }
 
 void Auth::check()
@@ -217,25 +174,10 @@ void Auth::check()
 	started = new QTime();
 	started->start();
 
-	//sort stroke indices by weight (ascending)
-	for(int i = 0; i < strokes.count(); i++) {
-		int lowest = -1;
-		for(int j = 0; j < strokes.count(); j++) {
-			if((lowest == -1 or strokes.at(j).getWeight() < strokes.at(lowest).getWeight())
-			and !indices.contains(j))
-				lowest = j;
-		}
-		indices.append(lowest);
-	}
-
-	if(tryPattern()) {
+	if(tryPattern())
 		emit passed();
-	} else {
-		if(started->elapsed() > max_check_time) {
-			qDebug() << "Processing timed out, could not match pattern";
-		}
+	else
 		emit failed();
-	}
 
 	double time = double(started->elapsed())/1000;
 	qDebug() << tries << " tries in " << time << "s, or " << tries/time << "tries/s";
@@ -245,5 +187,5 @@ void Auth::check()
 
 void Auth::printPattern()
 {
-	std::cout << qPrintable(strokesToString(strokes)) << "\n";
+	std::cout << qPrintable(strokesToString()) << "\n";
 }

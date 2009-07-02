@@ -39,14 +39,12 @@ public:
 	void printPattern();
 	void setAuthPattern(QString pattern);
 private:
-	void combineStrokes(QList<Stroke> &s);
 	bool tryPattern();
-	bool matchesAuthPattern(const QList<Stroke> &s);
-	QString strokesToString(QList<Stroke> l);
+	bool matchesAuthPattern();
+	QString strokesToString();
 
 	QString auth_pattern;
 	QList<Stroke> strokes;
-	QList<int> indices;
 	int tries;
 	QTime *started;
 
