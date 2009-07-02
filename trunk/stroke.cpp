@@ -21,10 +21,10 @@
 
 #include "stroke.h"
 
-Stroke(QLineF l, bool up):
-	length(l.length()),
+Stroke::Stroke(QLineF l, bool up):
 	up(up),
-	removed(false)
+	removed(false),
+	length(l.length())
 {
 	double angle = l.angle();
 	if(angle < 0)

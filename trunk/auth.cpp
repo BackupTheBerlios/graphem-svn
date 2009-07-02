@@ -170,7 +170,7 @@ void Auth::check()
 	for(int i = 0; i < strokes.count(); i++) {
 		int lowest = -1;
 		for(int j = 0; j < strokes.count(); j++) {
-			if((lowest == -1 or strokes.at(j).weight() < strokes.at(lowest).weight())
+			if((lowest == -1 or strokes.at(j).getWeight() < strokes.at(lowest).getWeight())
 			and !indices.contains(j))
 				lowest = j;
 		}

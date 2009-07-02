@@ -1,12 +1,13 @@
 0.1:
 use hashed pattern
+does that really make sense? Find out just what part of the total keyspace we have to try on average...
+if a pattern is supposed to be secure, we can only try a number of keys which is many orders of magnitude less
 config file?
 can i iterate through possible combinations (instead of recursion)?
 
-
 0.2:
 make Auth a base class
-check if input is valid when using --pattern
+check if input is valid when using --pattern (length, base 16)
 current brute force algorithm is quite slow
 	maybe generate possible patterns directly from input,
 	assign probabilities to each pattern
@@ -17,14 +18,12 @@ creating a new auth pattern:
 	repeat input a few times, try to find common elements
 	maybe generate a random pattern instead of recording
 
-
 0.3:
 create documentation
 create real gui
 	create/record pattern
 	try pattern a few times
 	offer to save pattern
-
 
 ?:
 support real handwriting

@@ -34,7 +34,7 @@ directions are converted to integers in 0..7
 class Stroke {
 public:
 	Stroke(QLineF l, bool up = false);
-	double weight() const { return weight; }
+	double getWeight() const { return weight; }
 	Stroke operator+=(const Stroke &s);
 
 	short direction;
