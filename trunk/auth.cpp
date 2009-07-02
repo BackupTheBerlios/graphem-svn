@@ -57,26 +57,20 @@ void Auth::preprocess(const QList<Node> &path)
 		QPointF a = path.at(start).pos;
 		if(pen_down and i > 0 and path.at(i).isSeparator()) { //pen up, end stroke here
 			QLineF l = QLineF(path.at(start).pos, path.at(i-1).pos);
-			strokes.append(Stroke(convertToFCC(l),
-				path.at(start).time.msecsTo(path.at(i-1).time),
-				l.length()));
+			strokes.append(Stroke(l));
 
 			pen_down = false;
 			start = i-1;
 		} else if(!pen_down and i > 1) { //add virtual stroke
 			QLineF l = QLineF(path.at(start).pos, path.at(i).pos);
-			strokes.append(Stroke(convertToFCC(l),
-				path.at(start).time.msecsTo(path.at(i).time),
-				l.length(), true));
+			strokes.append(Stroke(l, true));
 
 			pen_down = true;
 			start = i;
 		} else if(pen_down and !path.at(i).isSeparator()){
 			QLineF l = QLineF(path.at(start).pos, path.at(i).pos);
 			if(l.length() > short_limit) {
-				strokes.append(Stroke(convertToFCC(l),
-					path.at(start).time.msecsTo(path.at(i-1).time),
-					l.length()));
+				strokes.append(Stroke(l));
 				start = i;
 			}
 		}
@@ -101,8 +95,7 @@ void Auth::combineStrokes(QList<Stroke> &s)
 		if(s.at(i).up)
 			lastdirection = -1;
 		else if(s.at(i).direction == lastdirection) {
-			s[i-1].duration += s.at(i).duration;
-			s[i-1].length += s.at(i).length;
+			s[i-1] += s.at(i);
 			s[i].removed = true;
 			i--;
 		} else
@@ -129,7 +122,7 @@ bool Auth::tryPattern(QList<Stroke> s, int i)
 		return true;
 
 	//try removing stroke
-	if(s.at(index).length < long_limit and !s.at(index).up) {
+	if(!s.at(index).up) {
 		s[index].removed = true;
 		if(tryPattern(s, i+1))
 			return true;
@@ -160,17 +153,6 @@ bool Auth::matchesAuthPattern(const QList<Stroke> &s)
 	return auth_pattern == strokesToString(s);
 }
 
-int Auth::convertToFCC(QLineF l)
-{
-	qreal angle = l.angle();
-	if(angle < 0)
-		angle = 360-angle;
-	int result = qRound(angle/360*8);
-	if(result > 7)
-		result = 7;
-	return result;
-}
-	
 void Auth::check()
 {
 	if(auth_pattern.isEmpty()) {

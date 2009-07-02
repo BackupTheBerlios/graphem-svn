@@ -33,20 +33,19 @@ directions are converted to integers in 0..7
 
 class Stroke {
 public:
-	Stroke(unsigned short direction, int duration, double length, bool up = false) :
-		direction(direction),
-		duration(duration),
-		length(length),
-		up(up),
-		removed(false)
-	{ }
-	double weight() const { return length; }
+	Stroke(QLineF l, bool up = false);
+	double weight() const { return weight; }
+	Stroke operator+=(const Stroke &s);
 
-	short direction; // in [0,7]; start at 0 for a stroke in x-direction, continue counter-clockwise
-	int duration; //in msecs
-	double length; 
-	//double pressure; //how to do this right?
+	short direction;
 	bool up; //no actual stroke, just moving the pen
 	bool removed;
+private:
+	double length; 
+	double weight;
+
+	//weight factors
+	const static double w_angle = 70;
+	const static double w_length = 1;
 };
 #endif

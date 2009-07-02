@@ -42,7 +42,6 @@ private:
 	void combineStrokes(QList<Stroke> &s);
 	bool tryPattern(QList<Stroke> s, int i = 0);
 	bool matchesAuthPattern(const QList<Stroke> &s);
-	int convertToFCC(QLineF l);
 	QString strokesToString(QList<Stroke> l);
 
 	QString auth_pattern;
@@ -52,9 +51,7 @@ private:
 	QTime *started;
 
 	const static int max_check_time = 6000; //in ms
-	//limits for short/long lines
-	const static int short_limit = 10;
-	const static int long_limit = 200;
+	const static int short_limit = 10; //length limit for short strokes
 signals:
 	void failed();
 	void passed();
