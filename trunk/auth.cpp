@@ -103,6 +103,56 @@ void Auth::combineStrokes(QList<Stroke> &s)
 	}
 }
 
+bool Auth::tryPattern()
+{
+	if(matchesAuthPattern(strokes))
+		return true;
+	
+	int strokes_count = strokes.count();
+	int offset[strokes_count]; //stores current permutation
+	for(int i=0; i < strokes_count; i++)
+		offset[i] = 0;
+
+	for(int n = 0; started->elapsed() < max_check_time; n++) {
+		int p = 1;
+		for(int i = 0; i < strokes_count; i++) {
+			if((n % p) != 0) // all changes for this n done
+				break;
+
+			offset[i] = (offset[i]+1)%4;
+
+			int index = indices.at(i);
+			switch(offset[i]) {
+			case 0: // unchanged
+				break;
+			case 1: // remove
+				if(!strokes.at(index).up)
+					strokes[index].removed = true;
+				break;
+			case 2: // direction-1
+				strokes[index].removed = false;
+				if(strokes.at(index).direction == 0)
+					strokes[index].direction = 7;
+				else
+					strokes[index].direction--;
+				break;
+			case 3: // direction+1
+				strokes[index].direction += 2;
+				strokes[index].direction %= 8;
+				break;
+			}
+			p *= 4; // period increases by this amount as we move up the tree
+		}
+		combineStrokes(strokes);
+
+		if(matchesAuthPattern(strokes))
+			return true;
+	}
+	return false;
+}
+
+
+/*
 //tries variations of s, changes occur at indices[i]
 bool Auth::tryPattern(QList<Stroke> s, int i)
 {
@@ -142,6 +192,7 @@ bool Auth::tryPattern(QList<Stroke> s, int i)
 
 	return tryPattern(s, i+1);
 }
+*/
 
 //TODO replace this with a cryptographic hash + salt
 bool Auth::matchesAuthPattern(const QList<Stroke> &s)
@@ -177,7 +228,7 @@ void Auth::check()
 		indices.append(lowest);
 	}
 
-	if(tryPattern(strokes)) {
+	if(tryPattern()) {
 		emit passed();
 	} else {
 		if(started->elapsed() > max_check_time) {

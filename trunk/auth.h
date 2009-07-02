@@ -40,7 +40,7 @@ public:
 	void setAuthPattern(QString pattern);
 private:
 	void combineStrokes(QList<Stroke> &s);
-	bool tryPattern(QList<Stroke> s, int i = 0);
+	bool tryPattern();
 	bool matchesAuthPattern(const QList<Stroke> &s);
 	QString strokesToString(QList<Stroke> l);
 
