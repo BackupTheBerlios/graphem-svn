@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <cmath>
 #include <iostream>
 
 #include <QLineF>
@@ -50,8 +51,7 @@ Auth::Auth(QObject *parent):
 	started(0)
 { }
 
-void Auth::setAuthPattern(QString pattern) { auth_pattern = pattern; } 
-
+//analyses path and stores the result in strokes
 void Auth::preprocess(const QList<Node> &path)
 {
 	strokes.clear();
@@ -97,8 +97,12 @@ void Auth::preprocess(const QList<Node> &path)
 
 bool Auth::tryPattern()
 {
-	QList<int> indices;
+	//test unchanged
+	if(matchesAuthPattern())
+		return true;
+
 	//sort stroke indices by weight (ascending)
+	QList<int> indices;
 	for(int i = 0; i < strokes.count(); i++) {
 		int lowest = -1;
 		for(int j = 0; j < strokes.count(); j++) {
@@ -110,14 +114,18 @@ bool Auth::tryPattern()
 	}
 
 	int strokes_count = strokes.count();
+	int permutations_count = pow(4, strokes_count);
 	int offset[strokes_count]; //stores current permutation
 	for(int i=0; i < strokes_count; i++)
 		offset[i] = 0;
 
-	for(int n = 0; started->elapsed() < max_check_time; n++) {
+	for(int n = 1; n != permutations_count; n++) {
+		if(started->elapsed() > max_check_time)
+			break;
+
 		int p = 1;
 		for(int i = 0; i < strokes_count; i++) {
-			if((n % p) != 0 or n==0) // all changes for this n done
+			if((n % p) != 0) // all changes for this n done
 				break;
 
 			offset[i] = (offset[i]+1)%4;

@@ -2,7 +2,6 @@
 use hashed pattern
 does that really make sense? Find out just what part of the total keyspace we have to try on average...
 if a pattern is supposed to be secure, we can only try a number of keys which is many orders of magnitude less
-config file?
 
 0.2:
 make Auth a base class
@@ -19,6 +18,7 @@ creating a new auth pattern:
 
 0.3:
 create documentation
+config file?
 create real gui
 	create/record pattern
 	try pattern a few times

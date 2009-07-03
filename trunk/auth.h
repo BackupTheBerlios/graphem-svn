@@ -37,7 +37,7 @@ public:
 	void check();
 	void preprocess(const QList<Node> &path);
 	void printPattern();
-	void setAuthPattern(QString pattern);
+	void setAuthPattern(QString pattern) { auth_pattern = pattern; }
 private:
 	bool tryPattern();
 	bool matchesAuthPattern();
