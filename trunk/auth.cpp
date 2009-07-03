@@ -17,6 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "auth.h"
+
 #include <cmath>
 #include <iostream>
 
@@ -25,7 +27,6 @@
 #include <QString>
 #include <QtDebug>
 
-#include "auth.h"
 
 Auth::Auth(QObject *parent):
 	QObject(parent),

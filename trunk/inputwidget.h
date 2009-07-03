@@ -20,13 +20,14 @@
 #ifndef INPUTWIDGET_H
 #define INPUTWIDGET_H
 
+#include "node.h"
+
 #include <QList>
 #include <QPointF>
 #include <QString>
 #include <QTime>
 #include <QWidget>
 
-#include "node.h"
 
 class QTimer;
 

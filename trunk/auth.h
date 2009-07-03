@@ -20,14 +20,14 @@
 #ifndef AUTH_H
 #define AUTH_H
 
+#include "node.h"
+#include "stroke.h"
+
 #include <QByteArray>
 #include <QLineF>
 #include <QList>
 #include <QObject>
 #include <QString>
-
-#include "node.h"
-#include "stroke.h"
 
 class QTime;
 

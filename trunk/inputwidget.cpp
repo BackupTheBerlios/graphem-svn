@@ -17,6 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "inputwidget.h"
+
 #include <iostream>
 
 #include <QApplication>
@@ -25,8 +27,6 @@
 #include <QTabletEvent>
 #include <QTime>
 #include <QTimer>
-
-#include "inputwidget.h"
 
 
 InputWidget::InputWidget(QWidget* parent) :

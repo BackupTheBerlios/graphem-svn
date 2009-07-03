@@ -1,4 +1,5 @@
 0.2:
+remove qt 4.4/4.5 functions? (QLineF::angle())
 make Auth a base class
 check if input is valid when using --pattern
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?

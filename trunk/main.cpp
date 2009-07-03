@@ -17,13 +17,14 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "auth.h"
+#include "inputwidget.h"
+#include "main.h"
+
 #include <iostream>
 
 #include <QString>
 
-#include "auth.h"
-#include "inputwidget.h"
-#include "main.h"
 
 using namespace std;
 
@@ -80,7 +81,8 @@ Graphem::Graphem(int argc, char* argv[]) :
 		} else if(argv[i] == QString("--version")) {
 			cout << qPrintable(version) << "\n";
 			cout << "Copyright (C) 2009 Christian Pulvermacher\n";
-			cout << "Using Qt " << qVersion() << ", compiled against Qt " << QT_VERSION_STR << "\n";
+			cout << "Using Qt " << qVersion();
+			cout << ", compiled against Qt " << QT_VERSION_STR << "\n";
 			status = 0;
 			return;
 		} else {

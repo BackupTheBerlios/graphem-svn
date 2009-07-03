@@ -20,6 +20,8 @@
 #ifndef STROKE_H
 #define STROKE_H
 
+#include <QLineF>
+
 /*
 currently stores an improved version of Freeman chain codes:
 directions are converted to integers in 0..7
