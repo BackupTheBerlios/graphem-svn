@@ -20,11 +20,11 @@
 #ifndef INPUTWIDGET_H
 #define INPUTWIDGET_H
 
-#include <QWidget>
 #include <QList>
 #include <QPointF>
 #include <QString>
 #include <QTime>
+#include <QWidget>
 
 #include "node.h"
 

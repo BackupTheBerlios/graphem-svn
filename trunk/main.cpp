@@ -63,7 +63,7 @@ Graphem::Graphem(int argc, char* argv[]) :
 		} else if(argv[i] == QString("--print-data")) {
 			connect(input, SIGNAL(finished()),
 				input, SLOT(printData()));
-		} else if(argv[i] == QString("--print")) {
+		} else if(argv[i] == QString("--print-pattern")) {
 			print_pattern = true;
 		} else if(argv[i] == QString("--show-input")) {
 			input->showInput(true);

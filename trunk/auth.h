@@ -20,9 +20,10 @@
 #ifndef AUTH_H
 #define AUTH_H
 
+#include <QByteArray>
 #include <QLineF>
-#include <QObject>
 #include <QList>
+#include <QObject>
 #include <QString>
 
 #include "node.h"
@@ -37,13 +38,13 @@ public:
 	void check();
 	void preprocess(const QList<Node> &path);
 	void printPattern();
-	void setAuthPattern(QString pattern) { auth_pattern = pattern; }
+	void setAuthPattern(const QString &pattern);
 private:
 	bool tryPattern();
 	bool matchesAuthPattern();
 	QString strokesToString();
 
-	QString auth_pattern;
+	QByteArray auth_pattern;
 	QList<Stroke> strokes;
 	int tries;
 	QTime *started;

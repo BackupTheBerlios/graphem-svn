@@ -20,11 +20,18 @@
 #include <cmath>
 #include <iostream>
 
+#include <QCryptographicHash>
 #include <QLineF>
 #include <QString>
 #include <QtDebug>
 
 #include "auth.h"
+
+Auth::Auth(QObject *parent):
+	QObject(parent),
+	auth_pattern(""),
+	started(0)
+{ }
 
 //converts strokes into a string, omits 'removed' and duplicate strokes
 QString Auth::strokesToString()
@@ -45,11 +52,12 @@ QString Auth::strokesToString()
 	return result;
 }
 
-Auth::Auth(QObject *parent):
-	QObject(parent),
-	auth_pattern(""),
-	started(0)
-{ }
+void Auth::setAuthPattern(const QString &pattern)
+{
+	auth_pattern = QCryptographicHash::hash(
+		pattern.toAscii(),
+		QCryptographicHash::Sha1);
+}
 
 //analyses path and stores the result in strokes
 void Auth::preprocess(const QList<Node> &path)
@@ -166,7 +174,9 @@ bool Auth::matchesAuthPattern()
 	tries++;
 #endif
 
-	return auth_pattern == strokesToString();
+	return auth_pattern == QCryptographicHash::hash(
+		strokesToString().toAscii(),
+		QCryptographicHash::Sha1);
 }
 
 void Auth::check()
