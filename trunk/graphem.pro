@@ -7,7 +7,7 @@ TARGET =
 DEPENDPATH +=
 INCLUDEPATH +=
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG_OUTPUT -D NO_DEBUG
-#CONFIG += debug
+CONFIG += debug
 
 # Input
 HEADERS += main.h inputwidget.h stroke.h auth.h node.h

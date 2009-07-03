@@ -179,7 +179,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 			painter_path.moveTo(path.at(i).pos);
 		else
 			painter_path.lineTo(path.at(i).pos);
-		painter.drawEllipse(path.at(i).pos, 2, 2);
+		painter.drawEllipse(path.at(i).pos.x()-1, path.at(i).pos.y()-1, 2, 2);
 	}
 	painter.setPen(Qt::blue);
 	painter.drawPath(painter_path);
