@@ -17,16 +17,22 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "stroke.h"
+
+#include <cmath>
+
 #include <QLineF>
 
-#include "stroke.h"
 
 Stroke::Stroke(QLineF l, bool up):
 	up(up),
 	removed(false),
 	length(l.length())
 {
-	double angle = l.angle();
+	//"inspired" by QLineF::angle() (Qt 4.4)
+	const qreal theta = atan2(-l.dy(), l.dx()) * 180.0 / 3.141;
+	double angle = theta < 0 ? theta + 360 : theta;
+
 	if(angle < 0)
 		angle = 360-angle;
 	direction = qRound(angle/360*8) % 8;
@@ -35,9 +41,11 @@ Stroke::Stroke(QLineF l, bool up):
 	weight += length * w_length;
 }
 
-//add another stroke, assumes direction = s.direction!
+//add another stroke
 Stroke Stroke::operator+=(const Stroke &s)
 {
+	Q_ASSERT(direction == s.direction);
+
 	length += s.length;
 	weight += s.weight;
 
