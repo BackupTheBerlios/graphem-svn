@@ -24,9 +24,12 @@
 #include <iostream>
 
 #include <QDesktopWidget>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QSettings>
 #include <QString>
-#include <QHBoxLayout>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #include <QWidget>
 
 using namespace std;
@@ -37,13 +40,13 @@ Graphem::Graphem(int argc, char* argv[]) :
 	QApplication(argc, argv),
 	input(new InputWidget()),
 	auth(new Auth(this)),
+	settings(new QSettings("Graphem", "Graphem")),
 	tries_left(0),
 	print_pattern(false),
 	verbose(false),
 	lock_screen(false),
 	status(-1)
 {
-	QSettings settings("Graphem", "Graphem");
 
 	connect(input, SIGNAL(finished()),
 		this, SLOT(authenticate()),
@@ -67,11 +70,13 @@ Graphem::Graphem(int argc, char* argv[]) :
 
 			auth->setAuthPattern(argv[i+1]);
 			i++;
+#ifndef NO_DEBUG
 		} else if(argv[i] == QString("--print-data")) {
 			connect(input, SIGNAL(finished()),
 				input, SLOT(printData()));
 		} else if(argv[i] == QString("--print-pattern")) {
 			print_pattern = true;
+#endif
 		} else if(argv[i] == QString("--show-input")) {
 			input->showInput(true);
 		} else if(argv[i] == QString("--touchpad")) {
@@ -122,13 +127,27 @@ int Graphem::exec()
 	} else { //show main window
 		QWidget *main = new QWidget();
 		main->setWindowTitle(version);
+		QHBoxLayout *l1 = new QHBoxLayout();
 
-		QHBoxLayout *layout = new QHBoxLayout();
-		QWidget *foo = new QWidget(main);
-		layout->addWidget(foo);
-		layout->addWidget(input);
+		QVBoxLayout *l2 = new QVBoxLayout();
+		info_text = new QTextEdit();
+		info_text->setReadOnly(true);
+		refreshInfo();
 
-		main->setLayout(layout);
+		QHBoxLayout *l3 = new QHBoxLayout();
+		QPushButton *quit_button = new QPushButton("&Quit");
+		connect(quit_button, SIGNAL(clicked()),
+			this, SLOT(quit()));
+		l3->addWidget(quit_button);
+		l3->addWidget(new QPushButton("[fixme]"));
+
+		l2->addWidget(info_text);
+		l2->addLayout(l3);
+
+		l1->addLayout(l2);
+		l1->addWidget(input);
+
+		main->setLayout(l1);
 		main->show();
 	}
 
@@ -172,11 +191,26 @@ void Graphem::printHelp()
 	cout << "--help\t\t\t Show this text\n";
 	cout << "--lock\t\t\t Lock screen (Make sure your auth pattern works!)\n";
 	cout << "--pattern [pattern]\t Specify a recorded pattern to check against\n";
+
+#ifndef NO_DEBUG
 	cout << "--print-data\t\t Prints velocity/pressure data to standard output\n";
 	cout << "--print-pattern\t\t Prints entered pattern as a string\n";
+#endif
+
 	cout << "--show-input\t\t Shows input while drawing\n";
 	cout << "--touchpad\t\t Touchpad mode, no clicking necessary\n";
 	cout << "--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n";
 	cout << "-v, --verbose\t\t Print success/failure messages on stdout\n";
 	cout << "--version\t\t Print the version number and exit\n";
+}
+
+
+//refreshes info text on left side
+void Graphem::refreshInfo()
+{
+	if(settings->value("pattern_hash").toString().isEmpty()) {
+		info_text->setText("No hash here");
+	} else {
+		info_text->setText("Found hash.");
+	}
 }

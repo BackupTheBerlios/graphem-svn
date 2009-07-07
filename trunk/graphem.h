@@ -24,6 +24,8 @@
 
 class Auth;
 class InputWidget;
+class QSettings;
+class QTextEdit;
 
 class Graphem : public QApplication {
 	Q_OBJECT
@@ -35,10 +37,14 @@ public slots:
 	void failed();
 	void passed();
 private:
+	void refreshInfo();
 	void printHelp();
 
 	InputWidget* input;
 	Auth* auth;
+	QSettings* settings;
+	QTextEdit* info_text;
+
 	int tries_left;
 	bool print_pattern, verbose, lock_screen;
 	int status;

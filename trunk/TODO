@@ -1,6 +1,8 @@
 0.2:
 create real gui
-which command line arguments remain?
+remove command line arguments:
+		--pattern
+		--touchpad (stored along with pattern)
 config file
 record pattern
 	display recognized strokes (startpos, length, direction)

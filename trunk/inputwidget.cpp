@@ -36,7 +36,7 @@ InputWidget::InputWidget(QWidget* parent) :
 	touchpad_mode(false),
 	show_input(false)
 {
-	setMinimumSize(400,300);
+	setMinimumSize(300,200);
 	timer->setInterval(200); //check every 0.2s
 	connect(timer, SIGNAL(timeout()),
 		this, SLOT(checkFinished()));
