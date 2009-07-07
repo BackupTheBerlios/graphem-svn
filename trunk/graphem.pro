@@ -10,5 +10,5 @@ QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT -D NO_DEBUG
 CONFIG += debug
 
 # Input
-HEADERS += main.h inputwidget.h stroke.h auth.h node.h graphem.h
+HEADERS += inputwidget.h stroke.h auth.h node.h graphem.h
 SOURCES += main.cpp inputwidget.cpp auth.cpp stroke.cpp graphem.cpp

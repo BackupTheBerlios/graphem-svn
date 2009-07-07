@@ -47,6 +47,8 @@ Graphem::Graphem(int argc, char* argv[]) :
 	lock_screen(false),
 	status(-1)
 {
+	usage_total = settings->value("usage_total").toInt();
+	usage_failed = settings->value("usage_failed").toInt();
 
 	connect(input, SIGNAL(finished()),
 		this, SLOT(authenticate()),
@@ -132,6 +134,7 @@ int Graphem::exec()
 		QVBoxLayout *l2 = new QVBoxLayout();
 		info_text = new QTextEdit();
 		info_text->setReadOnly(true);
+		info_text->setFixedWidth(200);
 		refreshInfo();
 
 		QHBoxLayout *l3 = new QHBoxLayout();
@@ -139,7 +142,7 @@ int Graphem::exec()
 		connect(quit_button, SIGNAL(clicked()),
 			this, SLOT(quit()));
 		l3->addWidget(quit_button);
-		l3->addWidget(new QPushButton("[fixme]"));
+		l3->addWidget(new QPushButton("&New Pattern"));
 
 		l2->addWidget(info_text);
 		l2->addLayout(l3);
@@ -159,6 +162,8 @@ void Graphem::failed()
 {
 	if(verbose)
 		std::cout << "ERROR: Pattern not recognized.\n";
+	usage_total++;
+	usage_failed++;
 	if(tries_left == 1) //this try was our last
 		qApp->exit(1);
 
@@ -172,6 +177,7 @@ void Graphem::passed()
 {
 	if(verbose)
 		std::cout << "OK: Correct pattern.\n";
+	usage_total++;
 	quit();
 }
 
@@ -209,8 +215,17 @@ void Graphem::printHelp()
 void Graphem::refreshInfo()
 {
 	if(settings->value("pattern_hash").toString().isEmpty()) {
-		info_text->setText("No hash here");
+		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.");
 	} else {
-		info_text->setText("Found hash.");
+		info_text->setText(QString("<h3>Statistics</h3> Total: ") + QString::number(usage_total) + "<br />Correct: " + QString::number(double(usage_total - usage_failed)/usage_total));
 	}
+}
+
+void Graphem::quit()
+{
+	settings->setValue("usage_total", usage_total);
+	settings->setValue("usage_failed", usage_failed);
+	settings->sync();
+
+	QApplication::quit();
 }

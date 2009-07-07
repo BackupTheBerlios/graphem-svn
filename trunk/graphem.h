@@ -36,6 +36,7 @@ public slots:
 	void authenticate();
 	void failed();
 	void passed();
+	void quit();
 private:
 	void refreshInfo();
 	void printHelp();
@@ -47,6 +48,7 @@ private:
 
 	int tries_left;
 	bool print_pattern, verbose, lock_screen;
+	int usage_total, usage_failed; //usage statistics for pattern
 	int status;
 };
 #endif

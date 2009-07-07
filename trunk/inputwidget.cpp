@@ -37,6 +37,7 @@ InputWidget::InputWidget(QWidget* parent) :
 	show_input(false)
 {
 	setMinimumSize(300,200);
+	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	timer->setInterval(200); //check every 0.2s
 	connect(timer, SIGNAL(timeout()),
 		this, SLOT(checkFinished()));
