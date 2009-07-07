@@ -17,29 +17,30 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef GRAPHEM_H
+#define GRAPHEM_H
 
 #include <QApplication>
 
-class InputWidget;
 class Auth;
+class InputWidget;
 
 class Graphem : public QApplication {
 	Q_OBJECT
 public:
 	Graphem(int argc, char* argv[]);
-	int getStatus() { return status; }
-	void printHelp();
+	int exec();
 public slots:
 	void authenticate();
 	void failed();
 	void passed();
 private:
+	void printHelp();
+
 	InputWidget* input;
 	Auth* auth;
 	int tries_left;
-	bool print_pattern, verbose;
+	bool print_pattern, verbose, lock_screen;
 	int status;
 };
 #endif

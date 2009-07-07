@@ -37,13 +37,11 @@ private:
 	bool pen_down, mouse_down;
 	QTimer *timer;
 	QString title, msg;
-	bool touchpad_mode, lock_screen, show_input;
+	bool touchpad_mode, show_input;
 public:
 	InputWidget(QWidget *parent = 0);
-	void enableLocking(bool b);
 	void enableTouchpadMode(bool b);
 	void reset();
-	void show();
 	void showInput(bool b);
 
 	QList<Node> path;

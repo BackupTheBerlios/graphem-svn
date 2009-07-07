@@ -21,10 +21,8 @@
 
 #include <iostream>
 
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QMouseEvent>
 #include <QPainter>
-#include <QTabletEvent>
 #include <QTime>
 #include <QTimer>
 
@@ -36,7 +34,6 @@ InputWidget::InputWidget(QWidget* parent) :
 	timer(new QTimer(this)),
 	msg(""),
 	touchpad_mode(false),
-	lock_screen(false),
 	show_input(false)
 {
 	setMinimumSize(400,300);
@@ -46,6 +43,7 @@ InputWidget::InputWidget(QWidget* parent) :
 	timer->start();
 	showMessage();
 }
+
 
 void InputWidget::checkFinished()
 {
@@ -60,13 +58,16 @@ void InputWidget::checkFinished()
 	}
 }
 
+
 void InputWidget::reset()
 {
 	path.clear();
 	showMessage("Pattern not recognized, please try again.", 1500);
 }
 
+
 void InputWidget::showInput(bool b) { show_input = b; }
+
 
 void InputWidget::showMessage(QString m, int msecs)
 {
@@ -77,26 +78,9 @@ void InputWidget::showMessage(QString m, int msecs)
 		QTimer::singleShot(msecs, this, SLOT(showMessage()));
 }
 
+
 void InputWidget::enableTouchpadMode(bool b) { setMouseTracking(touchpad_mode = b); }
 
-void InputWidget::enableLocking(bool b) { lock_screen = b; }
-
-void InputWidget::show()
-{
-	if(lock_screen) {
-		setWindowFlags(Qt::X11BypassWindowManagerHint);
-		setVisible(true);
-		QDesktopWidget dw;
-		setGeometry(dw.screenGeometry());
-
-		grabKeyboard();
-		grabMouse();
-		activateWindow(); //make sure we catch keyboard events
-		raise();
-	} else {
-		showMaximized();
-	}
-}
 
 void InputWidget::mousePressEvent(QMouseEvent* ev)
 {
@@ -107,6 +91,7 @@ void InputWidget::mousePressEvent(QMouseEvent* ev)
 
 	path.append(Node(ev->pos(), QTime::currentTime()));
 }
+
 
 void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 {
@@ -119,6 +104,7 @@ void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 	path.append(Node::makeSeparator());
 	update();
 }
+
 
 void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 {
@@ -134,31 +120,6 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 	//there are some move events with pressed buttons discarded here, as some mousePress events get lost
 }
 
-/* not used (yet)
-//TODO: note that all tabletEvents get lost when we have a parent widget :/
-void InputWidget::tabletEvent(QTabletEvent *ev)
-{
-	if(mouse_down) { //mouse events shouldn't interfere with tablet events
-		ev->ignore();
-		return;
-	}
-
-	ev->accept(); //prevent generation of mouse events - most of the time
-	if(ev->pressure()) {
-		if(!pen_down) {
-			pen_down = true;
-		}
-		path.append(Node(ev->hiResGlobalPos()-geometry().topLeft(), QTime::currentTime(), ev->pressure()));
-		update();
-	} else if(pen_down) {
-		pen_down = false;
-
-		path.append(Node(ev->hiResGlobalPos()-geometry().topLeft(), QTime::currentTime(), ev->pressure()));
-		path.append(Node::makeSeparator());
-		update();
-	}
-}
-*/
 
 void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 {
@@ -184,6 +145,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 	painter.setPen(Qt::blue);
 	painter.drawPath(painter_path);
 }
+
 
 //print pressure and velocity over time
 void InputWidget::printData()

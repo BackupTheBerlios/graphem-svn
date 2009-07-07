@@ -1,24 +1,19 @@
 0.2:
-remove qt 4.4/4.5 functions? (does that work now?)
-make Auth a base class
-check if input is valid when using --pattern
-can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
-
-creating a new auth pattern:
-	estimate entropy of input
-	repeat input a few times, try to find common elements
-	maybe generate a random pattern instead of recording
+create real gui
+which command line arguments remain?
+config file
+record pattern
 	display recognized strokes (startpos, length, direction)
 
 0.3:
+can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 create documentation
-config file?
-create real gui
-	create/record pattern
-	try pattern a few times
-	offer to save pattern
+generate random pattern
+estimate entropy of input
 
 ?:
+test wether manual inlining makes sense
+make Auth a base class
 support real handwriting
 	try different algorithms for Auth module:
 	fcc-codes (current implementation):

@@ -34,6 +34,7 @@ Auth::Auth(QObject *parent):
 	started(0)
 { }
 
+
 //converts strokes into a string, omits 'removed' and duplicate strokes
 QString Auth::strokesToString()
 {
@@ -53,12 +54,14 @@ QString Auth::strokesToString()
 	return result;
 }
 
+
 void Auth::setAuthPattern(const QString &pattern)
 {
 	auth_pattern = QCryptographicHash::hash(
 		pattern.toAscii(),
 		QCryptographicHash::Sha1);
 }
+
 
 //analyses path and stores the result in strokes
 void Auth::preprocess(const QList<Node> &path)
@@ -103,6 +106,7 @@ void Auth::preprocess(const QList<Node> &path)
 			lastdirection = strokes.at(i).direction;
 	}
 }
+
 
 bool Auth::tryPattern()
 {
@@ -168,6 +172,7 @@ bool Auth::tryPattern()
 	return false;
 }
 
+
 //TODO replace this with a cryptographic hash + salt
 bool Auth::matchesAuthPattern()
 {
@@ -179,6 +184,7 @@ bool Auth::matchesAuthPattern()
 		strokesToString().toAscii(),
 		QCryptographicHash::Sha1);
 }
+
 
 void Auth::check()
 {

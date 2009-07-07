@@ -39,6 +39,6 @@ public:
 	QPointF pos;
 	QTime time;
 	bool separator;
-	qreal pressure;
+	qreal pressure; //currently unused
 };
 #endif
