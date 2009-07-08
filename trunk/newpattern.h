@@ -17,40 +17,25 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef GRAPHEM_H
-#define GRAPHEM_H
+#ifndef NEWPATTERN_H
+#define NEWPATTERN_H
 
-#include <QApplication>
+#include <QWidget>
 
-class Auth;
 class InputWidget;
-class NewPattern;
-class QSettings;
-class QTextEdit;
+class QPushButton;
 
-class Graphem : public QApplication {
+class NewPattern : public QWidget {
 	Q_OBJECT
 public:
-	Graphem(int argc, char* argv[]);
-	int exec();
-public slots:
-	void authenticate();
-	void failed();
-	void passed();
-	void quit();
+	NewPattern(QWidget *parent);
+private slots:
+	
 private:
-	void refreshInfo();
-	void printHelp();
-
-	InputWidget* input;
-	Auth* auth;
-	QSettings* settings;
-	QTextEdit* info_text;
-	NewPattern *new_pattern_dialog;
-
-	int tries_left;
-	bool print_pattern, verbose, lock_screen;
-	int usage_total, usage_failed; //usage statistics for pattern
-	int status;
+	InputWidget *input;
+	QPushButton *delete_last;
+	QPushButton *clear_pattern;
+	QPushButton *save_pattern;
+	QPushButton *cancel;
 };
 #endif

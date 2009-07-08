@@ -20,6 +20,7 @@
 #include "auth.h"
 #include "inputwidget.h"
 #include "graphem.h"
+#include "newpattern.h"
 
 #include <iostream>
 
@@ -41,6 +42,7 @@ Graphem::Graphem(int argc, char* argv[]) :
 	input(new InputWidget()),
 	auth(new Auth(this)),
 	settings(new QSettings("Graphem", "Graphem")),
+	new_pattern_dialog(0),
 	tries_left(0),
 	print_pattern(false),
 	verbose(false),
@@ -142,7 +144,11 @@ int Graphem::exec()
 		connect(quit_button, SIGNAL(clicked()),
 			this, SLOT(quit()));
 		l3->addWidget(quit_button);
-		l3->addWidget(new QPushButton("&New Pattern"));
+		QPushButton *new_pattern_button = new QPushButton("&New Pattern");
+		l3->addWidget(new_pattern_button);
+		new_pattern_dialog = new NewPattern(0);
+		connect(new_pattern_button, SIGNAL(clicked()),
+			new_pattern_dialog, SLOT(show()));
 
 		l2->addWidget(info_text);
 		l2->addLayout(l3);
@@ -215,7 +221,9 @@ void Graphem::printHelp()
 void Graphem::refreshInfo()
 {
 	if(settings->value("pattern_hash").toString().isEmpty()) {
-		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.");
+		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>");
+		input->showMessage("");
+		input->setEnabled(false);
 	} else {
 		info_text->setText(QString("<h3>Statistics</h3> Total: ") + QString::number(usage_total) + "<br />Correct: " + QString::number(double(usage_total - usage_failed)/usage_total));
 	}

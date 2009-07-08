@@ -17,40 +17,35 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef GRAPHEM_H
-#define GRAPHEM_H
+#include "inputwidget.h"
+#include "newpattern.h"
 
-#include <QApplication>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-class Auth;
-class InputWidget;
-class NewPattern;
-class QSettings;
-class QTextEdit;
+NewPattern::NewPattern(QWidget *parent):
+	QWidget(parent)
+	//input(new InputWidget(this))
+{
+		setWindowModality(Qt::ApplicationModal);
+		setWindowTitle("New Pattern");
 
-class Graphem : public QApplication {
-	Q_OBJECT
-public:
-	Graphem(int argc, char* argv[]);
-	int exec();
-public slots:
-	void authenticate();
-	void failed();
-	void passed();
-	void quit();
-private:
-	void refreshInfo();
-	void printHelp();
+		cancel = new QPushButton("&Cancel");
+		connect(cancel, SIGNAL(clicked()),
+			this, SLOT(close()));
+		save_pattern = new QPushButton("&Save");
+		delete_last = new QPushButton("&Delete Last Stroke");
+		clear_pattern = new QPushButton("&Clear");
 
-	InputWidget* input;
-	Auth* auth;
-	QSettings* settings;
-	QTextEdit* info_text;
-	NewPattern *new_pattern_dialog;
+		QHBoxLayout *l2 = new QHBoxLayout();
+		l2->addWidget(delete_last);
+		l2->addWidget(clear_pattern);
+		l2->addWidget(save_pattern);
+		l2->addWidget(cancel);
 
-	int tries_left;
-	bool print_pattern, verbose, lock_screen;
-	int usage_total, usage_failed; //usage statistics for pattern
-	int status;
-};
-#endif
+		QVBoxLayout *l1 = new QVBoxLayout();
+		//l1->addWidget(input);
+		l1->addLayout(l2);
+		setLayout(l1);
+}

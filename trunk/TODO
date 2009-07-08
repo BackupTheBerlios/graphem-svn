@@ -1,9 +1,16 @@
 0.2:
-create real gui
+inputwidget:
+	disable input when pattern not set
+	add "record" mode
+	messages don't really fit right now
+how to switch between testing and edit?
+	just change everythig?
+	tabs?
+	provide list of patterns?
+
 remove command line arguments:
-		--pattern
+		--pattern (or keep for quick testing?)
 		--touchpad (stored along with pattern)
-config file
 record pattern
 	display recognized strokes (startpos, length, direction)
 

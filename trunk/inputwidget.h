@@ -23,9 +23,7 @@
 #include "node.h"
 
 #include <QList>
-#include <QPointF>
 #include <QString>
-#include <QTime>
 #include <QWidget>
 
 

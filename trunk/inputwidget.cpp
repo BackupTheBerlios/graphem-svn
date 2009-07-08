@@ -148,9 +148,10 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 }
 
 
-//print pressure and velocity over time
+//print pressure and velocity over time (only in debug mode)
 void InputWidget::printData()
 {
+#ifndef NO_DEBUG
 	if(path.empty())
 		return;
 	QTime start = path.at(0).time;
@@ -163,4 +164,5 @@ void InputWidget::printData()
 		std::cout << path.at(i).pressure << "\t";
 		std::cout << length/time << "\n";
 	}
+#endif
 }
