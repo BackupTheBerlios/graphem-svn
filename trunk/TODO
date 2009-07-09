@@ -1,5 +1,4 @@
 0.2:
-add salt!
 add touchpad mode option
 display number of strokes
 adding new patterns should work like this:
@@ -8,7 +7,6 @@ adding new patterns should work like this:
 	clicking Save does what? overwriting old pattern without testing doesn't seem wise.
 
 remove command line arguments:
-		--pattern (or keep for quick testing?)
 		--touchpad (stored along with pattern)
 logo
 
@@ -22,6 +20,7 @@ estimate entropy of input
 
 ?:
 test wether manual inlining makes sense
+test if hash comparison can be optimized (QByteArray vs. QString vs ?)
 make Auth a base class
 support real handwriting
 	try different algorithms for Auth module:

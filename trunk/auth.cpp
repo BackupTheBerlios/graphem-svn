@@ -18,11 +18,11 @@
 */
 
 #include "auth.h"
+#include "crypto.h"
 
 #include <cmath>
 #include <iostream>
 
-#include <QCryptographicHash>
 #include <QLineF>
 #include <QString>
 #include <QtDebug>
@@ -30,7 +30,6 @@
 
 Auth::Auth(QObject *parent):
 	QObject(parent),
-	auth_pattern(""),
 	started(0)
 { }
 
@@ -165,14 +164,13 @@ bool Auth::tryPattern()
 }
 
 
-//TODO replace this with a cryptographic hash + salt
 bool Auth::matchesAuthPattern()
 {
 #ifndef NO_DEBUG
 	tries++;
 #endif
 
-	return auth_pattern == QCryptographicHash::hash(strokesToString().toAscii(), QCryptographicHash::Sha1);
+	return auth_pattern == getHash(strokesToString());
 }
 
 

@@ -62,14 +62,6 @@ Graphem::Graphem(int argc, char* argv[]) :
 			return;
 		} else if(argv[i] == QString("--lock")) {
 				lock_screen = true;
-		/*TODO: remove entirely?
-		} else if(argv[i] == QString("--pattern")) {
-			if(i+1 >= argc)
-				break; //parameter not found
-
-			auth->setAuthPattern(argv[i+1]);
-			i++;
-			*/
 #ifndef NO_DEBUG
 		} else if(argv[i] == QString("--print-data")) {
 			connect(input, SIGNAL(dataReady()),
@@ -183,7 +175,10 @@ void Graphem::failed()
 
 	if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
 		tries_left--;
+
 	input->reset();
+	if(!lock_screen)
+			refreshInfo();
 }
 
 
@@ -193,7 +188,10 @@ void Graphem::passed()
 		std::cout << "OK: Correct pattern.\n";
 	usage_total++;
 	if(lock_screen)
-			quit();
+		quit();
+
+	input->reset();
+	refreshInfo();
 }
 
 
@@ -211,7 +209,6 @@ void Graphem::printHelp()
 	cout << "Usage: " << qPrintable(arguments().at(0)) << " [options]\n\n";
 	cout << "--help\t\t\t Show this text\n";
 	cout << "--lock\t\t\t Lock screen (Make sure your auth pattern works!)\n";
-	//cout << "--pattern [pattern]\t Specify a recorded pattern to check against\n";
 
 #ifndef NO_DEBUG
 	cout << "--print-data\t\t Prints velocity/pressure data to standard output\n";
@@ -229,12 +226,19 @@ void Graphem::printHelp()
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(settings->value("pattern_hash").toString().isEmpty()) {
+	if(settings->value("pattern_hash").toByteArray().isEmpty()) {
 		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>");
 		input->showMessage("");
 		input->setEnabled(false);
 	} else {
-		info_text->setText(QString("<h3>Statistics</h3> Total: ") + QString::number(usage_total) + "<br />Correct: " + QString::number(double(usage_total - usage_failed)/usage_total));
+		info_text->setText(tr("<h3>Statistics</h3>\
+			Total: %1 <br />\
+			Correct: %2 / Failed: %3 <br />\
+			Recognition Rate: %4")
+			.arg(usage_total)
+			.arg(usage_total-usage_failed)
+			.arg(usage_failed)
+			.arg(double(usage_total - usage_failed)/usage_total));
 		input->setEnabled(true);
 		input->showMessage();
 		auth->setAuthHash(settings->value("pattern_hash").toByteArray());

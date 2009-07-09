@@ -18,10 +18,10 @@
 */
 
 #include "auth.h"
+#include "crypto.h"
 #include "inputwidget.h"
 #include "newpattern.h"
 
-#include <QCryptographicHash>
 #include <QDialogButtonBox>
 #include <QLineF>
 #include <QPushButton>
@@ -86,7 +86,7 @@ void NewPattern::save()
 	auth.preprocess(input->path);
 
 	QSettings* settings = new QSettings();
-	settings->setValue("pattern_hash", QCryptographicHash::hash(auth.strokesToString().toAscii(), QCryptographicHash::Sha1));
+	settings->setValue("pattern_hash", getHash(auth.strokesToString()));
 	settings->sync();
 	delete settings;
 }
