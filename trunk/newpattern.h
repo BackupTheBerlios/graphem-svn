@@ -20,12 +20,12 @@
 #ifndef NEWPATTERN_H
 #define NEWPATTERN_H
 
-#include <QWidget>
+#include <QDialog>
 
 class Auth;
 class InputWidget;
 
-class NewPattern : public QWidget {
+class NewPattern : public QDialog {
 	Q_OBJECT
 public:
 	NewPattern(QWidget *parent);

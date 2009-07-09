@@ -29,7 +29,7 @@
 #include <QVBoxLayout>
 
 NewPattern::NewPattern(QWidget *parent):
-	QWidget(parent),
+	QDialog(parent),
 	input(new InputWidget(this, true)) //InputWidget in record mode
 {
 	setWindowModality(Qt::ApplicationModal);
@@ -39,10 +39,12 @@ NewPattern::NewPattern(QWidget *parent):
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton("&Cancel", QDialogButtonBox::RejectRole);
 	connect(button_box, SIGNAL(rejected()),
-		this, SLOT(close()));
+		this, SLOT(reject()));
 	button_box->addButton("&Save", QDialogButtonBox::AcceptRole);
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(save()));
+	connect(button_box, SIGNAL(accepted()),
+		this, SLOT(accept()));
 	QPushButton *delete_last = button_box->addButton("&Delete Last Stroke", QDialogButtonBox::ActionRole);
 	connect(delete_last, SIGNAL(clicked()),
 		input, SLOT(deleteLastStroke()));

@@ -40,7 +40,7 @@ public:
 	void check();
 	void preprocess(const QList<Node> &path);
 	void printPattern();
-	void setAuthPattern(const QString &pattern);
+	void setAuthHash(const QByteArray &hash) { auth_pattern = hash; }
 private:
 	bool tryPattern();
 	bool matchesAuthPattern();

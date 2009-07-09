@@ -55,15 +55,6 @@ Graphem::Graphem(int argc, char* argv[]) :
 	usage_total = settings->value("usage_total").toInt();
 	usage_failed = settings->value("usage_failed").toInt();
 
-	connect(input, SIGNAL(dataReady()),
-		this, SLOT(authenticate()),
-		Qt::QueuedConnection); //allow for repaint before checking
-
-	connect(auth, SIGNAL(failed()),
-		this, SLOT(failed()));
-	connect(auth, SIGNAL(passed()),
-		this, SLOT(passed()));
-
 	for(int i = 1; i < argc; i++) {
 		if(argv[i] == QString("--help")) {
 			printHelp();
@@ -71,12 +62,14 @@ Graphem::Graphem(int argc, char* argv[]) :
 			return;
 		} else if(argv[i] == QString("--lock")) {
 				lock_screen = true;
+		/*TODO: remove entirely?
 		} else if(argv[i] == QString("--pattern")) {
 			if(i+1 >= argc)
 				break; //parameter not found
 
 			auth->setAuthPattern(argv[i+1]);
 			i++;
+			*/
 #ifndef NO_DEBUG
 		} else if(argv[i] == QString("--print-data")) {
 			connect(input, SIGNAL(dataReady()),
@@ -111,6 +104,15 @@ Graphem::Graphem(int argc, char* argv[]) :
 			return;
 		}
 	}
+
+	connect(input, SIGNAL(dataReady()),
+		this, SLOT(authenticate()),
+		Qt::QueuedConnection); //allow for repaint before checking
+
+	connect(auth, SIGNAL(failed()),
+		this, SLOT(failed()));
+	connect(auth, SIGNAL(passed()),
+		this, SLOT(passed()));
 }
 
 
@@ -152,7 +154,7 @@ int Graphem::exec()
 		new_pattern_dialog = new NewPattern(0);
 		connect(new_pattern_button, SIGNAL(clicked()),
 			new_pattern_dialog, SLOT(show()));
-		connect(new_pattern_dialog, SIGNAL(closed()),
+		connect(new_pattern_dialog, SIGNAL(accepted()),
 			this, SLOT(refreshInfo()));
 
 		l2->addWidget(info_text);
@@ -177,7 +179,7 @@ void Graphem::failed()
 	usage_total++;
 	usage_failed++;
 	if(tries_left == 1) //this try was our last
-		qApp->exit(1);
+		exit(1);
 
 	if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
 		tries_left--;
@@ -190,7 +192,8 @@ void Graphem::passed()
 	if(verbose)
 		std::cout << "OK: Correct pattern.\n";
 	usage_total++;
-	quit();
+	if(lock_screen)
+			quit();
 }
 
 
@@ -208,7 +211,7 @@ void Graphem::printHelp()
 	cout << "Usage: " << qPrintable(arguments().at(0)) << " [options]\n\n";
 	cout << "--help\t\t\t Show this text\n";
 	cout << "--lock\t\t\t Lock screen (Make sure your auth pattern works!)\n";
-	cout << "--pattern [pattern]\t Specify a recorded pattern to check against\n";
+	//cout << "--pattern [pattern]\t Specify a recorded pattern to check against\n";
 
 #ifndef NO_DEBUG
 	cout << "--print-data\t\t Prints velocity/pressure data to standard output\n";
@@ -232,6 +235,9 @@ void Graphem::refreshInfo()
 		input->setEnabled(false);
 	} else {
 		info_text->setText(QString("<h3>Statistics</h3> Total: ") + QString::number(usage_total) + "<br />Correct: " + QString::number(double(usage_total - usage_failed)/usage_total));
+		input->setEnabled(true);
+		input->showMessage();
+		auth->setAuthHash(settings->value("pattern_hash").toByteArray());
 	}
 }
 

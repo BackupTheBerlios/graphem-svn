@@ -55,14 +55,6 @@ QString Auth::strokesToString()
 }
 
 
-void Auth::setAuthPattern(const QString &pattern)
-{
-	auth_pattern = QCryptographicHash::hash(
-		pattern.toAscii(),
-		QCryptographicHash::Sha1);
-}
-
-
 //analyses path and stores the result in strokes
 void Auth::preprocess(const QList<Node> &path)
 {
