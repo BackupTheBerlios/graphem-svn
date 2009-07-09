@@ -18,6 +18,7 @@
 */
 
 #include "auth.h"
+#include "crypto.h"
 #include "inputwidget.h"
 #include "graphem.h"
 #include "newpattern.h"
@@ -147,7 +148,7 @@ int Graphem::exec()
 		connect(new_pattern_button, SIGNAL(clicked()),
 			new_pattern_dialog, SLOT(show()));
 		connect(new_pattern_dialog, SIGNAL(accepted()),
-			this, SLOT(refreshInfo()));
+			this, SLOT(resetStats()));
 
 		l2->addWidget(info_text);
 		l2->addLayout(l3);
@@ -160,6 +161,7 @@ int Graphem::exec()
 		main->show();
 	}
 
+	generateSalt();
 	return QApplication::exec();
 }
 
@@ -226,7 +228,8 @@ void Graphem::printHelp()
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(settings->value("pattern_hash").toByteArray().isEmpty()) {
+	if(settings->value("pattern_hash").toByteArray().isEmpty()
+	or settings->value("salt").toByteArray().isEmpty()) {
 		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>");
 		input->showMessage("");
 		input->setEnabled(false);
@@ -241,9 +244,18 @@ void Graphem::refreshInfo()
 			.arg(double(usage_total - usage_failed)/usage_total));
 		input->setEnabled(true);
 		input->showMessage();
-		auth->setAuthHash(settings->value("pattern_hash").toByteArray());
+		auth->setAuthHash(settings->value("pattern_hash").toByteArray(), settings->value("salt").toByteArray());
 	}
 }
+
+
+void Graphem::resetStats()
+{
+	usage_total = 0;
+	usage_failed = 0;
+	refreshInfo();
+}
+
 
 void Graphem::quit()
 {

@@ -40,13 +40,13 @@ public:
 	void check();
 	void preprocess(const QList<Node> &path);
 	void printPattern();
-	void setAuthHash(const QByteArray &hash) { auth_pattern = hash; }
+	void setAuthHash(const QByteArray &hash, const QByteArray &s) { auth_pattern = hash; salt = s; }
 private:
 	bool tryPattern();
 	bool matchesAuthPattern();
 	QString strokesToString();
 
-	QByteArray auth_pattern;
+	QByteArray auth_pattern, salt;
 	QList<Stroke> strokes;
 	int tries;
 	QTime *started;

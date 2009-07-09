@@ -38,6 +38,7 @@ public slots:
 	void failed();
 	void passed();
 	void refreshInfo();
+	void resetStats();
 	void quit();
 private:
 	void printHelp();

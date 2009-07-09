@@ -86,7 +86,9 @@ void NewPattern::save()
 	auth.preprocess(input->path);
 
 	QSettings* settings = new QSettings();
-	settings->setValue("pattern_hash", getHash(auth.strokesToString()));
+	QByteArray salt = generateSalt();
+	settings->setValue("pattern_hash", getHash(auth.strokesToString(), salt));
+	settings->setValue("salt", salt);
 	settings->sync();
 	delete settings;
 }

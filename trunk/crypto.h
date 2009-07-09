@@ -23,8 +23,12 @@
 #include <QCryptographicHash>
 #include <QString>
 
-inline QByteArray getHash(const QString &s, const QByteArray &salt) {
+
+inline QByteArray getHash(const QString &s, const QByteArray &salt)
+{
 	return QCryptographicHash::hash(s.toAscii() + salt, QCryptographicHash::Sha1);
 }
+
+QByteArray generateSalt();
 
 #endif

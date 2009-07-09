@@ -11,4 +11,4 @@ CONFIG += debug
 
 # Input
 HEADERS += inputwidget.h stroke.h auth.h node.h graphem.h newpattern.h crypto.h
-SOURCES += main.cpp inputwidget.cpp auth.cpp stroke.cpp graphem.cpp newpattern.cpp
+SOURCES += main.cpp inputwidget.cpp auth.cpp stroke.cpp graphem.cpp newpattern.cpp crypto.cpp

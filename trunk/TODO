@@ -1,10 +1,6 @@
 0.2:
 add touchpad mode option
 display number of strokes
-adding new patterns should work like this:
-	click New Pattern, dialog appears
-	enter your pattern, delete strokes if you want
-	clicking Save does what? overwriting old pattern without testing doesn't seem wise.
 
 remove command line arguments:
 		--touchpad (stored along with pattern)
