@@ -36,12 +36,13 @@
 
 using namespace std;
 
-const QString version = "Graphem 0.1";
+const QString version = "Graphem 0.2";
 
 Graphem::Graphem(int argc, char* argv[]) :
 	QApplication(argc, argv),
 	input(new InputWidget()),
 	auth(new Auth(this)),
+	info_text(0),
 	new_pattern_dialog(0),
 	tries_left(0),
 	print_pattern(false),
@@ -96,6 +97,12 @@ Graphem::Graphem(int argc, char* argv[]) :
 			status = 1;
 			return;
 		}
+	}
+
+	//don't lock screen with no key set
+	if(lock_screen and !loadHash()) {
+			status = 1;
+			return;
 	}
 
 	connect(input, SIGNAL(dataReady()),
@@ -228,8 +235,10 @@ void Graphem::printHelp()
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(settings->value("pattern_hash").toByteArray().isEmpty()
-	or settings->value("salt").toByteArray().isEmpty()) {
+	if(lock_screen)
+			return;
+
+	if(!loadHash()) {
 		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>");
 		input->showMessage("");
 		input->setEnabled(false);
@@ -244,8 +253,19 @@ void Graphem::refreshInfo()
 			.arg(double(usage_total - usage_failed)/usage_total));
 		input->setEnabled(true);
 		input->showMessage();
-		auth->setAuthHash(settings->value("pattern_hash").toByteArray(), settings->value("salt").toByteArray());
 	}
+}
+
+
+//set up Auth module with hash from config file
+bool Graphem::loadHash()
+{
+	if(settings->value("pattern_hash").toByteArray().isEmpty()
+	or settings->value("salt").toByteArray().isEmpty())
+		return false;
+
+	auth->setAuthHash(settings->value("pattern_hash").toByteArray(), settings->value("salt").toByteArray());
+	return true;
 }
 
 

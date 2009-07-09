@@ -1,7 +1,7 @@
 0.2:
 add touchpad mode option
 display number of strokes
-
+delete NewPattern after saving
 remove command line arguments:
 		--touchpad (stored along with pattern)
 logo

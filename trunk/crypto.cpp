@@ -17,42 +17,21 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef GRAPHEM_H
-#define GRAPHEM_H
+#include "crypto.h"
 
-#include <QApplication>
+#include <cstdlib>
+#include <ctime>
 
-class Auth;
-class InputWidget;
-class NewPattern;
-class QSettings;
-class QTextEdit;
+//TODO: not in any way secure, but does add some complexity to brute forcing
+QByteArray generateSalt()
+{
+	const int salt_bytes_count = 5;
+	srand(time(0));
+	QByteArray salt;
 
-class Graphem : public QApplication {
-	Q_OBJECT
-public:
-	Graphem(int argc, char* argv[]);
-	int exec();
-public slots:
-	void authenticate();
-	void failed();
-	void passed();
-	void refreshInfo();
-	void resetStats();
-	void quit();
-private:
-	bool loadHash();
-	void printHelp();
-
-	InputWidget* input;
-	Auth* auth;
-	QSettings* settings;
-	QTextEdit* info_text;
-	NewPattern *new_pattern_dialog;
-
-	int tries_left;
-	bool print_pattern, verbose, lock_screen;
-	int usage_total, usage_failed; //usage statistics for pattern
-	int status;
-};
-#endif
+	for(int i=0; i < salt_bytes_count; i++) {
+			char c = int(double(rand())/RAND_MAX*255.0)-127;
+			salt.append(c);
+	}
+	return salt;
+}
