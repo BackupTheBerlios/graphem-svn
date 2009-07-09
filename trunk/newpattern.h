@@ -22,6 +22,7 @@
 
 #include <QWidget>
 
+class Auth;
 class InputWidget;
 
 class NewPattern : public QWidget {
@@ -29,7 +30,8 @@ class NewPattern : public QWidget {
 public:
 	NewPattern(QWidget *parent);
 private slots:
-	
+	void drawArrows();
+	void save();
 private:
 	InputWidget *input;
 };

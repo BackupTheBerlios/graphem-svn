@@ -35,15 +35,16 @@ directions are converted to integers in 0..7
 
 class Stroke {
 public:
-	Stroke(QLineF l, bool up = false);
+	Stroke(QLineF l, int start_node, bool up = false);
 	double getWeight() const { return weight; }
 	Stroke operator+=(const Stroke &s);
 
+	int start_node_id;
 	short direction;
 	bool up; //no actual stroke, just moving the pen
 	bool removed;
-private:
 	double length; 
+private:
 	double weight;
 
 	//weight factors

@@ -20,6 +20,7 @@
 #ifndef AUTH_H
 #define AUTH_H
 
+#include "newpattern.h"
 #include "node.h"
 #include "stroke.h"
 
@@ -33,6 +34,7 @@ class QTime;
 
 class Auth : public QObject {
 	Q_OBJECT
+	friend class NewPattern;
 public:
 	Auth(QObject *parent);
 	void check();

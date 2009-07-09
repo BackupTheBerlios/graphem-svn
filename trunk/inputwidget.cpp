@@ -19,6 +19,7 @@
 
 #include "inputwidget.h"
 
+#include <cmath>
 #include <iostream>
 
 #include <QMouseEvent>
@@ -27,22 +28,30 @@
 #include <QTimer>
 
 
-InputWidget::InputWidget(QWidget* parent) :
+InputWidget::InputWidget(QWidget* parent, bool record) :
 	QWidget(parent),
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
 	msg(""),
 	touchpad_mode(false),
-	show_input(false)
+	show_input(false),
+	record_pattern(record)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	timer->setInterval(200); //check every 0.2s
-	connect(timer, SIGNAL(timeout()),
-		this, SLOT(checkFinished()));
+	if(record_pattern) {
+		connect(timer, SIGNAL(timeout()),
+			this, SIGNAL(dataReady()));
+		//showInput(true);
+		reset();
+	} else {
+		connect(timer, SIGNAL(timeout()),
+			this, SLOT(checkFinished()));
+		showMessage();
+	}
 	timer->start();
-	showMessage();
 }
 
 
@@ -55,7 +64,7 @@ void InputWidget::checkFinished()
 	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
 		showMessage("Processing...");
 		repaint();
-		emit finished();
+		emit dataReady();
 	}
 }
 
@@ -63,11 +72,13 @@ void InputWidget::checkFinished()
 void InputWidget::reset()
 {
 	path.clear();
-	showMessage("Pattern not recognized, please try again.", 1500);
+	arrows.clear();
+	if(record_pattern)
+		showMessage("Draw your new pattern here.");
+	else
+		showMessage("Pattern not recognized, please try again.", 1500);
+	update();
 }
-
-
-void InputWidget::showInput(bool b) { show_input = b; }
 
 
 void InputWidget::showMessage(QString m, int msecs)
@@ -78,9 +89,6 @@ void InputWidget::showMessage(QString m, int msecs)
 	if(msecs)
 		QTimer::singleShot(msecs, this, SLOT(showMessage()));
 }
-
-
-void InputWidget::enableTouchpadMode(bool b) { setMouseTracking(touchpad_mode = b); }
 
 
 void InputWidget::mousePressEvent(QMouseEvent* ev)
@@ -128,23 +136,43 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 	painter.setPen(Qt::white);
 	painter.fillRect(rect(), QBrush(Qt::black));
 	painter.drawText(width()/2 - 100, height()/2, msg);
-	if(!show_input or path.isEmpty())
-		return; //nothing to paint
 
-	QPainterPath painter_path;
-	painter.setPen(Qt::red);
 
-	for(int i=0; i < path.count(); i++) {
-		if(path.at(i).separator)
-			continue;
-		if(i == 0 or path.at(i-1).separator)
-			painter_path.moveTo(path.at(i).pos);
-		else
-			painter_path.lineTo(path.at(i).pos);
-		painter.drawEllipse(path.at(i).pos.x()-1, path.at(i).pos.y()-1, 2, 2);
+	if(show_input and !path.isEmpty()) {
+		QPainterPath painter_path;
+		painter.setPen(Qt::red);
+
+		for(int i=0; i < path.count(); i++) {
+			if(path.at(i).separator)
+				continue;
+			if(i == 0 or path.at(i-1).separator)
+				painter_path.moveTo(path.at(i).pos);
+			else
+				painter_path.lineTo(path.at(i).pos);
+			painter.drawEllipse(path.at(i).pos.x()-1, path.at(i).pos.y()-1, 2, 2);
+		}
+		painter.setPen(Qt::blue);
+		painter.drawPath(painter_path);
 	}
-	painter.setPen(Qt::blue);
-	painter.drawPath(painter_path);
+
+	if(!record_pattern)
+		return;
+	for(int i=0; i < arrows.count(); i++) {
+		if(arrows.at(i).pen_up)
+			painter.setPen(Qt::red);
+		else
+			painter.setPen(Qt::green);
+
+		QPointF start = path.at(arrows.at(i).start_node_id).pos;
+		const double angle = arrows.at(i).direction / 4.0 * 3.14159;
+		QPointF end = start + arrows.at(i).weight*QPointF(cos(angle), -sin(angle));
+		const QLineF l(start, end);
+		painter.drawLine(l);
+		start = end + QPointF(-0.2*(l.dy()+l.dx()), 0.2*(l.dx()-l.dy()));
+		painter.drawLine(start, end);
+		start = end + QPointF(0.2*(l.dy()-l.dx()), -0.2*(l.dx()+l.dy()));
+		painter.drawLine(start, end);
+	}
 }
 
 
@@ -165,4 +193,18 @@ void InputWidget::printData()
 		std::cout << length/time << "\n";
 	}
 #endif
+}
+
+
+//used while recording, takes last arrow and removes all Nodes belonging to it
+void InputWidget::deleteLastStroke()
+{
+	if(arrows.isEmpty())
+		return;
+
+	Arrow a = arrows.takeLast();
+	while(a.start_node_id+1 < path.count())
+		path.removeAt(a.start_node_id+1);
+
+	update();
 }

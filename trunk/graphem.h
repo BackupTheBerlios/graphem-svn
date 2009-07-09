@@ -37,9 +37,9 @@ public slots:
 	void authenticate();
 	void failed();
 	void passed();
+	void refreshInfo();
 	void quit();
 private:
-	void refreshInfo();
 	void printHelp();
 
 	InputWidget* input;

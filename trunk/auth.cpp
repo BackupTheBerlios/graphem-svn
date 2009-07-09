@@ -73,21 +73,21 @@ void Auth::preprocess(const QList<Node> &path)
 	for(int i = 0; i < path.count(); i++) {
 		QPointF a = path.at(start).pos;
 		if(pen_down and i > 0 and path.at(i).isSeparator()) { //pen up, end stroke here
-			QLineF l = QLineF(path.at(start).pos, path.at(i-1).pos);
-			strokes.append(Stroke(l));
+			QLineF l = QLineF(a, path.at(i-1).pos);
+			strokes.append(Stroke(l, start));
 
 			pen_down = false;
 			start = i-1;
 		} else if(!pen_down and i > 1) { //add virtual stroke
-			QLineF l = QLineF(path.at(start).pos, path.at(i).pos);
-			strokes.append(Stroke(l, true));
+			QLineF l = QLineF(a, path.at(i).pos);
+			strokes.append(Stroke(l, start, true));
 
 			pen_down = true;
 			start = i;
 		} else if(pen_down and !path.at(i).isSeparator()){
-			QLineF l = QLineF(path.at(start).pos, path.at(i).pos);
+			QLineF l = QLineF(a, path.at(i).pos);
 			if(l.length() > short_limit) {
-				strokes.append(Stroke(l));
+				strokes.append(Stroke(l, start));
 				start = i;
 			}
 		}
@@ -180,9 +180,7 @@ bool Auth::matchesAuthPattern()
 	tries++;
 #endif
 
-	return auth_pattern == QCryptographicHash::hash(
-		strokesToString().toAscii(),
-		QCryptographicHash::Sha1);
+	return auth_pattern == QCryptographicHash::hash(strokesToString().toAscii(), QCryptographicHash::Sha1);
 }
 
 

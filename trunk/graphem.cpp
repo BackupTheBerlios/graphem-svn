@@ -41,7 +41,6 @@ Graphem::Graphem(int argc, char* argv[]) :
 	QApplication(argc, argv),
 	input(new InputWidget()),
 	auth(new Auth(this)),
-	settings(new QSettings("Graphem", "Graphem")),
 	new_pattern_dialog(0),
 	tries_left(0),
 	print_pattern(false),
@@ -49,10 +48,14 @@ Graphem::Graphem(int argc, char* argv[]) :
 	lock_screen(false),
 	status(-1)
 {
+	setOrganizationName("Graphem");
+	setApplicationName("Graphem");
+	settings = new QSettings();
+
 	usage_total = settings->value("usage_total").toInt();
 	usage_failed = settings->value("usage_failed").toInt();
 
-	connect(input, SIGNAL(finished()),
+	connect(input, SIGNAL(dataReady()),
 		this, SLOT(authenticate()),
 		Qt::QueuedConnection); //allow for repaint before checking
 
@@ -76,7 +79,7 @@ Graphem::Graphem(int argc, char* argv[]) :
 			i++;
 #ifndef NO_DEBUG
 		} else if(argv[i] == QString("--print-data")) {
-			connect(input, SIGNAL(finished()),
+			connect(input, SIGNAL(dataReady()),
 				input, SLOT(printData()));
 		} else if(argv[i] == QString("--print-pattern")) {
 			print_pattern = true;
@@ -149,6 +152,8 @@ int Graphem::exec()
 		new_pattern_dialog = new NewPattern(0);
 		connect(new_pattern_button, SIGNAL(clicked()),
 			new_pattern_dialog, SLOT(show()));
+		connect(new_pattern_dialog, SIGNAL(closed()),
+			this, SLOT(refreshInfo()));
 
 		l2->addWidget(info_text);
 		l2->addLayout(l3);

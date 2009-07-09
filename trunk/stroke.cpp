@@ -24,7 +24,8 @@
 #include <QLineF>
 
 
-Stroke::Stroke(QLineF l, bool up):
+Stroke::Stroke(QLineF l, int start_node, bool up):
+	start_node_id(start_node),
 	up(up),
 	removed(false),
 	length(l.length())

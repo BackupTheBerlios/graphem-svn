@@ -22,12 +22,20 @@
 
 #include "node.h"
 
+#include <QLineF>
 #include <QList>
 #include <QString>
 #include <QWidget>
 
 
 class QTimer;
+
+struct Arrow {
+	bool pen_up;
+	int start_node_id;
+	int direction;
+	int weight;
+};
 
 class InputWidget : public QWidget {
 	Q_OBJECT
@@ -36,13 +44,14 @@ private:
 	QTimer *timer;
 	QString title, msg;
 	bool touchpad_mode, show_input;
+	bool record_pattern;
 public:
-	InputWidget(QWidget *parent = 0);
-	void enableTouchpadMode(bool b);
-	void reset();
-	void showInput(bool b);
+	InputWidget(QWidget *parent = 0, bool record = false);
+	void enableTouchpadMode(bool on) { setMouseTracking(touchpad_mode = on); }
+	void showInput(bool on) { show_input = on; }
 
 	QList<Node> path;
+	QList<Arrow> arrows; //used when recording
 protected:
 	void mouseMoveEvent(QMouseEvent *ev);
 	void mousePressEvent(QMouseEvent *ev);
@@ -50,10 +59,12 @@ protected:
 //	void tabletEvent(QTabletEvent *ev);
 	void paintEvent(QPaintEvent *ev);
 signals:
-	void finished();
+	void dataReady();
 public slots:
 	void checkFinished();
+	void deleteLastStroke();
 	void printData();
+	void reset();
 	void showMessage(QString m = "Please enter your auth pattern.", int msecs = 0);
 };
 #endif
