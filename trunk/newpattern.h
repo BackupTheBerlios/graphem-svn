@@ -23,7 +23,6 @@
 #include <QWidget>
 
 class InputWidget;
-class QPushButton;
 
 class NewPattern : public QWidget {
 	Q_OBJECT
@@ -33,9 +32,5 @@ private slots:
 	
 private:
 	InputWidget *input;
-	QPushButton *delete_last;
-	QPushButton *clear_pattern;
-	QPushButton *save_pattern;
-	QPushButton *cancel;
 };
 #endif

@@ -1,20 +1,23 @@
 0.2:
+add salt!
 inputwidget:
-	disable input when pattern not set
 	add "record" mode
 	messages don't really fit right now
-how to switch between testing and edit?
-	just change everythig?
-	tabs?
-	provide list of patterns?
+make NewPattern use QDialogButtonBox
+adding new patterns should work like this:
+	click New Pattern, dialog appears
+	enter your pattern, delete strokes if you want
+	clicking Save does what? overwriting old pattern without testing doesn't seem wise.
 
 remove command line arguments:
 		--pattern (or keep for quick testing?)
 		--touchpad (stored along with pattern)
 record pattern
 	display recognized strokes (startpos, length, direction)
+logo
 
 0.3:
+l10n
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 create documentation
 generate random pattern

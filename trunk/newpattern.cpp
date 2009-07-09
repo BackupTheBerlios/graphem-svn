@@ -20,32 +20,31 @@
 #include "inputwidget.h"
 #include "newpattern.h"
 
-#include <QHBoxLayout>
+#include <QDialogButtonBox>
 #include <QPushButton>
 #include <QVBoxLayout>
 
 NewPattern::NewPattern(QWidget *parent):
-	QWidget(parent)
-	//input(new InputWidget(this))
+	QWidget(parent),
+	input(new InputWidget(this))
 {
-		setWindowModality(Qt::ApplicationModal);
-		setWindowTitle("New Pattern");
-
-		cancel = new QPushButton("&Cancel");
-		connect(cancel, SIGNAL(clicked()),
-			this, SLOT(close()));
-		save_pattern = new QPushButton("&Save");
-		delete_last = new QPushButton("&Delete Last Stroke");
-		clear_pattern = new QPushButton("&Clear");
-
-		QHBoxLayout *l2 = new QHBoxLayout();
-		l2->addWidget(delete_last);
-		l2->addWidget(clear_pattern);
-		l2->addWidget(save_pattern);
-		l2->addWidget(cancel);
-
-		QVBoxLayout *l1 = new QVBoxLayout();
-		//l1->addWidget(input);
-		l1->addLayout(l2);
-		setLayout(l1);
+	setWindowModality(Qt::ApplicationModal);
+	resize(600,400);
+	setWindowTitle("New Pattern");
+	
+	input->showInput(true);
+	input->showMessage("Draw your new pattern here.");
+	
+	QDialogButtonBox *button_box = new QDialogButtonBox(this);
+	button_box->addButton("&Cancel", QDialogButtonBox::RejectRole);
+	connect(button_box, SIGNAL(rejected()),
+		this, SLOT(close()));
+	button_box->addButton("&Save", QDialogButtonBox::AcceptRole);
+	button_box->addButton("&Delete Last Stroke", QDialogButtonBox::ActionRole);
+	button_box->addButton("&Reset", QDialogButtonBox::ResetRole);
+	
+	QVBoxLayout *l1 = new QVBoxLayout();
+	l1->addWidget(input);
+	l1->addWidget(button_box);
+	setLayout(l1);
 }

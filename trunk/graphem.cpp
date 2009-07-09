@@ -157,6 +157,7 @@ int Graphem::exec()
 		l1->addWidget(input);
 
 		main->setLayout(l1);
+		main->resize(600,400);
 		main->show();
 	}
 
