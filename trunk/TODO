@@ -1,6 +1,5 @@
 0.2:
-InputWidget flashes "please enter your pattern" while drawing.
-center cursor after fail?
+what direction does a stroke of length 0 have?
 
 0.3:
 maybe use QMainWindow?
@@ -29,6 +28,7 @@ support real handwriting
 		still missing velocity, probably helpful
 use pattern to access encryption key, should be possible with QCA
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
+or center cursor after fail? (again, not for tablets)
 
 does hashing really make sense? Find out just what part of the total keyspace we have to try on average...
 if a pattern is supposed to be secure, we can only try a number of keys which is many orders of magnitude less

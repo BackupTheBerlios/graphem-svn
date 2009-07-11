@@ -33,6 +33,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
+	msg_timer(new QTimer(this)),
 	msg(""),
 	default_msg("Please enter your auth pattern."),
 	touchpad_mode(false),
@@ -41,6 +42,10 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	msg_timer->setSingleShot(true);
+	connect(msg_timer, SIGNAL(timeout()),
+		this, SLOT(showMessage()));
+
 	timer->setInterval(70); //check every 70ms
 	if(record_pattern) {
 		connect(timer, SIGNAL(timeout()),
@@ -64,7 +69,6 @@ void InputWidget::checkFinished()
 	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
 		showMessage("Processing...");
 		repaint();
-		timer->stop();
 		emit dataReady();
 	}
 }
@@ -82,7 +86,6 @@ void InputWidget::reset()
 {
 	path.clear();
 	arrows.clear();
-	timer->start();
 	if(!record_pattern)
 		showMessage("Pattern not recognized, please try again.", 1500);
 	update();
@@ -91,6 +94,7 @@ void InputWidget::reset()
 
 void InputWidget::showMessage(QString m, int msecs)
 {
+	msg_timer->stop(); //cancel timer if a timed message is being shown
 	if(m.isNull())
 		m = default_msg;
 
@@ -98,7 +102,7 @@ void InputWidget::showMessage(QString m, int msecs)
 		update(); //repaints after returning to event loop
 	msg = m;
 	if(msecs)
-		QTimer::singleShot(msecs, this, SLOT(showMessage()));
+		msg_timer->start(msecs);
 }
 
 
@@ -174,15 +178,21 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		if(arrows.at(i).pen_up)
 			painter.setPen(Qt::red);
 		else
-			painter.setPen(Qt::green);
+			painter.setPen(Qt::white);
 
 		QPointF start = path.at(arrows.at(i).start_node_id).pos;
 		const double angle = arrows.at(i).direction / 4.0 * 3.14159;
-		QPointF end = start + arrows.at(i).weight*QPointF(cos(angle), -sin(angle));
+		const QPointF end = start + arrows.at(i).weight*QPointF(cos(angle), -sin(angle));
 		const QLineF l(start, end);
+		if(l.length() == 0)
+				continue;
+
 		painter.drawLine(l);
+
 		start = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
+		std::cout << "s.x " << start.x() << "; s.y " << start.y() << "\n";
 		painter.drawLine(start, end);
+
 		start = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
 		painter.drawLine(start, end);
 	}

@@ -63,7 +63,7 @@ protected:
 	void paintEvent(QPaintEvent *ev);
 private:
 	bool pen_down, mouse_down;
-	QTimer *timer;
+	QTimer *timer, *msg_timer;
 	QString msg, default_msg;
 	bool touchpad_mode, show_input;
 	bool record_pattern;
