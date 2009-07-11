@@ -40,7 +40,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-	timer->setInterval(200); //check every 0.2s
+	timer->setInterval(100); //check every 100ms
 	if(record_pattern) {
 		connect(timer, SIGNAL(timeout()),
 			this, SIGNAL(dataReady()));
@@ -143,8 +143,10 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 	QPainter painter(this);
 	painter.setPen(Qt::white);
 	painter.fillRect(rect(), QBrush(Qt::black));
-	painter.drawText(width()/2 - 100, height()/2, msg);
 
+	painter.drawText(width()/2 - 100, height()/2, msg);
+	if(touchpad_mode and !record_pattern)
+		painter.drawText(11, 19, "[Touchpad Mode]");
 
 	if(show_input and !path.isEmpty()) {
 		QPainterPath painter_path;
@@ -176,9 +178,9 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		QPointF end = start + arrows.at(i).weight*QPointF(cos(angle), -sin(angle));
 		const QLineF l(start, end);
 		painter.drawLine(l);
-		start = end + QPointF(-0.2*(l.dy()+l.dx()), 0.2*(l.dx()-l.dy()));
+		start = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
 		painter.drawLine(start, end);
-		start = end + QPointF(0.2*(l.dy()-l.dx()), -0.2*(l.dx()+l.dy()));
+		start = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
 		painter.drawLine(start, end);
 	}
 }

@@ -1,13 +1,13 @@
 0.2:
-display number of strokes, touchpad_mode state
-logo
+recording pattern is a bit jumpy.. maybe some nodes at (0, 0)?
 change default message for testing
 InputWidget displays "failed" message for a short time after correct key is entered
-try ~100ms timeout for checkFinished() timer...
 center cursor after fail?
 
 0.3:
+maybe use QMainWindow?
 l10n
+logo
 how to remove margins around InputWidget?
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 make preprocess() suck less, use velocity to determiny averaging
@@ -34,4 +34,3 @@ don't show mouse cursor, maybe only record relative movements (except for tablet
 
 does hashing really make sense? Find out just what part of the total keyspace we have to try on average...
 if a pattern is supposed to be secure, we can only try a number of keys which is many orders of magnitude less
-

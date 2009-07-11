@@ -60,24 +60,26 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	setLayout(l1);
 
 	connect(input, SIGNAL(dataReady()),
-		this, SLOT(drawArrows()));
+		this, SLOT(updateDisplay()));
 }
 
 
-void NewPattern::drawArrows()
+void NewPattern::updateDisplay()
 {
 	input->arrows.clear();
 	Auth auth(this);
 	auth.preprocess(input->path);
 
 	for(int i = 0; i < auth.strokes.count(); i++) {
-			Arrow a;
-			a.start_node_id = auth.strokes.at(i).start_node_id;
-			a.pen_up = auth.strokes.at(i).up;
-			a.direction = auth.strokes.at(i).direction;
-			a.weight = auth.strokes.at(i).length;
-			input->arrows.append(a);
+		Arrow a;
+		a.start_node_id = auth.strokes.at(i).start_node_id;
+		a.pen_up = auth.strokes.at(i).up;
+		a.direction = auth.strokes.at(i).direction;
+		a.weight = auth.strokes.at(i).length;
+		input->arrows.append(a);
 	}
+
+	setWindowTitle(tr("New Pattern (%1 Stroke(s))").arg(auth.strokes.count()));
 }
 
 
