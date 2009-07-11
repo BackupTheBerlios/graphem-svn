@@ -24,15 +24,14 @@
 #include <QTime>
 
 struct Node {
-public:
-	Node(QPointF pos, QTime time, qreal pressure = 1, bool s = false) :
+	Node(QPointF pos, qreal pressure = 1, bool s = false) :
 		pos(pos),
-		time(time),
+		time(QTime::currentTime()),
 		separator(s),
 		pressure(pressure)
 	{ }
-	static Node makeSeparator() {
-		return Node(QPointF(), QTime(QTime::currentTime()), 0, true);
+	static Node makeSeparator(QPointF pos) {
+		return Node(pos, 0, true);
 	}
 	bool isSeparator() const { return separator; }
 

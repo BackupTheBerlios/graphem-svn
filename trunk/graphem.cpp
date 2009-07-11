@@ -134,8 +134,8 @@ int Graphem::exec()
 	} else { //show main window
 		QWidget *main = new QWidget();
 		main->setWindowTitle(version);
-		QHBoxLayout *l1 = new QHBoxLayout();
 
+		QHBoxLayout *l1 = new QHBoxLayout();
 		QVBoxLayout *l2 = new QVBoxLayout();
 		info_text = new QTextEdit();
 		info_text->setReadOnly(true);
@@ -191,8 +191,10 @@ void Graphem::passed()
 	if(verbose)
 		std::cout << "OK: Correct pattern.\n";
 	usage_total++;
-	if(lock_screen)
+	if(lock_screen) {
 		quit();
+		return;
+	}
 
 	input->reset();
 	refreshInfo();
@@ -246,6 +248,7 @@ void Graphem::refreshInfo()
 			.arg(usage_failed)
 			.arg(double(usage_total - usage_failed)/usage_total));
 		input->setEnabled(true);
+		input->setDefaultMessage("You can test your pattern here.");
 		input->showMessage();
 	}
 }

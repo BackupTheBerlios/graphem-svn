@@ -1,7 +1,6 @@
 0.2:
-recording pattern is a bit jumpy.. maybe some nodes at (0, 0)?
-change default message for testing
-InputWidget displays "failed" message for a short time after correct key is entered
+InputWidget flashes "please enter your pattern" while drawing.
+show recognition rate as percent
 center cursor after fail?
 
 0.3:

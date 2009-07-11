@@ -39,25 +39,14 @@ struct Arrow {
 
 class InputWidget : public QWidget {
 	Q_OBJECT
-private:
-	bool pen_down, mouse_down;
-	QTimer *timer;
-	QString title, msg;
-	bool touchpad_mode, show_input;
-	bool record_pattern;
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
 	void enableTouchpadMode(bool on);
+	void setDefaultMessage(QString m) { default_msg = m; }
 	void showInput(bool on) { show_input = on; }
 
 	QList<Node> path;
 	QList<Arrow> arrows; //used when recording
-protected:
-	void mouseMoveEvent(QMouseEvent *ev);
-	void mousePressEvent(QMouseEvent *ev);
-	void mouseReleaseEvent(QMouseEvent *ev);
-//	void tabletEvent(QTabletEvent *ev);
-	void paintEvent(QPaintEvent *ev);
 signals:
 	void dataReady();
 public slots:
@@ -65,6 +54,18 @@ public slots:
 	void deleteLastStroke();
 	void printData();
 	void reset();
-	void showMessage(QString m = "Please enter your auth pattern.", int msecs = 0);
+	void showMessage(QString m = QString(), int msecs = 0);
+protected:
+	void mouseMoveEvent(QMouseEvent *ev);
+	void mousePressEvent(QMouseEvent *ev);
+	void mouseReleaseEvent(QMouseEvent *ev);
+//	void tabletEvent(QTabletEvent *ev);
+	void paintEvent(QPaintEvent *ev);
+private:
+	bool pen_down, mouse_down;
+	QTimer *timer;
+	QString msg, default_msg;
+	bool touchpad_mode, show_input;
+	bool record_pattern;
 };
 #endif

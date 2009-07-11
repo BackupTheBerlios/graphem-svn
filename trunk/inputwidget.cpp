@@ -34,23 +34,23 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	mouse_down(false),
 	timer(new QTimer(this)),
 	msg(""),
+	default_msg("Please enter your auth pattern."),
 	touchpad_mode(false),
 	show_input(false),
 	record_pattern(record)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-	timer->setInterval(100); //check every 100ms
+	timer->setInterval(70); //check every 70ms
 	if(record_pattern) {
 		connect(timer, SIGNAL(timeout()),
 			this, SIGNAL(dataReady()));
-		//showInput(true);
 		reset();
 	} else {
 		connect(timer, SIGNAL(timeout()),
 			this, SLOT(checkFinished()));
-		showMessage();
 	}
+	showMessage();
 	timer->start();
 }
 
@@ -64,6 +64,7 @@ void InputWidget::checkFinished()
 	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
 		showMessage("Processing...");
 		repaint();
+		timer->stop();
 		emit dataReady();
 	}
 }
@@ -71,9 +72,9 @@ void InputWidget::checkFinished()
 
 void InputWidget::enableTouchpadMode(bool on)
 {
-		touchpad_mode = on;
-		if(!record_pattern)
-				setMouseTracking(touchpad_mode);
+	touchpad_mode = on;
+	if(!record_pattern)
+		setMouseTracking(touchpad_mode);
 }
 
 
@@ -81,9 +82,8 @@ void InputWidget::reset()
 {
 	path.clear();
 	arrows.clear();
-	if(record_pattern)
-		showMessage("Draw your new pattern here.");
-	else
+	timer->start();
+	if(!record_pattern)
 		showMessage("Pattern not recognized, please try again.", 1500);
 	update();
 }
@@ -91,6 +91,9 @@ void InputWidget::reset()
 
 void InputWidget::showMessage(QString m, int msecs)
 {
+	if(m.isNull())
+		m = default_msg;
+
 	if(msg != m)
 		update(); //repaints after returning to event loop
 	msg = m;
@@ -106,7 +109,7 @@ void InputWidget::mousePressEvent(QMouseEvent* ev)
 
 	mouse_down = true;
 
-	path.append(Node(ev->pos(), QTime::currentTime()));
+	path.append(Node(ev->pos()));
 }
 
 
@@ -117,8 +120,8 @@ void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 
 	mouse_down = false;
 
-	path.append(Node(ev->pos(), QTime::currentTime()));
-	path.append(Node::makeSeparator());
+	path.append(Node(ev->pos()));
+	path.append(Node::makeSeparator(ev->pos()));
 	update();
 }
 
@@ -131,7 +134,7 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 	}
 
 	if(mouse_down or touchpad_mode) {
-		path.append(Node(ev->pos(), QTime::currentTime()));
+		path.append(Node(ev->pos()));
 		update();
 	}
 	//there are some move events with pressed buttons discarded here, as some mousePress events get lost

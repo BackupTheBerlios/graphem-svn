@@ -37,6 +37,8 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	setWindowTitle("New Pattern");
 
 	input->enableTouchpadMode(touchpad_mode);
+	input->setDefaultMessage("");
+	input->showMessage("Enter your new pattern here.", 3000);
 	
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton("&Cancel", QDialogButtonBox::RejectRole);
