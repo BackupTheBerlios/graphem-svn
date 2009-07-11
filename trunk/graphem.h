@@ -24,7 +24,6 @@
 
 class Auth;
 class InputWidget;
-class NewPattern;
 class QSettings;
 class QTextEdit;
 
@@ -38,17 +37,17 @@ public slots:
 	void failed();
 	void passed();
 	void refreshInfo();
-	void resetStats();
+	void showNewPatternDialog();
 	void quit();
 private:
 	bool loadHash();
 	void printHelp();
+	void resetStats();
 
 	InputWidget* input;
 	Auth* auth;
 	QSettings* settings;
 	QTextEdit* info_text;
-	NewPattern *new_pattern_dialog;
 
 	int tries_left;
 	bool print_pattern, verbose, lock_screen;

@@ -28,13 +28,15 @@
 #include <QSettings>
 #include <QVBoxLayout>
 
-NewPattern::NewPattern(QWidget *parent):
+NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	QDialog(parent),
-	input(new InputWidget(this, true)) //InputWidget in record mode
+	input(new InputWidget(this, true)), //InputWidget in record mode
+	touchpad_mode(touchpad_mode)
 {
-	setWindowModality(Qt::ApplicationModal);
 	resize(600,400);
 	setWindowTitle("New Pattern");
+
+	input->enableTouchpadMode(touchpad_mode);
 	
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton("&Cancel", QDialogButtonBox::RejectRole);
@@ -88,6 +90,7 @@ void NewPattern::save()
 	QSettings* settings = new QSettings();
 	QByteArray salt = generateSalt();
 	settings->setValue("pattern_hash", getHash(auth.strokesToString(), salt));
+	settings->setValue("touchpad_mode", touchpad_mode);
 	settings->setValue("salt", salt);
 	settings->sync();
 	delete settings;

@@ -28,11 +28,12 @@ class InputWidget;
 class NewPattern : public QDialog {
 	Q_OBJECT
 public:
-	NewPattern(QWidget *parent);
+	NewPattern(QWidget *parent, bool touchpad_mode);
 private slots:
 	void drawArrows();
 	void save();
 private:
 	InputWidget *input;
+	bool touchpad_mode;
 };
 #endif

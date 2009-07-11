@@ -1,16 +1,18 @@
 0.2:
-add touchpad mode option
-display number of strokes
-delete NewPattern after saving
-remove command line arguments:
-		--touchpad (stored along with pattern)
+display number of strokes, touchpad_mode state
 logo
+change default message for testing
+InputWidget displays "failed" message for a short time after correct key is entered
+try ~100ms timeout for checkFinished() timer...
+center cursor after fail?
 
 0.3:
 l10n
+how to remove margins around InputWidget?
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 make preprocess() suck less, use velocity to determiny averaging
 create documentation
+include secure RNG
 generate random pattern
 estimate entropy of input
 

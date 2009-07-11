@@ -69,6 +69,14 @@ void InputWidget::checkFinished()
 }
 
 
+void InputWidget::enableTouchpadMode(bool on)
+{
+		touchpad_mode = on;
+		if(!record_pattern)
+				setMouseTracking(touchpad_mode);
+}
+
+
 void InputWidget::reset()
 {
 	path.clear();
@@ -93,7 +101,7 @@ void InputWidget::showMessage(QString m, int msecs)
 
 void InputWidget::mousePressEvent(QMouseEvent* ev)
 {
-	if(pen_down or touchpad_mode) //ignore mouse events while we're already getting tablet data
+	if(pen_down or touchpad_mode)
 		return;
 
 	mouse_down = true;

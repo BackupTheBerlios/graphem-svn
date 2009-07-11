@@ -47,7 +47,7 @@ private:
 	bool record_pattern;
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
-	void enableTouchpadMode(bool on) { setMouseTracking(touchpad_mode = on); }
+	void enableTouchpadMode(bool on);
 	void showInput(bool on) { show_input = on; }
 
 	QList<Node> path;

@@ -27,6 +27,7 @@
 
 #include <QDesktopWidget>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
 #include <QString>
@@ -43,7 +44,6 @@ Graphem::Graphem(int argc, char* argv[]) :
 	input(new InputWidget()),
 	auth(new Auth(this)),
 	info_text(0),
-	new_pattern_dialog(0),
 	tries_left(0),
 	print_pattern(false),
 	verbose(false),
@@ -73,8 +73,6 @@ Graphem::Graphem(int argc, char* argv[]) :
 #endif
 		} else if(argv[i] == QString("--show-input")) {
 			input->showInput(true);
-		} else if(argv[i] == QString("--touchpad")) {
-			input->enableTouchpadMode(true);
 		} else if(argv[i] == QString("--tries")) {
 			if(i+1 >= argc)
 				break; //parameter not found
@@ -151,11 +149,8 @@ int Graphem::exec()
 		l3->addWidget(quit_button);
 		QPushButton *new_pattern_button = new QPushButton("&New Pattern");
 		l3->addWidget(new_pattern_button);
-		new_pattern_dialog = new NewPattern(0);
 		connect(new_pattern_button, SIGNAL(clicked()),
-			new_pattern_dialog, SLOT(show()));
-		connect(new_pattern_dialog, SIGNAL(accepted()),
-			this, SLOT(resetStats()));
+			this, SLOT(showNewPatternDialog()));
 
 		l2->addWidget(info_text);
 		l2->addLayout(l3);
@@ -225,7 +220,6 @@ void Graphem::printHelp()
 #endif
 
 	cout << "--show-input\t\t Shows input while drawing\n";
-	cout << "--touchpad\t\t Touchpad mode, no clicking necessary\n";
 	cout << "--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n";
 	cout << "-v, --verbose\t\t Print success/failure messages on stdout\n";
 	cout << "--version\t\t Print the version number and exit\n";
@@ -265,6 +259,12 @@ bool Graphem::loadHash()
 		return false;
 
 	auth->setAuthHash(settings->value("pattern_hash").toByteArray(), settings->value("salt").toByteArray());
+
+	bool touchpad = false;
+	if(settings->value("touchpad_mode").toBool())
+			touchpad = true;
+	input->enableTouchpadMode(touchpad);
+
 	return true;
 }
 
@@ -276,6 +276,27 @@ void Graphem::resetStats()
 	refreshInfo();
 }
 
+
+void Graphem::showNewPatternDialog()
+{
+	QMessageBox msgBox;
+	msgBox.setText("Enable touchpad mode?");
+	msgBox.setInformativeText("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored.");
+	msgBox.addButton(QMessageBox::Cancel);
+	msgBox.addButton("&Enable Touchpad Mode", QMessageBox::YesRole);
+	msgBox.setDefaultButton(msgBox.addButton("&Disable Touchpad Mode", QMessageBox::NoRole));
+	int ret = msgBox.exec();
+
+	if(ret == QMessageBox::Cancel)
+		return;
+	
+	//TODO: main window should be parent...
+	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
+	NewPattern *new_pattern_dialog = new NewPattern(0, !ret);
+	if(new_pattern_dialog->exec() == QDialog::Accepted)
+		resetStats();
+	delete new_pattern_dialog;
+}
 
 void Graphem::quit()
 {
