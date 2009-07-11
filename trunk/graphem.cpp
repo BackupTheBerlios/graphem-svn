@@ -44,6 +44,7 @@ Graphem::Graphem(int argc, char* argv[]) :
 	input(new InputWidget()),
 	auth(new Auth(this)),
 	info_text(0),
+	main(0),
 	tries_left(0),
 	print_pattern(false),
 	verbose(false),
@@ -132,7 +133,7 @@ int Graphem::exec()
 		input->activateWindow(); //make sure we catch keyboard events
 		input->raise();
 	} else { //show main window
-		QWidget *main = new QWidget();
+		main = new QWidget();
 		main->setWindowTitle(version);
 
 		QHBoxLayout *l1 = new QHBoxLayout();
@@ -147,7 +148,7 @@ int Graphem::exec()
 		connect(quit_button, SIGNAL(clicked()),
 			this, SLOT(quit()));
 		l3->addWidget(quit_button);
-		QPushButton *new_pattern_button = new QPushButton("&New Pattern");
+		QPushButton *new_pattern_button = new QPushButton("&New Pattern...");
 		l3->addWidget(new_pattern_button);
 		connect(new_pattern_button, SIGNAL(clicked()),
 			this, SLOT(showNewPatternDialog()));
@@ -282,20 +283,21 @@ void Graphem::resetStats()
 
 void Graphem::showNewPatternDialog()
 {
-	QMessageBox msgBox;
-	msgBox.setText("Enable touchpad mode?");
+	QMessageBox msgBox(QMessageBox::Question,
+		"Enable touchpad mode?",
+		"<b>Enable touchpad mode?</b>",
+		QMessageBox::Cancel,
+		main);
 	msgBox.setInformativeText("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored.");
-	msgBox.addButton(QMessageBox::Cancel);
-	msgBox.addButton("&Enable Touchpad Mode", QMessageBox::YesRole);
-	msgBox.setDefaultButton(msgBox.addButton("&Disable Touchpad Mode", QMessageBox::NoRole));
+	msgBox.addButton("&Enable", QMessageBox::YesRole);
+	msgBox.setDefaultButton(msgBox.addButton("Use &Normal Mode", QMessageBox::NoRole));
 	int ret = msgBox.exec();
 
 	if(ret == QMessageBox::Cancel)
 		return;
 	
-	//TODO: main window should be parent...
 	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
-	NewPattern *new_pattern_dialog = new NewPattern(0, !ret);
+	NewPattern *new_pattern_dialog = new NewPattern(main, !ret);
 	if(new_pattern_dialog->exec() == QDialog::Accepted)
 		resetStats();
 	delete new_pattern_dialog;

@@ -190,7 +190,6 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		painter.drawLine(l);
 
 		start = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
-		std::cout << "s.x " << start.x() << "; s.y " << start.y() << "\n";
 		painter.drawLine(start, end);
 
 		start = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());

@@ -26,6 +26,7 @@ class Auth;
 class InputWidget;
 class QSettings;
 class QTextEdit;
+class QWidget;
 
 class Graphem : public QApplication {
 	Q_OBJECT
@@ -48,6 +49,7 @@ private:
 	Auth* auth;
 	QSettings* settings;
 	QTextEdit* info_text;
+	QWidget *main;
 
 	int tries_left;
 	bool print_pattern, verbose, lock_screen;
