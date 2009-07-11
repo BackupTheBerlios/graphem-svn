@@ -1,6 +1,5 @@
 0.2:
 InputWidget flashes "please enter your pattern" while drawing.
-show recognition rate as percent
 center cursor after fail?
 
 0.3:

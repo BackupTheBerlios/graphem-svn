@@ -242,11 +242,11 @@ void Graphem::refreshInfo()
 		info_text->setText(tr("<h3>Statistics</h3>\
 			Total: %1 <br />\
 			Correct: %2 / Failed: %3 <br />\
-			Recognition Rate: %4")
+			Recognition Rate: %4\%")
 			.arg(usage_total)
 			.arg(usage_total-usage_failed)
 			.arg(usage_failed)
-			.arg(double(usage_total - usage_failed)/usage_total));
+			.arg(qRound(double(usage_total - usage_failed)/usage_total*1000)/10.0));
 		input->setEnabled(true);
 		input->setDefaultMessage("You can test your pattern here.");
 		input->showMessage();
