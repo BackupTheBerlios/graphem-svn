@@ -213,19 +213,20 @@ void Graphem::authenticate()
 
 void Graphem::printHelp()
 {
-	cout << "Usage: " << qPrintable(arguments().at(0)) << " [options]\n\n";
-	cout << "--help\t\t\t Show this text\n";
-	cout << "--lock\t\t\t Lock screen (Make sure your auth pattern works!)\n";
+	cout << qPrintable(tr("Usage: %1 [options]\n\n").arg(arguments().at(0))
+	+"--help\t\t\t Show this text\n"
+	+"--lock\t\t\t Lock screen (Make sure your key pattern works!)\n"
 
 #ifndef NO_DEBUG
-	cout << "--print-data\t\t Prints velocity/pressure data to standard output\n";
-	cout << "--print-pattern\t\t Prints entered pattern as a string\n";
+	+"--print-data\t\t Prints velocity/pressure data to standard output\n"
+	+"--print-pattern\t\t Prints entered pattern as a string\n"
 #endif
 
-	cout << "--show-input\t\t Shows input while drawing\n";
-	cout << "--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n";
-	cout << "-v, --verbose\t\t Print success/failure messages on stdout\n";
-	cout << "--version\t\t Print the version number and exit\n";
+	+"--show-input\t\t Shows input while drawing\n"
+	+"--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n"
+	+"-v, --verbose\t\t Print success/failure messages on stdout\n"
+	+"--version\t\t Print the version number and exit\n");
+	
 }
 
 
@@ -236,7 +237,7 @@ void Graphem::refreshInfo()
 			return;
 
 	if(!loadHash()) {
-		info_text->setText("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>");
+		info_text->setText(tr("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
 		input->setEnabled(false);
 	} else {
@@ -249,7 +250,7 @@ void Graphem::refreshInfo()
 			.arg(usage_failed)
 			.arg(qRound(double(usage_total - usage_failed)/usage_total*1000)/10.0));
 		input->setEnabled(true);
-		input->setDefaultMessage("You can test your pattern here.");
+		input->setDefaultMessage(tr("You can test your pattern here."));
 		input->showMessage();
 	}
 }
@@ -284,13 +285,13 @@ void Graphem::resetStats()
 void Graphem::showNewPatternDialog()
 {
 	QMessageBox msgBox(QMessageBox::Question,
-		"Enable touchpad mode?",
-		"<b>Enable touchpad mode?</b>",
+		tr("Enable touchpad mode?"),
+		tr("<b>Enable touchpad mode?</b>"),
 		QMessageBox::Cancel,
 		main);
-	msgBox.setInformativeText("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored.");
-	msgBox.addButton("&Enable", QMessageBox::YesRole);
-	msgBox.setDefaultButton(msgBox.addButton("Use &Normal Mode", QMessageBox::NoRole));
+	msgBox.setInformativeText(tr("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored."));
+	msgBox.addButton(tr("&Enable"), QMessageBox::YesRole);
+	msgBox.setDefaultButton(msgBox.addButton(tr("Use &Normal Mode"), QMessageBox::NoRole));
 	int ret = msgBox.exec();
 
 	if(ret == QMessageBox::Cancel)

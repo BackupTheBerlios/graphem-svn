@@ -34,25 +34,25 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	touchpad_mode(touchpad_mode)
 {
 	resize(600,400);
-	setWindowTitle("New Pattern");
+	setWindowTitle(tr("New Pattern"));
 
 	input->enableTouchpadMode(touchpad_mode);
 	input->setDefaultMessage("");
-	input->showMessage("Enter your new pattern here.", 3000);
+	input->showMessage(tr("Enter your new pattern here."), 3000);
 	
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
-	button_box->addButton("&Cancel", QDialogButtonBox::RejectRole);
+	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 	connect(button_box, SIGNAL(rejected()),
 		this, SLOT(reject()));
-	button_box->addButton("&Save", QDialogButtonBox::AcceptRole);
+	button_box->addButton(tr("&Save"), QDialogButtonBox::AcceptRole);
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(save()));
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(accept()));
-	QPushButton *delete_last = button_box->addButton("&Delete Last Stroke", QDialogButtonBox::ActionRole);
+	QPushButton *delete_last = button_box->addButton(tr("&Delete Last Stroke"), QDialogButtonBox::ActionRole);
 	connect(delete_last, SIGNAL(clicked()),
 		input, SLOT(deleteLastStroke()));
-	QPushButton *reset = button_box->addButton("&Reset", QDialogButtonBox::ResetRole);
+	QPushButton *reset = button_box->addButton(tr("&Reset"), QDialogButtonBox::ResetRole);
 	connect(reset, SIGNAL(clicked()),
 		input, SLOT(reset()));
 	

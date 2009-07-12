@@ -35,7 +35,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	timer(new QTimer(this)),
 	msg_timer(new QTimer(this)),
 	msg(""),
-	default_msg("Please enter your auth pattern."),
+	default_msg(tr("Please enter your key pattern.")),
 	touchpad_mode(false),
 	show_input(false),
 	record_pattern(record)
@@ -67,7 +67,7 @@ void InputWidget::checkFinished()
 	showMessage(""); //don't show message after input started
 
 	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
-		showMessage("Processing...");
+		showMessage(tr("Processing..."));
 		repaint();
 		emit dataReady();
 	}
@@ -87,7 +87,7 @@ void InputWidget::reset()
 	path.clear();
 	arrows.clear();
 	if(!record_pattern)
-		showMessage("Pattern not recognized, please try again.", 1500);
+		showMessage(tr("Pattern not recognized, please try again."), 1500);
 	update();
 }
 
@@ -153,7 +153,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 
 	painter.drawText(width()/2 - 100, height()/2, msg);
 	if(touchpad_mode and !record_pattern)
-		painter.drawText(11, 19, "[Touchpad Mode]");
+		painter.drawText(11, 19, tr("[Touchpad Mode]"));
 
 	if(show_input and !path.isEmpty()) {
 		QPainterPath painter_path;

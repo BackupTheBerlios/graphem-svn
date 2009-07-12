@@ -1,4 +1,5 @@
 0.3:
+"red" strokes require two clicks to remove instead of one
 maybe use QMainWindow?
 l10n
 logo
@@ -11,6 +12,7 @@ generate random pattern
 estimate entropy of input
 
 ?:
+(!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
 test wether manual inlining makes sense
 test if hash comparison can be optimized (QByteArray vs. QString vs ?)
 make Auth a base class
