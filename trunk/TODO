@@ -7,7 +7,6 @@ how to remove margins around InputWidget?
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 make preprocess() suck less, use velocity to determiny averaging
 create documentation
-include secure RNG
 generate random pattern
 estimate entropy of input
 

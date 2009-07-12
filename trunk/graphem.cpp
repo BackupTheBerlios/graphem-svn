@@ -164,7 +164,6 @@ int Graphem::exec()
 		main->show();
 	}
 
-	generateSalt();
 	return QApplication::exec();
 }
 

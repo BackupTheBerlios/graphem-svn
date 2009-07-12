@@ -170,7 +170,7 @@ bool Auth::matchesAuthPattern()
 	tries++;
 #endif
 
-	return auth_pattern == getHash(strokesToString(), salt);
+	return auth_pattern == Crypto::getHash(strokesToString(), salt);
 }
 
 

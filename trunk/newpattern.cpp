@@ -92,8 +92,8 @@ void NewPattern::save()
 	auth.preprocess(input->path);
 
 	QSettings* settings = new QSettings();
-	QByteArray salt = generateSalt();
-	settings->setValue("pattern_hash", getHash(auth.strokesToString(), salt));
+	QByteArray salt = Crypto::generateSalt();
+	settings->setValue("pattern_hash", Crypto::getHash(auth.strokesToString(), salt));
 	settings->setValue("touchpad_mode", touchpad_mode);
 	settings->setValue("salt", salt);
 	settings->sync();

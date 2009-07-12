@@ -19,19 +19,10 @@
 
 #include "crypto.h"
 
-#include <cstdlib>
-#include <ctime>
+#include <QtCrypto>
 
-//TODO: not in any way secure, but does add some complexity to brute forcing
-QByteArray generateSalt()
+QByteArray Crypto::generateSalt()
 {
 	const int salt_bytes_count = 5;
-	srand(time(0));
-	QByteArray salt;
-
-	for(int i=0; i < salt_bytes_count; i++) {
-			char c = int(double(rand())/RAND_MAX*255.0)-127;
-			salt.append(c);
-	}
-	return salt;
+	return QCA::Random::randomArray(salt_bytes_count).toByteArray();
 }

@@ -21,6 +21,7 @@
 #define GRAPHEM_H
 
 #include <QApplication>
+#include <QtCrypto>
 
 class Auth;
 class InputWidget;
@@ -50,6 +51,7 @@ private:
 	QSettings* settings;
 	QTextEdit* info_text;
 	QWidget *main;
+	QCA::Initializer crypto_init;
 
 	int tries_left;
 	bool print_pattern, verbose, lock_screen;
