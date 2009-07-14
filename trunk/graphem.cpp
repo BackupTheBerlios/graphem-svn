@@ -17,13 +17,9 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "auth.h"
-#include "crypto.h"
 #include "inputwidget.h"
 #include "graphem.h"
 #include "newpattern.h"
-
-#include <iostream>
 
 #include <QCoreApplication>
 #include <QDockWidget>
@@ -32,11 +28,10 @@
 #include <QSettings>
 #include <QString>
 #include <QTextEdit>
-#include <QWidget>
 
 
-Graphem::Graphem(Auth *auth):
-	auth(auth),
+Graphem::Graphem(InputWidget* input):
+	input(input),
 	info_text(0)
 {
 	settings = new QSettings();
@@ -48,16 +43,18 @@ Graphem::Graphem(Auth *auth):
 	setCentralWidget(input);
 
 	//menu bar
-	QMenu *file = menuBar()->addMenu(tr("&File")); //naming?
+	QMenu *file = menuBar()->addMenu(tr("&File"));
 	file->addAction(tr("&New Pattern..."), this,
 		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
+	file->addAction(tr("&Generate Random Pattern..."), this,
+		SLOT(showNewPatternDialog()), tr("Ctrl+G")); //TODO 
 	file->addSeparator();
 	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
 	menuBar()->addMenu(tr("&Settings"));
 		// show input
 		// processing timeout
 	QMenu *help = menuBar()->addMenu(tr("&Help"));
-	help->addAction(tr("&About Qt"), this, SLOT(aboutQt()), 0);
+	help->addAction(tr("&About Qt"), qApp, SLOT(aboutQt()), 0);
 	//about
 	
 	//info dock
@@ -74,12 +71,10 @@ Graphem::Graphem(Auth *auth):
 		this, SLOT(authenticate()),
 		Qt::QueuedConnection); //allow for repaint before checking
 
-/* TODO
 	connect(auth, SIGNAL(failed()),
 		this, SLOT(failed()));
 	connect(auth, SIGNAL(passed()),
 		this, SLOT(passed()));
-	*/
 }
 
 
@@ -87,25 +82,15 @@ void Graphem::failed()
 {
 	usage_total++;
 	usage_failed++;
-	if(tries_left == 1) //this try was our last
-		exit(1);
-
-	if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
-		tries_left--;
 
 	input->reset();
-	if(!lock_screen)
-			refreshInfo();
+	refreshInfo();
 }
 
 
 void Graphem::passed()
 {
 	usage_total++;
-	if(lock_screen) {
-		quit();
-		return;
-	}
 
 	input->reset();
 	refreshInfo();
@@ -114,18 +99,18 @@ void Graphem::passed()
 
 void Graphem::authenticate()
 {
-	auth->preprocess(input->path);
-	if(print_pattern)
-		auth->printPattern();
-	auth->check();
+	input->auth()->preprocess(input->path);
+	//if(print_pattern) TODO
+	//	auth->printPattern();
+	input->auth()->check();
 }
 
 
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(!auth->loadHash()) {
-		info_text->setText(tr("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
+	if(!input->auth()->loadHash()) {
+		info_text->setText(tr("<h3>Welcome</h3>To start using Graphem, you have to set a new key pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
 		input->setEnabled(false);
 	} else {

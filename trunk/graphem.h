@@ -22,7 +22,6 @@
 
 #include <QMainWindow>
 
-class Auth;
 class InputWidget;
 class QSettings;
 class QTextEdit;
@@ -32,7 +31,7 @@ const QString graphem_version = "Graphem 0.3";
 class Graphem : public QMainWindow {
 	Q_OBJECT
 public:
-	Graphem(Auth *auth);
+	Graphem(InputWidget *input);
 public slots:
 	void authenticate();
 	void failed();
@@ -44,7 +43,6 @@ private:
 	void resetStats();
 
 	InputWidget* input;
-	Auth* auth;
 	QSettings* settings;
 	QTextEdit* info_text;
 

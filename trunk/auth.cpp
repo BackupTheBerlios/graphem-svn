@@ -32,7 +32,9 @@
 Auth::Auth(QObject *parent):
 	QObject(parent),
 	tries_left(0),
-	started(0)
+	started(0),
+	touchpad_mode(false),
+	verbose(false)
 { }
 
 
@@ -169,7 +171,7 @@ bool Auth::tryPattern()
 bool Auth::matchesAuthPattern()
 {
 #ifndef NO_DEBUG
-	tries++;
+	compared_hashes_count++;
 #endif
 
 	return auth_pattern == Crypto::getHash(strokesToString(), salt);
@@ -185,22 +187,32 @@ void Auth::check()
 
 	qDebug() << "number of strokes: " << strokes.count();
 
-	tries = 0;
+	compared_hashes_count = 0;
 	started = new QTime();
 	started->start();
 
 	if(tryPattern()) {
 		if(verbose)
-			std::cout << "ERROR: Pattern not recognized.\n";
+			std::cout << "OK: Correct pattern.\n";
+
 		emit passed();
 	} else {
 		if(verbose)
-			std::cout << "OK: Correct pattern.\n";
+			std::cout << "ERROR: Pattern not recognized.\n";
+		if(tries_left == 1) //this try was our last
+			exit(1); //TODO ?
+
+		if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
+			tries_left--;
+
 		emit failed();
 	}
 
+#ifndef NO_DEBUG
 	double time = double(started->elapsed())/1000;
-	qDebug() << tries << " tries in " << time << "s, or " << tries/time << "tries/s";
+	qDebug() << compared_hashes_count << " tries in " << time << "s, or " << compared_hashes_count/time << "tries/s";
+#endif
+
 	delete started;
 }
 

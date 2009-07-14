@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "auth.h"
 #include "inputwidget.h"
 
 #include <cmath>
@@ -30,6 +31,7 @@
 
 InputWidget::InputWidget(QWidget* parent, bool record) :
 	QWidget(parent),
+	auth(this),
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),

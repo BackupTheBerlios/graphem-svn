@@ -17,7 +17,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "auth.h"
 #include "graphem.h"
 #include "inputwidget.h"
 
@@ -40,12 +39,10 @@ int main(int argc, char* argv[])
 	app.setApplicationName("Graphem");
 
 	QCA::Initializer crypto_init;
-	Auth *auth = new Auth();
 	InputWidget *input = new InputWidget();
 
 	bool lock_screen = false;
 	bool print_pattern = false;
-	bool verbose = false;
 
 	for(int i = 1; i < argc; i++) {
 		if(argv[i] == QString("--help")) {
@@ -66,10 +63,10 @@ int main(int argc, char* argv[])
 			if(i+1 >= argc)
 				break; //parameter not found
 
-			auth->setTries(QString(argv[i+1]).toInt());
+			input->auth()->setTries(QString(argv[i+1]).toInt());
 			i++;
 		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
-			verbose = true;
+			input->auth()->setVerbose(true);
 		} else if(argv[i] == QString("--version")) {
 			cout << qPrintable(graphem_version) << "\n";
 			cout << "Copyright (C) 2009 Christian Pulvermacher\n";
@@ -85,10 +82,14 @@ int main(int argc, char* argv[])
 	}
 
 	if(lock_screen) {
-		if(!auth->loadHash()) {
+		if(!input->auth()->loadHash()) {
 			cerr << "Couldn't load key pattern!\n";
 			return 1;
 		}
+		input->enableTouchpadMode(auth->usingTouchpadMode()); //TODO move this into input
+
+		QObject::connect(auth, SIGNAL(passed()),
+			input, SLOT(close()));
 
 		input->setWindowTitle(graphem_version);
 		input->setWindowFlags(Qt::X11BypassWindowManagerHint);
@@ -101,8 +102,8 @@ int main(int argc, char* argv[])
 		input->activateWindow(); //make sure we catch keyboard events
 		input->raise();
 	} else { //show main window
-		Graphem main(auth);
-		main.show();
+		Graphem *main = new Graphem(input);
+		main->show();
 	}
 
 	return app.exec();

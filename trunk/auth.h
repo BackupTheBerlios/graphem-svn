@@ -43,6 +43,8 @@ public:
 	void printPattern();
 	void setAuthHash(const QByteArray &hash, const QByteArray &s) { auth_pattern = hash; salt = s; }
 	void setTries(int tries) { tries_left = tries; }
+	void setVerbose(bool on) { verbose = on; }
+	bool usingTouchpadMode() { return touchpad_mode; }
 signals:
 	void failed();
 	void passed();
@@ -53,10 +55,11 @@ private:
 
 	QByteArray auth_pattern, salt;
 	QList<Stroke> strokes;
-	int tries; //TODO: rename, ambiguous
+	int compared_hashes_count;
 	int tries_left;
 	QTime *started;
 	bool touchpad_mode;
+	bool verbose;
 
 	const static int max_check_time = 6000; //in ms
 	const static int short_limit = 10; //length limit for short strokes

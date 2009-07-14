@@ -1,7 +1,8 @@
 0.3:
-create MainWindow class
 "red" strokes require two clicks to remove instead of one
---tries only makes sense with --lock
+--tries doesn't make sense with main window or --lock, maybe create new mode: fullscreen but no lock?
+diagonal arrows suffer from rounding errors?
+same old problem: input -> auth? (include auth in inputwidget?
 l10n
 logo
 how to remove margins around InputWidget?
@@ -10,12 +11,14 @@ make preprocess() suck less, use velocity to determiny averaging
 create documentation
 generate random pattern
 estimate entropy of input
-very weird segfault on x86-64, qt 4.4.0
+segfault on x86-64, qt 4.4.0 (missing & before argc. that's what you get for subclassing QApplication)
 
 ?:
 (!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
-test wether manual inlining makes sense
-test if hash comparison can be optimized (QByteArray vs. QString vs ?)
+do some benchmarking
+	test wether manual inlining makes sense
+	test if hash comparison can be optimized (QByteArray vs. QString vs ?)
+	QCryptoGraphicHash vs QCA::Hash
 make Auth a base class
 support real handwriting
 	try different algorithms for Auth module:
