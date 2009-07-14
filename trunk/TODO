@@ -1,6 +1,7 @@
 0.3:
+create MainWindow class
 "red" strokes require two clicks to remove instead of one
-maybe use QMainWindow?
+--tries only makes sense with --lock
 l10n
 logo
 how to remove margins around InputWidget?
@@ -9,6 +10,7 @@ make preprocess() suck less, use velocity to determiny averaging
 create documentation
 generate random pattern
 estimate entropy of input
+very weird segfault on x86-64, qt 4.4.0
 
 ?:
 (!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines

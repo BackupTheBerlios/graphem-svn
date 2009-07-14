@@ -36,11 +36,13 @@ class Auth : public QObject {
 	Q_OBJECT
 	friend class NewPattern;
 public:
-	Auth(QObject *parent);
+	Auth(QObject *parent = 0);
 	void check();
+	bool loadHash();
 	void preprocess(const QList<Node> &path);
 	void printPattern();
 	void setAuthHash(const QByteArray &hash, const QByteArray &s) { auth_pattern = hash; salt = s; }
+	void setTries(int tries) { tries_left = tries; }
 signals:
 	void failed();
 	void passed();
@@ -51,8 +53,10 @@ private:
 
 	QByteArray auth_pattern, salt;
 	QList<Stroke> strokes;
-	int tries;
+	int tries; //TODO: rename, ambiguous
+	int tries_left;
 	QTime *started;
+	bool touchpad_mode;
 
 	const static int max_check_time = 6000; //in ms
 	const static int short_limit = 10; //length limit for short strokes

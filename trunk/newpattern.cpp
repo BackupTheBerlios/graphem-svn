@@ -82,6 +82,7 @@ void NewPattern::updateDisplay()
 	}
 
 	setWindowTitle(tr("New Pattern (%1 Stroke(s))").arg(auth.strokes.count()));
+	//TODO: move into status bar
 }
 
 

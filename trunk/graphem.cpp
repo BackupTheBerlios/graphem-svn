@@ -25,153 +25,66 @@
 
 #include <iostream>
 
-#include <QDesktopWidget>
-#include <QHBoxLayout>
+#include <QCoreApplication>
+#include <QDockWidget>
+#include <QMenuBar>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QSettings>
 #include <QString>
 #include <QTextEdit>
-#include <QVBoxLayout>
 #include <QWidget>
 
-using namespace std;
 
-const QString version = "Graphem 0.2";
-
-Graphem::Graphem(int argc, char* argv[]) :
-	QApplication(argc, argv),
-	input(new InputWidget()),
-	auth(new Auth(this)),
-	info_text(0),
-	main(0),
-	tries_left(0),
-	print_pattern(false),
-	verbose(false),
-	lock_screen(false),
-	status(-1)
+Graphem::Graphem(Auth *auth):
+	auth(auth),
+	info_text(0)
 {
-	setOrganizationName("Graphem");
-	setApplicationName("Graphem");
 	settings = new QSettings();
 
 	usage_total = settings->value("usage_total").toInt();
 	usage_failed = settings->value("usage_failed").toInt();
 
-	for(int i = 1; i < argc; i++) {
-		if(argv[i] == QString("--help")) {
-			printHelp();
-			status = 0;
-			return;
-		} else if(argv[i] == QString("--lock")) {
-				lock_screen = true;
-#ifndef NO_DEBUG
-		} else if(argv[i] == QString("--print-data")) {
-			connect(input, SIGNAL(dataReady()),
-				input, SLOT(printData()));
-		} else if(argv[i] == QString("--print-pattern")) {
-			print_pattern = true;
-#endif
-		} else if(argv[i] == QString("--show-input")) {
-			input->showInput(true);
-		} else if(argv[i] == QString("--tries")) {
-			if(i+1 >= argc)
-				break; //parameter not found
+	setWindowTitle(graphem_version);
+	setCentralWidget(input);
 
-			tries_left = QString(argv[i+1]).toInt();
-			i++;
-		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
-			verbose = true;
-		} else if(argv[i] == QString("--version")) {
-			cout << qPrintable(version) << "\n";
-			cout << "Copyright (C) 2009 Christian Pulvermacher\n";
-			cout << "Documentation is available on http://graphem.berlios.de/\n";
-			cout << "Using Qt " << qVersion();
-			cout << ", compiled against Qt " << QT_VERSION_STR << "\n";
-			status = 0;
-			return;
-		} else {
-			cerr << "Unknown command line option '" << argv[i] << "'\n";
-			printHelp();
-			status = 1;
-			return;
-		}
-	}
+	//menu bar
+	QMenu *file = menuBar()->addMenu(tr("&File")); //naming?
+	file->addAction(tr("&New Pattern..."), this,
+		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
+	file->addSeparator();
+	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
+	menuBar()->addMenu(tr("&Settings"));
+		// show input
+		// processing timeout
+	QMenu *help = menuBar()->addMenu(tr("&Help"));
+	help->addAction(tr("&About Qt"), this, SLOT(aboutQt()), 0);
+	//about
+	
+	//info dock
+	info_text = new QTextEdit();
+	info_text->setReadOnly(true);
+	refreshInfo();
+	QDockWidget *info_dock = new QDockWidget(tr("Information"), this);
+	info_dock->setWidget(info_text);
+	addDockWidget(Qt::LeftDockWidgetArea, info_dock);
 
-	//don't lock screen with no key set
-	if(lock_screen and !loadHash()) {
-			status = 1;
-			return;
-	}
+	resize(600,400);
 
 	connect(input, SIGNAL(dataReady()),
 		this, SLOT(authenticate()),
 		Qt::QueuedConnection); //allow for repaint before checking
 
+/* TODO
 	connect(auth, SIGNAL(failed()),
 		this, SLOT(failed()));
 	connect(auth, SIGNAL(passed()),
 		this, SLOT(passed()));
-}
-
-
-int Graphem::exec()
-{
-	if(status != -1) //status already set, exit
-			return status;
-
-
-	if(lock_screen) {
-		input->setWindowTitle(version);
-		input->setWindowFlags(Qt::X11BypassWindowManagerHint);
-		input->setVisible(true);
-		QDesktopWidget dw;
-		input->setGeometry(dw.screenGeometry());
-
-		input->grabKeyboard();
-		input->grabMouse();
-		input->activateWindow(); //make sure we catch keyboard events
-		input->raise();
-	} else { //show main window
-		main = new QWidget();
-		main->setWindowTitle(version);
-
-		QHBoxLayout *l1 = new QHBoxLayout();
-		QVBoxLayout *l2 = new QVBoxLayout();
-		info_text = new QTextEdit();
-		info_text->setReadOnly(true);
-		info_text->setFixedWidth(200);
-		refreshInfo();
-
-		QHBoxLayout *l3 = new QHBoxLayout();
-		QPushButton *quit_button = new QPushButton("&Quit");
-		connect(quit_button, SIGNAL(clicked()),
-			this, SLOT(quit()));
-		l3->addWidget(quit_button);
-		QPushButton *new_pattern_button = new QPushButton("&New Pattern...");
-		l3->addWidget(new_pattern_button);
-		connect(new_pattern_button, SIGNAL(clicked()),
-			this, SLOT(showNewPatternDialog()));
-
-		l2->addWidget(info_text);
-		l2->addLayout(l3);
-
-		l1->addLayout(l2);
-		l1->addWidget(input);
-
-		main->setLayout(l1);
-		main->resize(600,400);
-		main->show();
-	}
-
-	return QApplication::exec();
+	*/
 }
 
 
 void Graphem::failed()
 {
-	if(verbose)
-		std::cout << "ERROR: Pattern not recognized.\n";
 	usage_total++;
 	usage_failed++;
 	if(tries_left == 1) //this try was our last
@@ -188,8 +101,6 @@ void Graphem::failed()
 
 void Graphem::passed()
 {
-	if(verbose)
-		std::cout << "OK: Correct pattern.\n";
 	usage_total++;
 	if(lock_screen) {
 		quit();
@@ -210,32 +121,10 @@ void Graphem::authenticate()
 }
 
 
-void Graphem::printHelp()
-{
-	cout << qPrintable(tr("Usage: %1 [options]\n\n").arg(arguments().at(0))
-	+"--help\t\t\t Show this text\n"
-	+"--lock\t\t\t Lock screen (Make sure your key pattern works!)\n"
-
-#ifndef NO_DEBUG
-	+"--print-data\t\t Prints velocity/pressure data to standard output\n"
-	+"--print-pattern\t\t Prints entered pattern as a string\n"
-#endif
-
-	+"--show-input\t\t Shows input while drawing\n"
-	+"--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n"
-	+"-v, --verbose\t\t Print success/failure messages on stdout\n"
-	+"--version\t\t Print the version number and exit\n");
-	
-}
-
-
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(lock_screen)
-			return;
-
-	if(!loadHash()) {
+	if(!auth->loadHash()) {
 		info_text->setText(tr("<h3>Welcome</h3>To start using Graphem, you have to set a new authentication pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
 		input->setEnabled(false);
@@ -255,24 +144,6 @@ void Graphem::refreshInfo()
 }
 
 
-//set up Auth module with hash from config file
-bool Graphem::loadHash()
-{
-	if(settings->value("pattern_hash").toByteArray().isEmpty()
-	or settings->value("salt").toByteArray().isEmpty())
-		return false;
-
-	auth->setAuthHash(settings->value("pattern_hash").toByteArray(), settings->value("salt").toByteArray());
-
-	bool touchpad = false;
-	if(settings->value("touchpad_mode").toBool())
-			touchpad = true;
-	input->enableTouchpadMode(touchpad);
-
-	return true;
-}
-
-
 void Graphem::resetStats()
 {
 	usage_total = 0;
@@ -287,7 +158,7 @@ void Graphem::showNewPatternDialog()
 		tr("Enable touchpad mode?"),
 		tr("<b>Enable touchpad mode?</b>"),
 		QMessageBox::Cancel,
-		main);
+		this);
 	msgBox.setInformativeText(tr("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored."));
 	msgBox.addButton(tr("&Enable"), QMessageBox::YesRole);
 	msgBox.setDefaultButton(msgBox.addButton(tr("Use &Normal Mode"), QMessageBox::NoRole));
@@ -297,11 +168,12 @@ void Graphem::showNewPatternDialog()
 		return;
 	
 	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
-	NewPattern *new_pattern_dialog = new NewPattern(main, !ret);
+	NewPattern *new_pattern_dialog = new NewPattern(this, !ret);
 	if(new_pattern_dialog->exec() == QDialog::Accepted)
 		resetStats();
 	delete new_pattern_dialog;
 }
+
 
 void Graphem::quit()
 {
@@ -309,5 +181,5 @@ void Graphem::quit()
 	settings->setValue("usage_failed", usage_failed);
 	settings->sync();
 
-	QApplication::quit();
+	qApp->quit();
 }

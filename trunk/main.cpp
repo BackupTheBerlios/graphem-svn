@@ -17,10 +17,111 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "auth.h"
 #include "graphem.h"
+#include "inputwidget.h"
+
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QString>
+#include <QtCrypto>
+
+#include <iostream>
+
+void printHelp(char *arg0);
+
+using namespace std;
+
 
 int main(int argc, char* argv[])
 {
-	Graphem graphem(argc, argv);
-	return graphem.exec();
+	QApplication app(argc, argv);
+	app.setOrganizationName("Graphem");
+	app.setApplicationName("Graphem");
+
+	QCA::Initializer crypto_init;
+	Auth *auth = new Auth();
+	InputWidget *input = new InputWidget();
+
+	bool lock_screen = false;
+	bool print_pattern = false;
+	bool verbose = false;
+
+	for(int i = 1; i < argc; i++) {
+		if(argv[i] == QString("--help")) {
+			printHelp(argv[0]);
+			return 0;
+		} else if(argv[i] == QString("--lock")) {
+				lock_screen = true;
+#ifndef NO_DEBUG
+		} else if(argv[i] == QString("--print-data")) {
+			QObject::connect(input, SIGNAL(dataReady()),
+				input, SLOT(printData()));
+		} else if(argv[i] == QString("--print-pattern")) {
+			print_pattern = true;
+#endif
+		} else if(argv[i] == QString("--show-input")) {
+			input->showInput(true);
+		} else if(argv[i] == QString("--tries")) {
+			if(i+1 >= argc)
+				break; //parameter not found
+
+			auth->setTries(QString(argv[i+1]).toInt());
+			i++;
+		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
+			verbose = true;
+		} else if(argv[i] == QString("--version")) {
+			cout << qPrintable(graphem_version) << "\n";
+			cout << "Copyright (C) 2009 Christian Pulvermacher\n";
+			cout << "Documentation is available on http://graphem.berlios.de/\n";
+			cout << "Using Qt " << qVersion();
+			cout << ", compiled against Qt " << QT_VERSION_STR << "\n";
+			return 0;
+		} else {
+			cerr << "Unknown command line option '" << argv[i] << "'\n";
+			printHelp(argv[0]);
+			return 1;
+		}
+	}
+
+	if(lock_screen) {
+		if(!auth->loadHash()) {
+			cerr << "Couldn't load key pattern!\n";
+			return 1;
+		}
+
+		input->setWindowTitle(graphem_version);
+		input->setWindowFlags(Qt::X11BypassWindowManagerHint);
+		input->setVisible(true);
+		QDesktopWidget dw;
+		input->setGeometry(dw.screenGeometry());
+
+		input->grabKeyboard();
+		input->grabMouse();
+		input->activateWindow(); //make sure we catch keyboard events
+		input->raise();
+	} else { //show main window
+		Graphem main(auth);
+		main.show();
+	}
+
+	return app.exec();
+}
+
+
+void printHelp(char *arg0)
+{
+	cout << qPrintable(QObject::tr("Usage: %1 [options]\n\n").arg(arg0)
+	+"--help\t\t\t Show this text\n"
+	+"--lock\t\t\t Lock screen (Make sure your key pattern works!)\n"
+
+#ifndef NO_DEBUG
+	+"--print-data\t\t Prints velocity/pressure data to standard output\n"
+	+"--print-pattern\t\t Prints entered pattern as a string\n"
+#endif
+
+	+"--show-input\t\t Shows input while drawing\n"
+	+"--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n"
+	+"-v, --verbose\t\t Print success/failure messages on stdout\n"
+	+"--version\t\t Print the version number and exit\n");
 }

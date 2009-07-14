@@ -24,12 +24,14 @@
 #include <iostream>
 
 #include <QLineF>
+#include <QSettings>
 #include <QString>
 #include <QtDebug>
 
 
 Auth::Auth(QObject *parent):
 	QObject(parent),
+	tries_left(0),
 	started(0)
 { }
 
@@ -187,10 +189,15 @@ void Auth::check()
 	started = new QTime();
 	started->start();
 
-	if(tryPattern())
+	if(tryPattern()) {
+		if(verbose)
+			std::cout << "ERROR: Pattern not recognized.\n";
 		emit passed();
-	else
+	} else {
+		if(verbose)
+			std::cout << "OK: Correct pattern.\n";
 		emit failed();
+	}
 
 	double time = double(started->elapsed())/1000;
 	qDebug() << tries << " tries in " << time << "s, or " << tries/time << "tries/s";
@@ -201,4 +208,22 @@ void Auth::check()
 void Auth::printPattern()
 {
 	std::cout << qPrintable(strokesToString()) << "\n";
+}
+
+
+//set up Auth module with hash from config file
+bool Auth::loadHash()
+{
+	QSettings settings;
+	if(settings.value("pattern_hash").toByteArray().isEmpty()
+	or settings.value("salt").toByteArray().isEmpty())
+		return false;
+
+	setAuthHash(settings.value("pattern_hash").toByteArray(), settings.value("salt").toByteArray());
+
+	touchpad_mode = false;
+	if(settings.value("touchpad_mode").toBool())
+		touchpad_mode = true;
+
+	return true;
 }

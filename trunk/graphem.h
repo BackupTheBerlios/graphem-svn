@@ -20,20 +20,19 @@
 #ifndef GRAPHEM_H
 #define GRAPHEM_H
 
-#include <QApplication>
-#include <QtCrypto>
+#include <QMainWindow>
 
 class Auth;
 class InputWidget;
 class QSettings;
 class QTextEdit;
-class QWidget;
 
-class Graphem : public QApplication {
+const QString graphem_version = "Graphem 0.3";
+
+class Graphem : public QMainWindow {
 	Q_OBJECT
 public:
-	Graphem(int argc, char* argv[]);
-	int exec();
+	Graphem(Auth *auth);
 public slots:
 	void authenticate();
 	void failed();
@@ -42,20 +41,13 @@ public slots:
 	void showNewPatternDialog();
 	void quit();
 private:
-	bool loadHash();
-	void printHelp();
 	void resetStats();
 
 	InputWidget* input;
 	Auth* auth;
 	QSettings* settings;
 	QTextEdit* info_text;
-	QWidget *main;
-	QCA::Initializer crypto_init;
 
-	int tries_left;
-	bool print_pattern, verbose, lock_screen;
 	int usage_total, usage_failed; //usage statistics for pattern
-	int status;
 };
 #endif
