@@ -43,7 +43,8 @@ class InputWidget : public QWidget {
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
 	void enableTouchpadMode(bool on);
-	//Auth* auth() { return auth; } // needed?
+	Auth* auth() { return _auth; } // needed?
+	void resetAuth();
 	void setDefaultMessage(QString m) { default_msg = m; }
 	void showInput(bool on) { show_input = on; }
 
@@ -55,16 +56,16 @@ public slots:
 	void checkFinished();
 	void deleteLastStroke();
 	void printData();
+	void quit();
 	void reset();
 	void showMessage(QString m = QString(), int msecs = 0);
 protected:
 	void mouseMoveEvent(QMouseEvent *ev);
 	void mousePressEvent(QMouseEvent *ev);
 	void mouseReleaseEvent(QMouseEvent *ev);
-//	void tabletEvent(QTabletEvent *ev);
 	void paintEvent(QPaintEvent *ev);
 private:
-	Auth *auth;
+        Auth *_auth;
 	bool pen_down, mouse_down;
 	QTimer *timer, *msg_timer;
 	QString msg, default_msg;

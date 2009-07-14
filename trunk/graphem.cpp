@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "auth.h"
 #include "inputwidget.h"
 #include "graphem.h"
 #include "newpattern.h"
@@ -34,10 +35,6 @@ Graphem::Graphem(InputWidget* input):
 	input(input),
 	info_text(0)
 {
-	settings = new QSettings();
-
-	usage_total = settings->value("usage_total").toInt();
-	usage_failed = settings->value("usage_failed").toInt();
 
 	setWindowTitle(graphem_version);
 	setCentralWidget(input);
@@ -47,75 +44,55 @@ Graphem::Graphem(InputWidget* input):
 	file->addAction(tr("&New Pattern..."), this,
 		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
 	file->addAction(tr("&Generate Random Pattern..."), this,
-		SLOT(showNewPatternDialog()), tr("Ctrl+G")); //TODO 
+		SLOT(showGeneratePatternDialog()), tr("Ctrl+G"));
 	file->addSeparator();
 	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
 	menuBar()->addMenu(tr("&Settings"));
 		// show input
 		// processing timeout
 	QMenu *help = menuBar()->addMenu(tr("&Help"));
-	help->addAction(tr("&About Qt"), qApp, SLOT(aboutQt()), 0);
-	//about
+	help->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()), 0);
+	help->addAction(tr("&About"), this, SLOT(showAboutDialog()), 0);
 	
 	//info dock
 	info_text = new QTextEdit();
 	info_text->setReadOnly(true);
-	refreshInfo();
-	QDockWidget *info_dock = new QDockWidget(tr("Information"), this);
+	info_dock = new QDockWidget(this);
 	info_dock->setWidget(info_text);
 	addDockWidget(Qt::LeftDockWidgetArea, info_dock);
 
 	resize(600,400);
 
-	connect(input, SIGNAL(dataReady()),
-		this, SLOT(authenticate()),
-		Qt::QueuedConnection); //allow for repaint before checking
-
-	connect(auth, SIGNAL(failed()),
-		this, SLOT(failed()));
-	connect(auth, SIGNAL(passed()),
-		this, SLOT(passed()));
-}
-
-
-void Graphem::failed()
-{
-	usage_total++;
-	usage_failed++;
-
-	input->reset();
+	connect(input->auth(), SIGNAL(passed()),
+		this, SLOT(reset()));
+	connect(input->auth(), SIGNAL(failed()),
+		this, SLOT(reset()));
+		
 	refreshInfo();
 }
 
 
-void Graphem::passed()
+void Graphem::reset()
 {
-	usage_total++;
-
 	input->reset();
 	refreshInfo();
-}
-
-
-void Graphem::authenticate()
-{
-	input->auth()->preprocess(input->path);
-	//if(print_pattern) TODO
-	//	auth->printPattern();
-	input->auth()->check();
 }
 
 
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(!input->auth()->loadHash()) {
-		info_text->setText(tr("<h3>Welcome</h3>To start using Graphem, you have to set a new key pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
+	if(!input->auth()->ready()) {
+		info_dock->setWindowTitle(tr("Welcome"));
+		info_text->setText(tr("To start using Graphem, you have to set a new key pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
 		input->setEnabled(false);
 	} else {
-		info_text->setText(tr("<h3>Statistics</h3>\
-			Total: %1 <br />\
+		int usage_total = input->auth()->usageTotal();
+		int usage_failed = input->auth()->usageFailed();
+
+		info_dock->setWindowTitle(tr("Statistics"));
+		info_text->setText(tr("Total: %1 <br />\
 			Correct: %2 / Failed: %3 <br />\
 			Recognition Rate: %4\%")
 			.arg(usage_total)
@@ -129,11 +106,22 @@ void Graphem::refreshInfo()
 }
 
 
-void Graphem::resetStats()
+void Graphem::showAboutDialog()
 {
-	usage_total = 0;
-	usage_failed = 0;
-	refreshInfo();
+	QMessageBox::about(this, tr("About Graphem"),
+	tr("<center><h1>%1</h1>\
+A small mouse gesture based authentication program and screen locker\
+<p>Home Page: <a href=\"http://graphem.berlios.de/\">http://graphem.berlios.de</a></p>\
+<small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
+<p>%2</p> </small>")
+	.arg(graphem_version)
+	.arg("This program is free software; you can redistribute it and/or modify<br> it under the terms of the GNU General Public License as published by<br> the Free Software Foundation; either version 2 of the License, or<br> (at your option) any later version."));
+}
+
+
+void Graphem::showGeneratePatternDialog()
+{
+	//TODO
 }
 
 
@@ -154,17 +142,17 @@ void Graphem::showNewPatternDialog()
 	
 	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
 	NewPattern *new_pattern_dialog = new NewPattern(this, !ret);
-	if(new_pattern_dialog->exec() == QDialog::Accepted)
-		resetStats();
+	if(new_pattern_dialog->exec() == QDialog::Accepted) {
+		input->resetAuth();
+		refreshInfo();
+	}
+
 	delete new_pattern_dialog;
 }
 
 
 void Graphem::quit()
 {
-	settings->setValue("usage_total", usage_total);
-	settings->setValue("usage_failed", usage_failed);
-	settings->sync();
-
+	input->quit();
 	qApp->quit();
 }

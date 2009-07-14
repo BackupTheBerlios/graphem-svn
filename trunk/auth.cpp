@@ -33,6 +33,8 @@ Auth::Auth(QObject *parent):
 	QObject(parent),
 	tries_left(0),
 	started(0),
+	hash_loaded(false),
+	print_pattern(false),
 	touchpad_mode(false),
 	verbose(false)
 { }
@@ -191,16 +193,22 @@ void Auth::check()
 	started = new QTime();
 	started->start();
 
+	usage_total++;
 	if(tryPattern()) {
 		if(verbose)
 			std::cout << "OK: Correct pattern.\n";
 
 		emit passed();
 	} else {
+		usage_failed++;
 		if(verbose)
 			std::cout << "ERROR: Pattern not recognized.\n";
-		if(tries_left == 1) //this try was our last
-			exit(1); //TODO ?
+
+
+		if(tries_left == 1) {//this try was our last
+			saveStats();
+			exit(1);
+		}
 
 		if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
 			tries_left--;
@@ -211,25 +219,24 @@ void Auth::check()
 #ifndef NO_DEBUG
 	double time = double(started->elapsed())/1000;
 	qDebug() << compared_hashes_count << " tries in " << time << "s, or " << compared_hashes_count/time << "tries/s";
+
+	if(print_pattern)
+		qDebug() << "Input: " << strokesToString();
 #endif
 
 	delete started;
 }
 
 
-void Auth::printPattern()
-{
-	std::cout << qPrintable(strokesToString()) << "\n";
-}
-
-
 //set up Auth module with hash from config file
-bool Auth::loadHash()
+void Auth::loadHash()
 {
 	QSettings settings;
 	if(settings.value("pattern_hash").toByteArray().isEmpty()
-	or settings.value("salt").toByteArray().isEmpty())
-		return false;
+	or settings.value("salt").toByteArray().isEmpty()) {
+		hash_loaded = false;
+		return;
+	}
 
 	setAuthHash(settings.value("pattern_hash").toByteArray(), settings.value("salt").toByteArray());
 
@@ -237,5 +244,19 @@ bool Auth::loadHash()
 	if(settings.value("touchpad_mode").toBool())
 		touchpad_mode = true;
 
-	return true;
+	usage_total = settings.value("usage_total").toInt();
+	usage_failed = settings.value("usage_failed").toInt();
+
+	hash_loaded = true;
+}
+
+
+void Auth::saveStats()
+{
+	if(hash_loaded) {
+		QSettings settings;
+		settings.setValue("usage_total", usage_total);
+		settings.setValue("usage_failed", usage_failed);
+		settings.sync();
+	}
 }

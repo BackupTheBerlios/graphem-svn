@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "auth.h"
 #include "graphem.h"
 #include "inputwidget.h"
 
@@ -42,7 +43,6 @@ int main(int argc, char* argv[])
 	InputWidget *input = new InputWidget();
 
 	bool lock_screen = false;
-	bool print_pattern = false;
 
 	for(int i = 1; i < argc; i++) {
 		if(argv[i] == QString("--help")) {
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 			QObject::connect(input, SIGNAL(dataReady()),
 				input, SLOT(printData()));
 		} else if(argv[i] == QString("--print-pattern")) {
-			print_pattern = true;
+			input->auth()->setPrintPattern(true);
 #endif
 		} else if(argv[i] == QString("--show-input")) {
 			input->showInput(true);
@@ -82,14 +82,13 @@ int main(int argc, char* argv[])
 	}
 
 	if(lock_screen) {
-		if(!input->auth()->loadHash()) {
+		if(!input->auth()->ready()) {
 			cerr << "Couldn't load key pattern!\n";
 			return 1;
 		}
-		input->enableTouchpadMode(auth->usingTouchpadMode()); //TODO move this into input
 
-		QObject::connect(auth, SIGNAL(passed()),
-			input, SLOT(close()));
+		QObject::connect(input->auth(), SIGNAL(passed()),
+			input, SLOT(quit()));
 
 		input->setWindowTitle(graphem_version);
 		input->setWindowFlags(Qt::X11BypassWindowManagerHint);

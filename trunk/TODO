@@ -2,7 +2,6 @@
 "red" strokes require two clicks to remove instead of one
 --tries doesn't make sense with main window or --lock, maybe create new mode: fullscreen but no lock?
 diagonal arrows suffer from rounding errors?
-same old problem: input -> auth? (include auth in inputwidget?
 l10n
 logo
 how to remove margins around InputWidget?
@@ -11,9 +10,9 @@ make preprocess() suck less, use velocity to determiny averaging
 create documentation
 generate random pattern
 estimate entropy of input
-segfault on x86-64, qt 4.4.0 (missing & before argc. that's what you get for subclassing QApplication)
 
 ?:
+create test cases for specific inputs
 (!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
 do some benchmarking
 	test wether manual inlining makes sense

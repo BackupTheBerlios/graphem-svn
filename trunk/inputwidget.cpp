@@ -23,6 +23,7 @@
 #include <cmath>
 #include <iostream>
 
+#include <QCoreApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTime>
@@ -31,7 +32,7 @@
 
 InputWidget::InputWidget(QWidget* parent, bool record) :
 	QWidget(parent),
-	auth(this),
+	_auth(new Auth(this)),
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
@@ -56,6 +57,12 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	} else {
 		connect(timer, SIGNAL(timeout()),
 			this, SLOT(checkFinished()));
+		connect(this, SIGNAL(dataReady()),
+			_auth, SLOT(check()),
+			Qt::QueuedConnection); //allow for repaint before checking
+		connect(_auth, SIGNAL(failed()),
+			this, SLOT(reset()));
+		resetAuth();
 	}
 	showMessage();
 	timer->start();
@@ -71,6 +78,7 @@ void InputWidget::checkFinished()
 	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
 		showMessage(tr("Processing..."));
 		repaint();
+		auth()->preprocess(path);
 		emit dataReady();
 	}
 }
@@ -231,4 +239,23 @@ void InputWidget::deleteLastStroke()
 		path.removeAt(a.start_node_id+1);
 
 	update();
+}
+
+
+void InputWidget::resetAuth()
+{
+	_auth->loadHash();
+	enableTouchpadMode(_auth->usingTouchpadMode());
+}
+
+
+//do some cleanup, then quit
+void InputWidget::quit()
+{
+	releaseMouse();
+	releaseKeyboard();
+	hide();
+
+	_auth->saveStats();
+	qApp->quit();
 }

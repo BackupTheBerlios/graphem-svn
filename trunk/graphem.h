@@ -23,7 +23,7 @@
 #include <QMainWindow>
 
 class InputWidget;
-class QSettings;
+class QDockWidget;
 class QTextEdit;
 
 const QString graphem_version = "Graphem 0.3";
@@ -33,19 +33,15 @@ class Graphem : public QMainWindow {
 public:
 	Graphem(InputWidget *input);
 public slots:
-	void authenticate();
-	void failed();
-	void passed();
 	void refreshInfo();
+	void reset();
+	void showAboutDialog();
+	void showGeneratePatternDialog();
 	void showNewPatternDialog();
 	void quit();
 private:
-	void resetStats();
-
 	InputWidget* input;
-	QSettings* settings;
+	QDockWidget* info_dock;
 	QTextEdit* info_text;
-
-	int usage_total, usage_failed; //usage statistics for pattern
 };
 #endif

@@ -37,29 +37,38 @@ class Auth : public QObject {
 	friend class NewPattern;
 public:
 	Auth(QObject *parent = 0);
-	void check();
-	bool loadHash();
+	void loadHash();
 	void preprocess(const QList<Node> &path);
-	void printPattern();
-	void setAuthHash(const QByteArray &hash, const QByteArray &s) { auth_pattern = hash; salt = s; }
+	bool ready() { return hash_loaded; }
+	void saveStats();
 	void setTries(int tries) { tries_left = tries; }
 	void setVerbose(bool on) { verbose = on; }
+	void setPrintPattern(bool on) { print_pattern = on; }
+	int usageFailed() { return usage_failed; }
+	int usageTotal() { return usage_total; }
 	bool usingTouchpadMode() { return touchpad_mode; }
+public slots:
+	void check();
 signals:
 	void failed();
 	void passed();
 private:
-	bool tryPattern();
 	bool matchesAuthPattern();
+	void setAuthHash(const QByteArray &hash, const QByteArray &s) { auth_pattern = hash; salt = s; }
 	QString strokesToString();
+	bool tryPattern();
 
 	QByteArray auth_pattern, salt;
 	QList<Stroke> strokes;
 	int compared_hashes_count;
 	int tries_left;
 	QTime *started;
+	bool hash_loaded;
+	bool print_pattern;
 	bool touchpad_mode;
 	bool verbose;
+
+	int usage_total, usage_failed; //usage statistics for pattern
 
 	const static int max_check_time = 6000; //in ms
 	const static int short_limit = 10; //length limit for short strokes
