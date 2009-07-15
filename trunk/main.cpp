@@ -79,6 +79,7 @@ int main(int argc, char* argv[])
 
 	if(mode == DEFAULT) { //show main window
 		Graphem *main = new Graphem(input);
+		main->setWindowIcon(QIcon("icon.png"));
 		main->show();
 	} else {
 		if(!input->auth()->ready()) {
@@ -88,6 +89,8 @@ int main(int argc, char* argv[])
 
 		QObject::connect(input->auth(), SIGNAL(passed()),
 			input, SLOT(quit()));
+
+		input->setWindowIcon(QIcon("icon.png"));
 
 		if(mode == ASK) {
 			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(graphem_version));

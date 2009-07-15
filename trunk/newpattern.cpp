@@ -42,30 +42,32 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	input->setDefaultMessage("");
 	input->showMessage(tr("Enter your new pattern here."), 3000);
 	
+	connect(input, SIGNAL(dataReady()),
+		this, SLOT(updateDisplay()));
+
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
+	button_box->addButton(tr("&Save"), QDialogButtonBox::AcceptRole);
+	QPushButton *delete_last = button_box->addButton(tr("&Delete Last Stroke"), QDialogButtonBox::ActionRole);
+	QPushButton *reset = button_box->addButton(tr("&Reset"), QDialogButtonBox::ResetRole);
 	connect(button_box, SIGNAL(rejected()),
 		this, SLOT(reject()));
-	button_box->addButton(tr("&Save"), QDialogButtonBox::AcceptRole);
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(save()));
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(accept()));
-	QPushButton *delete_last = button_box->addButton(tr("&Delete Last Stroke"), QDialogButtonBox::ActionRole);
 	connect(delete_last, SIGNAL(clicked()),
 		input, SLOT(deleteLastStroke()));
-	QPushButton *reset = button_box->addButton(tr("&Reset"), QDialogButtonBox::ResetRole);
 	connect(reset, SIGNAL(clicked()),
 		input, SLOT(reset()));
 	
 	QVBoxLayout *l1 = new QVBoxLayout();
+	l1->setMargin(0);
+	button_box->setContentsMargins(9, 0, 9, 0);
 	l1->addWidget(input);
 	l1->addWidget(button_box);
 	l1->addWidget(status);
 	setLayout(l1);
-
-	connect(input, SIGNAL(dataReady()),
-		this, SLOT(updateDisplay()));
 }
 
 
