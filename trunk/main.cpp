@@ -67,13 +67,6 @@ int main(int argc, char* argv[])
 			i++;
 		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
 			input->auth()->setVerbose(true);
-		} else if(argv[i] == QString("--version")) {
-			cout << qPrintable(graphem_version) << "\n";
-			cout << "Copyright (C) 2009 Christian Pulvermacher\n";
-			cout << "Documentation is available on http://graphem.berlios.de/\n";
-			cout << "Using Qt " << qVersion();
-			cout << ", compiled against Qt " << QT_VERSION_STR << "\n";
-			return 0;
 		} else {
 			cerr << "Unknown command line option '" << argv[i] << "'\n";
 			printHelp(argv[0]);
@@ -122,6 +115,5 @@ void printHelp(char *arg0)
 
 	+"--show-input\t\t Shows input while drawing\n"
 	+"--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n"
-	+"-v, --verbose\t\t Print success/failure messages on stdout\n"
-	+"--version\t\t Print the version number and exit\n");
+	+"-v, --verbose\t\t Print success/failure messages on stdout\n");
 }

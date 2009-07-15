@@ -4,9 +4,9 @@
 diagonal arrows suffer from rounding errors?
 l10n
 logo
-how to remove margins around InputWidget?
+how to remove margins around InputWidget in NewPattern dialog?
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
-make preprocess() suck less, use velocity to determiny averaging
+make preprocess() suck less, use velocity to determine averaging
 create documentation
 generate random pattern
 estimate entropy of input
