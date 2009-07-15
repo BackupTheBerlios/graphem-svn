@@ -21,6 +21,7 @@
 #include "inputwidget.h"
 #include "graphem.h"
 #include "newpattern.h"
+#include "preferences.h"
 
 #include <QCoreApplication>
 #include <QDockWidget>
@@ -46,9 +47,11 @@ Graphem::Graphem(InputWidget* input):
 	file->addAction(tr("&Generate Random Pattern..."), this,
 		SLOT(showGeneratePatternDialog()), tr("Ctrl+G"));
 	file->addSeparator();
+	file->addAction(tr("&Preferences"), this,
+		SLOT(showPreferences()), tr("Ctrl+P"));
+	file->addSeparator();
 	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
-	menuBar()->addMenu(tr("&Settings"));
-		// show input
+
 		// processing timeout
 	QMenu *help = menuBar()->addMenu(tr("&Help"));
 	help->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()), 0);
@@ -155,4 +158,12 @@ void Graphem::quit()
 {
 	input->quit();
 	qApp->quit();
+}
+
+
+void Graphem::showPreferences()
+{
+	Preferences *pref = new Preferences(this);
+	pref->exec();
+	delete pref;
 }

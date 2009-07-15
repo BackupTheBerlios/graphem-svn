@@ -26,12 +26,14 @@
 #include <QLineF>
 #include <QPushButton>
 #include <QSettings>
+#include <QStatusBar>
 #include <QVBoxLayout>
 
 NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	QDialog(parent),
 	input(new InputWidget(this, true)), //InputWidget in record mode
-	touchpad_mode(touchpad_mode)
+	touchpad_mode(touchpad_mode),
+	status(new QStatusBar(this))
 {
 	resize(600,400);
 	setWindowTitle(tr("New Pattern"));
@@ -59,6 +61,7 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	QVBoxLayout *l1 = new QVBoxLayout();
 	l1->addWidget(input);
 	l1->addWidget(button_box);
+	l1->addWidget(status);
 	setLayout(l1);
 
 	connect(input, SIGNAL(dataReady()),
@@ -81,8 +84,7 @@ void NewPattern::updateDisplay()
 		input->arrows.append(a);
 	}
 
-	setWindowTitle(tr("New Pattern (%1 Stroke(s))").arg(auth.strokes.count()));
-	//TODO: move into status bar
+	status->showMessage(tr("%1 Stroke(s)").arg(auth.strokes.count()));
 }
 
 

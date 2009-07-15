@@ -24,6 +24,7 @@
 
 class Auth;
 class InputWidget;
+class QStatusBar;
 
 class NewPattern : public QDialog {
 	Q_OBJECT
@@ -35,5 +36,6 @@ private slots:
 private:
 	InputWidget *input;
 	bool touchpad_mode;
+	QStatusBar *status;
 };
 #endif

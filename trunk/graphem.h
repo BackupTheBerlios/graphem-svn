@@ -38,6 +38,7 @@ public slots:
 	void showAboutDialog();
 	void showGeneratePatternDialog();
 	void showNewPatternDialog();
+	void showPreferences();
 	void quit();
 private:
 	InputWidget* input;
