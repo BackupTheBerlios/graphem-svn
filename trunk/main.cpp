@@ -23,12 +23,14 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QShortcut>
 #include <QString>
 #include <QtCrypto>
 
 #include <iostream>
 
 void printHelp(char *arg0);
+enum WindowMode { DEFAULT, ASK, LOCK };
 
 using namespace std;
 
@@ -42,14 +44,17 @@ int main(int argc, char* argv[])
 	QCA::Initializer crypto_init;
 	InputWidget *input = new InputWidget();
 
-	bool lock_screen = false;
+	WindowMode mode = DEFAULT;
+	int tries = 0; //ignored if mode != ASK
 
 	for(int i = 1; i < argc; i++) {
 		if(argv[i] == QString("--help")) {
 			printHelp(argv[0]);
 			return 0;
+		} else if(argv[i] == QString("--ask")) {
+			mode = ASK;
 		} else if(argv[i] == QString("--lock")) {
-				lock_screen = true;
+			mode = LOCK;
 #ifndef NO_DEBUG
 		} else if(argv[i] == QString("--print-data")) {
 			QObject::connect(input, SIGNAL(dataReady()),
@@ -61,7 +66,7 @@ int main(int argc, char* argv[])
 			if(i+1 >= argc)
 				break; //parameter not found
 
-			input->auth()->setTries(QString(argv[i+1]).toInt());
+			tries = QString(argv[i+1]).toInt();
 			i++;
 		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
 			input->auth()->setVerbose(true);
@@ -72,7 +77,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if(lock_screen) {
+	if(mode == DEFAULT) { //show main window
+		Graphem *main = new Graphem(input);
+		main->show();
+	} else {
 		if(!input->auth()->ready()) {
 			cerr << "Couldn't load key pattern!\n";
 			return 1;
@@ -81,19 +89,23 @@ int main(int argc, char* argv[])
 		QObject::connect(input->auth(), SIGNAL(passed()),
 			input, SLOT(quit()));
 
-		input->setWindowTitle(graphem_version);
-		input->setWindowFlags(Qt::X11BypassWindowManagerHint);
-		input->setVisible(true);
-		QDesktopWidget dw;
-		input->setGeometry(dw.screenGeometry());
+		if(mode == ASK) {
+			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(graphem_version));
+			new QShortcut(QKeySequence("Esc"), input, SLOT(quit()));
+			input->auth()->setTries(tries);
+			input->showMaximized();
+		} else { //lock
+			input->setWindowTitle(graphem_version);
+			input->setWindowFlags(Qt::X11BypassWindowManagerHint);
+			input->setVisible(true);
+			QDesktopWidget dw;
+			input->setGeometry(dw.screenGeometry());
 
-		input->grabKeyboard();
-		input->grabMouse();
-		input->activateWindow(); //make sure we catch keyboard events
-		input->raise();
-	} else { //show main window
-		Graphem *main = new Graphem(input);
-		main->show();
+			input->grabKeyboard();
+			input->grabMouse();
+			input->activateWindow(); //make sure we catch keyboard events
+			input->raise();
+		}
 	}
 
 	return app.exec();
@@ -102,15 +114,17 @@ int main(int argc, char* argv[])
 
 void printHelp(char *arg0)
 {
-	cout << qPrintable(QObject::tr("Usage: %1 [options]\n\n").arg(arg0)
-	+"--help\t\t\t Show this text\n"
-	+"--lock\t\t\t Lock screen (Make sure your key pattern works!)\n"
+	cout << "Usage: " << arg0 << " [options]\n\n"
+	<< "--ask\t\t Ask for key pattern but don't give access to configuration; can be canceled\n"
+	<< "--help\t\t Show this text\n"
+	<< "--lock\t\t Lock screen (Make sure your key pattern works!)\n"
 
 #ifndef NO_DEBUG
-	+"--print-data\t\t Prints velocity/pressure data to standard output\n"
-	+"--print-pattern\t\t Prints entered pattern as a string\n"
+	<< "--print-data\t Prints velocity/pressure data to standard output\n"
+	<< "--print-pattern\t Prints entered pattern as a string\n"
 #endif
 
-	+"--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n"
-	+"-v, --verbose\t\t Print success/failure messages on stdout\n");
+	<< "--tries [n]\t Abort after [n] tries; can only be used with --ask\n"
+	<< "-v, --verbose\t Print success/failure messages on standard output\n"
+	<< "\n Returns 0 on success, 1 if canceled or maximum number of tries reached\n";
 }

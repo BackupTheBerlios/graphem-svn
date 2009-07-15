@@ -112,7 +112,7 @@ void Graphem::showAboutDialog()
 {
 	QMessageBox::about(this, tr("About Graphem"),
 	tr("<center><h1>%1</h1>\
-A small mouse gesture based authentication program and screen locker\
+<h3>A small mouse gesture based authentication program and screen locker</h3>\
 <p>Documentation is available on <a href=\"http://graphem.berlios.de/\">http://graphem.berlios.de</a></p>\
 <small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
 <p>%2</p></small>")

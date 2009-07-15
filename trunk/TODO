@@ -1,6 +1,5 @@
 0.3:
 "red" strokes require two clicks to remove instead of one
---tries doesn't make sense with main window or --lock, maybe create new mode: fullscreen but no lock?
 statusbar in NewPattern looks _bad_
 l10n
 logo
@@ -11,6 +10,7 @@ create documentation
 generate random pattern
 estimate entropy of input
 is QCA's rng enough?
+check return codes.
 
 ?:
 create test cases for specific inputs
@@ -30,8 +30,7 @@ support real handwriting
 		element: cusp, straight line, loop; also store direction
 		still missing velocity, probably helpful
 use pattern to access encryption key, should be possible with QCA
+add fancy graphics to auth dialog
+maybe separate ASK/LOCK binaries - if the whole package is too large
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
 or center cursor after fail? (again, not for tablets)
-
-does hashing really make sense? Find out just what part of the total keyspace we have to try on average...
-if a pattern is supposed to be secure, we can only try a number of keys which is many orders of magnitude less

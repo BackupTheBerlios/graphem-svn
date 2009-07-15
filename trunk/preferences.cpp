@@ -34,10 +34,8 @@ Preferences::Preferences(QWidget *parent):
 
 	//set up controls
 	QDialogButtonBox *button_box = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
-//	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 	connect(button_box, SIGNAL(rejected()),
 		this, SLOT(reject()));
-//	button_box->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(save()));
 

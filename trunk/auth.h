@@ -32,7 +32,7 @@
 
 class QTime;
 
-class Auth : public QObject {
+class Auth : public QObject { //TODO needs cleanup
 	Q_OBJECT
 	friend class NewPattern;
 public:

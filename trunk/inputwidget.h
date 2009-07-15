@@ -43,12 +43,12 @@ class InputWidget : public QWidget {
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
 	void enableTouchpadMode(bool on);
-	Auth* auth() { return _auth; } // needed?
+	Auth* auth() { return _auth; } // TODO needed?
 	void resetAuth();
 	void setDefaultMessage(QString m) { default_msg = m; }
 
 	QList<Node> path;
-	QList<Arrow> arrows; //used when recording
+	QList<Arrow> arrows; // used when recording
 signals:
 	void dataReady();
 public slots:
@@ -64,7 +64,7 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *ev);
 	void paintEvent(QPaintEvent *ev);
 private:
-        Auth *_auth;
+	Auth *_auth;
 	bool pen_down, mouse_down;
 	QTimer *timer, *msg_timer;
 	QString msg, default_msg;
