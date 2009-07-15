@@ -20,7 +20,6 @@
 #include "auth.h"
 #include "inputwidget.h"
 
-#include <cmath>
 #include <iostream>
 
 #include <QCoreApplication>
@@ -182,8 +181,22 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		painter.drawPath(painter_path);
 	}
 
+	// draw arrows
 	if(!record_pattern)
 		return;
+
+	//approximation to 3*cos() to get rid of floating point errors
+	const int x[] = {
+		3,
+		2,
+		0,
+		-2,
+		-3,
+		-2,
+		0,
+		2
+	};
+
 	for(int i=0; i < arrows.count(); i++) {
 		if(arrows.at(i).pen_up)
 			painter.setPen(Qt::red);
@@ -191,8 +204,9 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 			painter.setPen(Qt::white);
 
 		QPointF start = path.at(arrows.at(i).start_node_id).pos;
-		const double angle = arrows.at(i).direction / 4.0 * 3.14159;
-		const QPointF end = start + arrows.at(i).weight*QPointF(cos(angle), -sin(angle));
+		const int dir = arrows.at(i).direction;
+		const QPointF end = start + arrows.at(i).weight
+			*QPoint(x[dir], x[(dir+2)%8])/3;
 		const QLineF l(start, end);
 		if(l.length() == 0)
 				continue;

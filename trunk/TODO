@@ -1,7 +1,6 @@
 0.3:
 "red" strokes require two clicks to remove instead of one
 --tries doesn't make sense with main window or --lock, maybe create new mode: fullscreen but no lock?
-diagonal arrows suffer from rounding errors?
 l10n
 logo
 how to remove margins around InputWidget in NewPattern dialog?
@@ -10,6 +9,7 @@ make preprocess() suck less, use velocity to determine averaging
 create documentation
 generate random pattern
 estimate entropy of input
+is QCA's rng enough?
 
 ?:
 create test cases for specific inputs
