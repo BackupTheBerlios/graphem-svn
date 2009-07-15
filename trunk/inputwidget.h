@@ -46,7 +46,6 @@ public:
 	Auth* auth() { return _auth; } // needed?
 	void resetAuth();
 	void setDefaultMessage(QString m) { default_msg = m; }
-	void showInput(bool on) { show_input = on; }
 
 	QList<Node> path;
 	QList<Arrow> arrows; //used when recording

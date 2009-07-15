@@ -27,7 +27,6 @@
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QSettings>
 #include <QString>
 #include <QTextEdit>
 
@@ -157,7 +156,7 @@ void Graphem::showNewPatternDialog()
 void Graphem::quit()
 {
 	input->quit();
-	qApp->quit();
+	close();
 }
 
 
@@ -165,5 +164,9 @@ void Graphem::showPreferences()
 {
 	Preferences *pref = new Preferences(this);
 	pref->exec();
+
+	input->resetAuth();
+	input->reset();
+
 	delete pref;
 }

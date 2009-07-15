@@ -67,10 +67,9 @@ private:
 	bool print_pattern;
 	bool touchpad_mode;
 	bool verbose;
-
+	int check_timeout; //in ms
 	int usage_total, usage_failed; //usage statistics for pattern
 
-	const static int max_check_time = 6000; //in ms
 	const static int short_limit = 10; //length limit for short strokes
 };
 #endif

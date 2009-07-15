@@ -22,9 +22,9 @@
 
 #include <iostream>
 
-#include <QCoreApplication>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QSettings>
 #include <QTime>
 #include <QTimer>
 
@@ -62,6 +62,8 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 		connect(_auth, SIGNAL(failed()),
 			this, SLOT(reset()));
 		resetAuth();
+		QSettings settings;
+		show_input = settings.value("show_input").toBool();
 	}
 	showMessage();
 	timer->start();
@@ -95,6 +97,8 @@ void InputWidget::reset()
 {
 	path.clear();
 	arrows.clear();
+	QSettings settings;
+	show_input = settings.value("show_input").toBool();
 	if(!record_pattern)
 		showMessage(tr("Pattern not recognized, please try again."), 1500);
 	update();
@@ -271,5 +275,5 @@ void InputWidget::quit()
 	hide();
 
 	_auth->saveStats();
-	qApp->quit();
+	close();
 }

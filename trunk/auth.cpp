@@ -36,7 +36,8 @@ Auth::Auth(QObject *parent):
 	hash_loaded(false),
 	print_pattern(false),
 	touchpad_mode(false),
-	verbose(false)
+	verbose(false),
+	check_timeout(6000)
 { }
 
 
@@ -130,7 +131,7 @@ bool Auth::tryPattern()
 		offset[i] = 0;
 
 	for(int n = 1; n != permutations_count; n++) {
-		if(started->elapsed() > max_check_time)
+		if(started->elapsed() > check_timeout)
 			break;
 
 		int p = 1;
@@ -246,6 +247,7 @@ void Auth::loadHash()
 
 	usage_total = settings.value("usage_total").toInt();
 	usage_failed = settings.value("usage_failed").toInt();
+	check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
 
 	hash_loaded = true;
 }

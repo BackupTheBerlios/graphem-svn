@@ -57,8 +57,6 @@ int main(int argc, char* argv[])
 		} else if(argv[i] == QString("--print-pattern")) {
 			input->auth()->setPrintPattern(true);
 #endif
-		} else if(argv[i] == QString("--show-input")) {
-			input->showInput(true);
 		} else if(argv[i] == QString("--tries")) {
 			if(i+1 >= argc)
 				break; //parameter not found
@@ -113,7 +111,6 @@ void printHelp(char *arg0)
 	+"--print-pattern\t\t Prints entered pattern as a string\n"
 #endif
 
-	+"--show-input\t\t Shows input while drawing\n"
 	+"--tries [n]\t\t Exit Graphem with status code 1 after [n] tries; 0 to disable (default)\n"
 	+"-v, --verbose\t\t Print success/failure messages on stdout\n");
 }

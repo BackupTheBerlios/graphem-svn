@@ -1,6 +1,7 @@
 0.3:
 "red" strokes require two clicks to remove instead of one
 --tries doesn't make sense with main window or --lock, maybe create new mode: fullscreen but no lock?
+statusbar in NewPattern looks _bad_
 l10n
 logo
 how to remove margins around InputWidget in NewPattern dialog?

@@ -33,11 +33,11 @@ Preferences::Preferences(QWidget *parent):
 	QSettings settings;
 
 	//set up controls
-	QDialogButtonBox *button_box = new QDialogButtonBox(this);
-	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
+	QDialogButtonBox *button_box = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
+//	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 	connect(button_box, SIGNAL(rejected()),
 		this, SLOT(reject()));
-	button_box->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
+//	button_box->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(save()));
 
@@ -45,7 +45,7 @@ Preferences::Preferences(QWidget *parent):
 	if(settings.value("show_input").toBool())
 		show_input->setCheckState(Qt::Checked);
 
-	QLabel *check_timeout_label = new QLabel(tr("Authentication timeout"));
+	QLabel *check_timeout_label = new QLabel(tr("&Authentication timeout"));
 	check_timeout = new QSpinBox();
 	check_timeout->setRange(1, 120);
 	check_timeout->setSuffix("s");
@@ -68,6 +68,10 @@ Preferences::Preferences(QWidget *parent):
 //save and accept dialog
 void Preferences::save()
 {
+	QSettings settings;
+	settings.setValue("show_input", show_input->checkState() == Qt::Checked);
+	settings.setValue("check_timeout", check_timeout->value());
+	settings.sync();
 
 	accept();
 }
