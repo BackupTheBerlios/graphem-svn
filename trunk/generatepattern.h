@@ -17,24 +17,25 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef NEWPATTERN_H
-#define NEWPATTERN_H
+#ifndef GENERATEPATTERN_H
+#define GENERATEPATTERN_H
 
 #include <QDialog>
 
-class Auth;
 class InputWidget;
-class QStatusBar;
+class QCheckBox;
+class QSpinBox;
 
-class NewPattern : public QDialog {
+class GeneratePattern : public QDialog {
 	Q_OBJECT
 public:
-	NewPattern(QWidget *parent, bool touchpad_mode);
+	GeneratePattern(QWidget *parent);
 private slots:
-	void updateDisplay();
+	void generate();
 	void save();
 private:
 	InputWidget *input;
-	QStatusBar *status;
+	QCheckBox *touchpad;
+	QSpinBox *strokes_count;
 };
 #endif

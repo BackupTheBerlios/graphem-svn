@@ -18,7 +18,6 @@
 */
 
 #include "auth.h"
-#include "crypto.h"
 #include "inputwidget.h"
 #include "newpattern.h"
 
@@ -32,7 +31,6 @@
 NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	QDialog(parent),
 	input(new InputWidget(this, true)), //InputWidget in record mode
-	touchpad_mode(touchpad_mode),
 	status(new QStatusBar(this))
 {
 	resize(600,400);
@@ -95,13 +93,5 @@ void NewPattern::save()
 {
 	Auth auth(this);
 	auth.preprocess(input->path);
-
-	QSettings settings;
-	QByteArray salt = Crypto::generateSalt();
-	settings.setValue("pattern_hash", Crypto::getHash(auth.strokesToString(), salt));
-	settings.setValue("touchpad_mode", touchpad_mode);
-	settings.setValue("salt", salt);
-	settings.setValue("usage_total", 0);
-	settings.setValue("usage_failed", 0);
-	settings.sync();
+	auth.saveHash();
 }

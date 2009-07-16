@@ -40,6 +40,7 @@ public:
 	void loadHash();
 	void preprocess(const QList<Node> &path);
 	bool ready() { return hash_loaded; }
+	void saveHash();
 	void saveStats();
 	void setTries(int tries) { tries_left = tries; }
 	void setVerbose(bool on) { verbose = on; }

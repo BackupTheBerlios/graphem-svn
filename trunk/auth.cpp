@@ -262,3 +262,17 @@ void Auth::saveStats()
 		settings.sync();
 	}
 }
+
+
+//save hash to config, overwrite old key pattern
+void Auth::saveHash()
+{
+	QSettings settings;
+	QByteArray salt = Crypto::generateSalt();
+	settings.setValue("pattern_hash", Crypto::getHash(strokesToString(), salt));
+	settings.setValue("touchpad_mode", touchpad_mode);
+	settings.setValue("salt", salt);
+	settings.setValue("usage_total", 0);
+	settings.setValue("usage_failed", 0);
+	settings.sync();
+}

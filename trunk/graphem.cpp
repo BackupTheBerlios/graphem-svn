@@ -19,6 +19,7 @@
 
 #include "auth.h"
 #include "inputwidget.h"
+#include "generatepattern.h"
 #include "graphem.h"
 #include "newpattern.h"
 #include "preferences.h"
@@ -123,7 +124,13 @@ void Graphem::showAboutDialog()
 
 void Graphem::showGeneratePatternDialog()
 {
-	//TODO
+	GeneratePattern *dialog = new GeneratePattern(this);
+	if(dialog->exec() == QDialog::Accepted) {
+		input->resetAuth();
+		refreshInfo();
+	}
+
+	delete dialog;
 }
 
 

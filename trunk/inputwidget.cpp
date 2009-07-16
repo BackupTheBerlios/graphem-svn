@@ -32,6 +32,7 @@
 InputWidget::InputWidget(QWidget* parent, bool record) :
 	QWidget(parent),
 	_auth(new Auth(this)),
+	accept_input(true),
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
