@@ -35,6 +35,7 @@ class QTime;
 class Auth : public QObject { //TODO needs cleanup
 	Q_OBJECT
 	friend class NewPattern;
+	friend class GeneratePattern;
 public:
 	Auth(QObject *parent = 0);
 	void loadHash();

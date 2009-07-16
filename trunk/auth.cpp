@@ -124,8 +124,8 @@ bool Auth::tryPattern()
 		indices.append(lowest);
 	}
 
-	int strokes_count = strokes.count();
-	int permutations_count = pow(4, strokes_count);
+	const int strokes_count = strokes.count();
+	const int permutations_count = pow(4, strokes_count);
 	int offset[strokes_count]; //stores current permutation
 	for(int i=0; i < strokes_count; i++)
 		offset[i] = 0;

@@ -26,6 +26,7 @@
 namespace Crypto {
 	QByteArray generateSalt();
 	QByteArray getHash(const QString &s, const QByteArray &salt);
+	int randInt(int min, int max);
 };
 
 

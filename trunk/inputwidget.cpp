@@ -138,6 +138,7 @@ void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 
 	mouse_down = false;
 
+//TODO maybe remove first line
 	path.append(Node(ev->pos()));
 	path.append(Node::makeSeparator(ev->pos()));
 	update();

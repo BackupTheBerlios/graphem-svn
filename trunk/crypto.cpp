@@ -26,3 +26,17 @@ QByteArray Crypto::generateSalt()
 	const int salt_bytes_count = 5;
 	return QCA::Random::randomArray(salt_bytes_count).toByteArray();
 }
+
+int Crypto::randInt(int min, int max)
+{
+	//in [0, UINT_MAX]
+	const unsigned int r = QCA::Random::randomInt();
+	//in [0, 1]
+	double x = double(r)/UINT_MAX;
+
+	//TODO not exactly uniform yet
+	const double result = min + (max-min)*x;
+	Q_ASSERT(result >= min);
+	Q_ASSERT(result <= max);
+	return result;
+}
