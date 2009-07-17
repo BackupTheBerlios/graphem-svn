@@ -24,7 +24,7 @@
 #include "newpattern.h"
 #include "preferences.h"
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QMessageBox>
