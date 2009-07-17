@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 		//main->setWindowIcon(QIcon("icon.png"));
 		main->show();
 	} else {
-		if(!input->auth()->ready()) {
+		if(!input->hashLoaded()) {
 			cerr << "Couldn't load key pattern!\n";
 			return 1;
 		}

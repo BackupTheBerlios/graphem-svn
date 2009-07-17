@@ -183,12 +183,12 @@ bool Auth::matchesAuthPattern()
 
 void Auth::check()
 {
+	qDebug() << "number of strokes: " << strokes.count();
+
 	if(auth_pattern.isEmpty()) {
 		emit passed();
 		return;
 	}
-
-	qDebug() << "number of strokes: " << strokes.count();
 
 	compared_hashes_count = 0;
 	started = new QTime();

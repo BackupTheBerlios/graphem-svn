@@ -28,6 +28,7 @@
 #include <QSpinBox>
 #include <QLabel>
 
+
 GeneratePattern::GeneratePattern(QWidget *parent):
 	QDialog(parent),
 	input(new InputWidget(this, true))
@@ -75,7 +76,7 @@ void GeneratePattern::generate()
 	bool pen_up;
 	QPoint lastpos = QPoint(Crypto::randInt(0, input->width()),
 			Crypto::randInt(0, input->height()));
-	for(int i = 0; i < strokes_count->value(); i++) {
+	for(int i = 0; i <= strokes_count->value(); i++) {
 		QPoint pos = lastpos + QPoint(Crypto::randInt(-150, 150),
 			Crypto::randInt(-150, 150));
 		if(!input->rect().contains(pos, true)) {
@@ -88,14 +89,11 @@ void GeneratePattern::generate()
 			pen_up = false;
 		} else { //insert ~20% "up"-strokes
 			pen_up = (Crypto::randInt(0, 100) <= 20);
-			pen_up = true; //TODO just testing
-			last_pen_up = pen_up;
 		}
+		last_pen_up = pen_up;
 
-		if(pen_up) {
-			//TODO broken
-			input->path.append(Node(pos));
-			input->path.append(Node::makeSeparator(pos));
+		if(pen_up and !(i == strokes_count->value())) {
+//			input->path.append(Node(pos));
 			input->path.append(Node::makeSeparator(pos));
 		} else {
 			input->path.append(Node(pos));
@@ -105,6 +103,7 @@ void GeneratePattern::generate()
 
 	Auth auth(this);
 	auth.preprocess(input->path);
+	auth.check();
 
 	for(int i = 0; i < auth.strokes.count(); i++) {
 		Arrow a;

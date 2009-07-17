@@ -36,11 +36,11 @@ class Auth : public QObject { //TODO needs cleanup
 	Q_OBJECT
 	friend class NewPattern;
 	friend class GeneratePattern;
+	friend class InputWidget;
 public:
 	Auth(QObject *parent = 0);
 	void loadHash();
 	void preprocess(const QList<Node> &path);
-	bool ready() { return hash_loaded; }
 	void saveHash();
 	void saveStats();
 	void setTries(int tries) { tries_left = tries; }

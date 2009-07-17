@@ -80,10 +80,13 @@ void InputWidget::checkFinished()
 	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
 		showMessage(tr("Processing..."));
 		repaint();
-		auth()->preprocess(path);
+		_auth->preprocess(path);
 		emit dataReady();
 	}
 }
+
+
+bool InputWidget::hashLoaded(){ return _auth->hash_loaded; }
 
 
 void InputWidget::enableTouchpadMode(bool on)

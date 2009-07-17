@@ -26,6 +26,7 @@ class InputWidget;
 class QCheckBox;
 class QSpinBox;
 
+//TODO could also be a child of NewPattern
 class GeneratePattern : public QDialog {
 	Q_OBJECT
 public:

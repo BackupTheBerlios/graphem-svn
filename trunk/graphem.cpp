@@ -85,7 +85,7 @@ void Graphem::reset()
 //refreshes info text on left side
 void Graphem::refreshInfo()
 {
-	if(!input->auth()->ready()) {
+	if(!input->hashLoaded()) {
 		info_dock->setWindowTitle(tr("Welcome"));
 		info_text->setText(tr("To start using Graphem, you have to set a new key pattern. Please click the \"New Pattern\" button.<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
