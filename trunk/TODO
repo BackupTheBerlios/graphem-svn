@@ -1,9 +1,9 @@
 0.3:
 "red" strokes require two clicks to remove instead of one
+work on encapsulaion
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 make preprocess() suck less, use velocity to determine averaging
 create documentation (site)
-generate random pattern
 estimate entropy of input
 is QCA's rng enough?
 check return codes.

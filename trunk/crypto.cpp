@@ -34,8 +34,8 @@ int Crypto::randInt(int min, int max)
 	//in [0, 1]
 	double x = double(r)/UINT_MAX;
 
-	//TODO not exactly uniform yet
-	const double result = min + (max-min)*x;
+	//uniform in [min-0.5, max+0.5], then rounded
+	const int result = qRound(min-0.5 + (max-min+1)*x);
 	Q_ASSERT(result >= min);
 	Q_ASSERT(result <= max);
 	return result;

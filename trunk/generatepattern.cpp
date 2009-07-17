@@ -70,17 +70,19 @@ GeneratePattern::GeneratePattern(QWidget *parent):
 void GeneratePattern::generate()
 {
 	// TODO create corresponding hash
-	input->arrows.clear();
+	input->reset();
 
 	bool last_pen_up = true;
 	bool pen_up;
 	QPoint lastpos = QPoint(Crypto::randInt(0, input->width()),
 			Crypto::randInt(0, input->height()));
 	for(int i = 0; i <= strokes_count->value(); i++) {
-		QPoint pos = lastpos + QPoint(Crypto::randInt(-150, 150),
-			Crypto::randInt(-150, 150));
-		if(!input->rect().contains(pos, true)) {
-			// outside input widget, try again
+		int l = Crypto::randInt(30, 250);
+		QPoint pos = lastpos + l*QPoint(Crypto::randInt(-1, 1),
+			Crypto::randInt(-1, 1));
+
+		if(!input->rect().contains(pos, true) // outside input widget
+		or	QLineF(pos, lastpos).length() < 20 ) { //too short
 			i--;
 			continue;
 		}
@@ -90,7 +92,6 @@ void GeneratePattern::generate()
 		} else { //insert ~20% "up"-strokes
 			pen_up = (Crypto::randInt(0, 100) <= 20);
 		}
-		last_pen_up = pen_up;
 
 		if(pen_up and !(i == strokes_count->value())) {
 //			input->path.append(Node(pos));
@@ -99,11 +100,12 @@ void GeneratePattern::generate()
 			input->path.append(Node(pos));
 		}
 		lastpos = pos;
+		last_pen_up = pen_up;
 	}
 
 	Auth auth(this);
 	auth.preprocess(input->path);
-	auth.check();
+	auth.check(); //print no of strokes
 
 	for(int i = 0; i < auth.strokes.count(); i++) {
 		Arrow a;

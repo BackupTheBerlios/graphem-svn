@@ -142,7 +142,7 @@ void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 	mouse_down = false;
 
 //TODO maybe remove first line
-	path.append(Node(ev->pos()));
+//	path.append(Node(ev->pos()));
 	path.append(Node::makeSeparator(ev->pos()));
 	update();
 }
@@ -212,7 +212,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		else
 			painter.setPen(Qt::white);
 
-		QPointF start = path.at(arrows.at(i).start_node_id).pos;
+		const QPointF start = path.at(arrows.at(i).start_node_id).pos;
 		const int dir = arrows.at(i).direction;
 		const QPointF end = start + arrows.at(i).weight
 			*QPoint(x[dir], x[(dir+2)%8])/3;
@@ -222,11 +222,14 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 
 		painter.drawLine(l);
 
-		start = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
-		painter.drawLine(start, end);
+		QPointF a  = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
+		painter.drawLine(a, end);
 
-		start = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
-		painter.drawLine(start, end);
+		//print number at start
+		painter.drawText(start+end-a, QString::number(i));
+
+		a = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
+		painter.drawLine(a, end);
 	}
 }
 
