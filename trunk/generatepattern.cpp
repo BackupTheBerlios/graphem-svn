@@ -74,18 +74,16 @@ void GeneratePattern::generate()
 
 	bool last_pen_up = true;
 	bool pen_up;
+	int last_x = 0; int last_y = 0;
+	int x, y;
 	QPoint lastpos = QPoint(Crypto::randInt(0, input->width()),
 			Crypto::randInt(0, input->height()));
-	for(int i = 0; i <= strokes_count->value(); i++) {
-		int l = Crypto::randInt(30, 250);
-		QPoint pos = lastpos + l*QPoint(Crypto::randInt(-1, 1),
-			Crypto::randInt(-1, 1));
-
-		if(!input->rect().contains(pos, true) // outside input widget
-		or	QLineF(pos, lastpos).length() < 20 ) { //too short
-			i--;
-			continue;
-		}
+	const int num_strokes = strokes_count->value();
+	for(int i = 0; i <= num_strokes; i++) {
+		const int l = Crypto::randInt(30, 250);
+		x = Crypto::randInt(-1, 1);
+		y = Crypto::randInt(-1, 1);
+		QPoint pos = lastpos + l*QPoint(x, y);
 
 		if(touchpad->checkState() == Qt::Checked or last_pen_up) {
 			pen_up = false;
@@ -93,9 +91,15 @@ void GeneratePattern::generate()
 			pen_up = (Crypto::randInt(0, 100) <= 20);
 		}
 
-		if(pen_up and !(i == strokes_count->value())) {
-//			input->path.append(Node(pos));
-			input->path.append(Node::makeSeparator(pos));
+		if(!input->rect().contains(pos, true) //outside input widget
+		or (last_x == x and last_y == y and last_pen_up == pen_up) //same direction and type as last stroke
+		or	QLineF(pos, lastpos).length() < 20 ) { //too short
+			i--;
+			continue;
+		}
+
+		if(pen_up and !(i == num_strokes) and !(i == num_strokes-1)) {
+			input->path.append(Node(pos, true));
 		} else {
 			input->path.append(Node(pos));
 		}

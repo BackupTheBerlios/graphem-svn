@@ -141,9 +141,7 @@ void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 
 	mouse_down = false;
 
-//TODO maybe remove first line
-//	path.append(Node(ev->pos()));
-	path.append(Node::makeSeparator(ev->pos()));
+	path.append(Node(ev->pos(), true));
 	update();
 }
 
@@ -178,9 +176,9 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		painter.setPen(Qt::red);
 
 		for(int i=0; i < path.count(); i++) {
-			if(path.at(i).separator)
+			if(path.at(i).pen_up)
 				continue;
-			if(i == 0 or path.at(i-1).separator)
+			if(i == 0 or path.at(i-1).pen_up)
 				painter_path.moveTo(path.at(i).pos);
 			else
 				painter_path.lineTo(path.at(i).pos);
@@ -234,7 +232,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 }
 
 
-//print pressure and velocity over time (only in debug mode)
+//print /* pressure and */  velocity over time (only in debug mode)
 void InputWidget::printData()
 {
 #ifndef NO_DEBUG
@@ -247,7 +245,7 @@ void InputWidget::printData()
 			length = QLineF(path.at(i-1).pos, path.at(i).pos).length();
 		double time = start.msecsTo(path.at(i).time);
 		std::cout << time << "\t";
-		std::cout << path.at(i).pressure << "\t";
+		//std::cout << path.at(i).pressure << "\t";
 		std::cout << length/time << "\n";
 	}
 #endif

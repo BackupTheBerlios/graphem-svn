@@ -1,8 +1,7 @@
 0.3:
-"red" strokes require two clicks to remove instead of one
+FIXED?: "red" strokes require two clicks to remove instead of one 
 work on encapsulaion
-can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
-make preprocess() suck less, use velocity to determine averaging
+make generatepattern subclass of newpattern?
 create documentation (site)
 estimate entropy of input
 is QCA's rng enough?
@@ -13,6 +12,8 @@ benchmark.
 l10n
 create test cases for specific inputs
 (!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
+can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
+make preprocess() suck less, use velocity to determine averaging
 do some benchmarking
 	test wether manual inlining makes sense
 	test if hash comparison can be optimized (QByteArray vs. QString vs ?)
@@ -28,7 +29,7 @@ support real handwriting
 		element: cusp, straight line, loop; also store direction
 		still missing velocity, probably helpful
 use pattern to access encryption key, should be possible with QCA
-add fancy graphics to auth dialog
+add fancy graphics to auth dialog (fade in/out?)
 maybe separate ASK/LOCK binaries - if the whole package is too large
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
 or center cursor after fail? (again, not for tablets)
