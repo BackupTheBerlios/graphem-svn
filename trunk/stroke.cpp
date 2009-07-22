@@ -30,15 +30,15 @@ Stroke::Stroke(QLineF l, int start_node, bool up):
 	removed(false),
 	length(l.length())
 {
-	//"inspired" by QLineF::angle() (Qt 4.4)
-	const qreal theta = atan2(-l.dy(), l.dx()) * 180.0 / 3.141;
-	double angle = theta < 0 ? theta + 360 : theta;
-
+	//actuallly this is a real valued version of direction
+	double angle = atan2(-l.dy(), l.dx()) * 4 / 3.141;
 	if(angle < 0)
-		angle = 360-angle;
-	direction = qRound(angle/360*8) % 8;
+		angle += 8;
+	Q_ASSERT(angle >= 0);
 
-	weight = (1- (angle/360*8 - qRound(angle/360*8))) * w_angle;
+	direction = qRound(angle) % 8;
+
+	weight = (1- (angle - qRound(angle))) * w_angle;
 	weight += length * w_length;
 }
 

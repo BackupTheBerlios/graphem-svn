@@ -2,7 +2,9 @@
 FIXED?: "red" strokes require two clicks to remove instead of one 
 work on encapsulaion
 make generatepattern subclass of newpattern?
-create documentation (site)
+create documentation
+	offline, HTML?
+	add that to website
 estimate entropy of input
 is QCA's rng enough?
 check return codes.
@@ -28,8 +30,10 @@ support real handwriting
 	maybe something else:
 		element: cusp, straight line, loop; also store direction
 		still missing velocity, probably helpful
+PAM integration?
 use pattern to access encryption key, should be possible with QCA
-add fancy graphics to auth dialog (fade in/out?)
+add fancy graphics to auth dialog
+	fade in/out?
 maybe separate ASK/LOCK binaries - if the whole package is too large
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
 or center cursor after fail? (again, not for tablets)
