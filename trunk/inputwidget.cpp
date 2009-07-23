@@ -32,7 +32,6 @@
 InputWidget::InputWidget(QWidget* parent, bool record) :
 	QWidget(parent),
 	_auth(new Auth(this)),
-	accept_input(true),
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
@@ -232,7 +231,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 }
 
 
-//print /* pressure and */  velocity over time (only in debug mode)
+//print  pen_up(pressure) and velocity over time (only in debug mode)
 void InputWidget::printData()
 {
 #ifndef NO_DEBUG
@@ -245,7 +244,7 @@ void InputWidget::printData()
 			length = QLineF(path.at(i-1).pos, path.at(i).pos).length();
 		double time = start.msecsTo(path.at(i).time);
 		std::cout << time << "\t";
-		//std::cout << path.at(i).pressure << "\t";
+		std::cout << int(path.at(i).pen_up) << "\t";
 		std::cout << length/time << "\n";
 	}
 #endif

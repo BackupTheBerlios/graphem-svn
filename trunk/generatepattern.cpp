@@ -34,7 +34,7 @@ GeneratePattern::GeneratePattern(QWidget *parent):
 	input(new InputWidget(this, true))
 {
 	setWindowTitle(tr("Generate new key pattern"));
-	input->setEnabled(false); //TODO if this is sufficient, delete InputWidget::enableInput()
+	input->setEnabled(false);
 	input->setDefaultMessage("");
 	input->showMessage("");
 
@@ -69,7 +69,6 @@ GeneratePattern::GeneratePattern(QWidget *parent):
 //generate new key and display
 void GeneratePattern::generate()
 {
-	// TODO create corresponding hash
 	input->reset();
 
 	bool last_pen_up = true;
@@ -84,6 +83,7 @@ void GeneratePattern::generate()
 		x = Crypto::randInt(-1, 1);
 		y = Crypto::randInt(-1, 1);
 		QPoint pos = lastpos + l*QPoint(x, y);
+		//TODO still duplicate strokes?
 
 		if(touchpad->checkState() == Qt::Checked or last_pen_up) {
 			pen_up = false;
@@ -103,13 +103,19 @@ void GeneratePattern::generate()
 		} else {
 			input->path.append(Node(pos));
 		}
+
+		last_x = x; last_y = y;
 		lastpos = pos;
 		last_pen_up = pen_up;
 	}
+	//TODO: missing strokes occur with more than one up stroke??
 
+	input->printData(); //TODO just testing
 	Auth auth(this);
 	auth.preprocess(input->path);
 	auth.check(); //print no of strokes
+	// TODO create corresponding hash
+
 
 	for(int i = 0; i < auth.strokes.count(); i++) {
 		Arrow a;

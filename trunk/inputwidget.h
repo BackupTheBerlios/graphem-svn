@@ -44,7 +44,6 @@ class InputWidget : public QWidget {
 	friend class GeneratePattern;
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
-	void enableInput(bool on) { accept_input = on; }
 	void enableTouchpadMode(bool on);
 	Auth* auth() { return _auth; } // TODO needed?
 	bool hashLoaded();
@@ -68,7 +67,6 @@ private:
 	QList<Node> path;
 	QList<Arrow> arrows; // used when recording
 	Auth *_auth;
-	bool accept_input;
 	bool pen_down, mouse_down;
 	QTimer *timer, *msg_timer;
 	QString msg, default_msg;
