@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Utility;Security
+Encoding=UTF-8
+Name=Configure Graphem
+Exec=graphem
+#Icon=
+Type=Application
+Comment=Set up the mouse gestures Graphem should use for authentication.
