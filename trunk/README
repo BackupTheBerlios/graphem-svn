@@ -1,0 +1,30 @@
+Introduction
+============
+
+Graphem is a small mouse gesture based authentication program and screen locker.
+Project home page: http://graphem.berlios.de/
+
+
+Configuration
+=============
+
+The configuration window is shown when Graphem is started without any arguments.
+TODO...
+
+
+Locking the screen
+==================
+
+To lock the screen, add the --lock argument when executing Graphem.
+You should test your key pattern a few times in the configuration window so
+you don't lock yourself out.
+
+
+Scripting
+=========
+
+When calling Graphem from a script, you'll want to use the --ask argument.
+The user can then enter their key pattern or press ESC to cancel the dialog.
+Return code 0 indicates success, 1 means the dialog was canceled or the number
+of possible tries was exceeded. To set the number of tries, add --tries [n]
+to the command line. The default allows an infinite number of retries.
