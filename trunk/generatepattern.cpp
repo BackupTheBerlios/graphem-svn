@@ -84,8 +84,8 @@ void GeneratePattern::generate()
 		const int l = Crypto::randInt(30, 250);
 		x = Crypto::randInt(-1, 1);
 		y = Crypto::randInt(-1, 1);
-		QPoint pos = lastpos + l*QPoint(x, y);
-		//TODO don't draw strokes on top of each other
+		QPoint pos = lastpos + l*QPoint(x, y) + 5*QPoint(y, -x);
+		//last summand is offset to avoid having strokes directly on top of each other
 
 		if(touchpad->checkState() == Qt::Checked or last_pen_up
 		or i >= num_strokes-2) {
