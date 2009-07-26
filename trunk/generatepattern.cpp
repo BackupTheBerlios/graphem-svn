@@ -28,6 +28,8 @@
 #include <QSpinBox>
 #include <QLabel>
 
+#include <iostream>
+
 
 GeneratePattern::GeneratePattern(QWidget *parent):
 	QDialog(parent),
@@ -48,7 +50,6 @@ GeneratePattern::GeneratePattern(QWidget *parent):
 	QPushButton *generate_button = new QPushButton(tr("&Generate"));
 	connect(generate_button, SIGNAL(clicked()),
 		this, SLOT(generate()));
-
 
 	// layout
 	QHBoxLayout *lh = new QHBoxLayout();
@@ -77,40 +78,36 @@ void GeneratePattern::generate()
 	int x, y;
 	QPoint lastpos = QPoint(Crypto::randInt(0, input->width()),
 			Crypto::randInt(0, input->height()));
+	input->path.append(Node(lastpos)); //start here 
 	const int num_strokes = strokes_count->value();
-	for(int i = 0; i <= num_strokes; i++) {
+	for(int i = 0; i < num_strokes; i++) {
 		const int l = Crypto::randInt(30, 250);
 		x = Crypto::randInt(-1, 1);
 		y = Crypto::randInt(-1, 1);
 		QPoint pos = lastpos + l*QPoint(x, y);
-		//TODO still duplicate strokes?
+		//TODO don't draw strokes on top of each other
 
-		if(touchpad->checkState() == Qt::Checked or last_pen_up) {
+		if(touchpad->checkState() == Qt::Checked or last_pen_up
+		or i >= num_strokes-2) {
 			pen_up = false;
 		} else { //insert ~20% "up"-strokes
 			pen_up = (Crypto::randInt(0, 100) <= 20);
 		}
 
 		if(!input->rect().contains(pos, true) //outside input widget
-		or (last_x == x and last_y == y and last_pen_up == pen_up) //same direction and type as last stroke
+		or (last_x == x and last_y == y and !last_pen_up) //same direction as last stroke
 		or	QLineF(pos, lastpos).length() < 20 ) { //too short
 			i--;
 			continue;
 		}
 
-		if(pen_up and !(i == num_strokes) and !(i == num_strokes-1)) {
-			input->path.append(Node(pos, true));
-		} else {
-			input->path.append(Node(pos));
-		}
+		input->path.append(Node(pos, pen_up));
 
 		last_x = x; last_y = y;
 		lastpos = pos;
 		last_pen_up = pen_up;
 	}
-	//TODO: missing strokes occur with more than one up stroke??
 
-	input->printData(); //TODO just testing
 	Auth auth(this);
 	auth.preprocess(input->path);
 	auth.check(); //print no of strokes

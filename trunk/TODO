@@ -1,17 +1,17 @@
 0.3:
-FIXED?: "red" strokes require two clicks to remove instead of one 
+don't save pattern when exiting dialog, allow testing
 work on encapsulaion
 make generatepattern subclass of newpattern?
 create documentation
 	offline, HTML?
 	add that to website
-estimate entropy of input
 is QCA's rng enough?
 check return codes.
 benchmark.
 
 ?:
 l10n
+estimate strength of input
 create test cases for specific inputs
 (!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
