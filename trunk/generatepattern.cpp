@@ -24,6 +24,7 @@
 
 #include <QBoxLayout>
 #include <QCheckBox>
+#include <QDialogButtonBox>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QLabel>
@@ -51,19 +52,30 @@ GeneratePattern::GeneratePattern(QWidget *parent):
 	connect(generate_button, SIGNAL(clicked()),
 		this, SLOT(generate()));
 
+	QDialogButtonBox *button_box = new QDialogButtonBox(this);
+	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
+	button_box->addButton(tr("&OK"), QDialogButtonBox::AcceptRole);
+	connect(button_box, SIGNAL(rejected()),
+		this, SLOT(reject()));
+	connect(button_box, SIGNAL(accepted()),
+		this, SLOT(accept())); //TODO
+
 	// layout
-	QHBoxLayout *lh = new QHBoxLayout();
 	QVBoxLayout *lv = new QVBoxLayout();
+	QHBoxLayout *lh = new QHBoxLayout();
+	QVBoxLayout *lbar = new QVBoxLayout();
 	QHBoxLayout *lstrokes = new QHBoxLayout();
 	lstrokes->addWidget(strokes_count_label);
 	lstrokes->addWidget(strokes_count);
-	lv->addLayout(lstrokes);
-	lv->addWidget(touchpad);
-	lv->addWidget(generate_button);
-	lh->addLayout(lv);
+	lbar->addLayout(lstrokes);
+	lbar->addWidget(touchpad);
+	lbar->addWidget(generate_button);
+	lh->addLayout(lbar);
 	lh->addWidget(input);
+	lv->addLayout(lh);
+	lv->addWidget(button_box);
 
-	setLayout(lh);
+	setLayout(lv);
 }
 
 

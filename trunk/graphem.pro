@@ -8,7 +8,7 @@ DEPENDPATH +=
 INCLUDEPATH += /usr/include/QtCrypto
 LIBS += -lqca
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT -D NO_DEBUG
-CONFIG += debug
+#CONFIG += debug
 
 # Input
 HEADERS += inputwidget.h stroke.h auth.h node.h graphem.h newpattern.h crypto.h preferences.h generatepattern.h
