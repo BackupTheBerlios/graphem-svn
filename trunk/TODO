@@ -1,6 +1,5 @@
 0.3:
 don't save pattern when exiting dialog, allow testing
-work on encapsulaion
 create documentation
 	offline, HTML?
 	add that to website
