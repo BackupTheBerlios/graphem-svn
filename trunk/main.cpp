@@ -19,7 +19,7 @@
 
 #include "auth.h"
 #include "crypto.h"
-#include "graphem.h"
+#include "mainwindow.h"
 #include "inputwidget.h"
 
 #include <QApplication>
@@ -32,6 +32,8 @@
 
 void printHelp(char *arg0);
 enum WindowMode { DEFAULT, ASK, LOCK };
+
+const QString graphem_version = "Graphem 0.3";
 
 using namespace std;
 
@@ -84,8 +86,9 @@ int main(int argc, char* argv[])
 	}
 
 	if(mode == DEFAULT) { //show main window
-		Graphem *main = new Graphem(input);
+		MainWindow *main = new MainWindow(input);
 		//main->setWindowIcon(QIcon("icon.png"));
+		main->setWindowTitle(graphem_version);
 		main->show();
 	} else {
 		if(!input->hashLoaded()) {

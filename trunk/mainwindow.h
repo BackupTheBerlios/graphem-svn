@@ -17,8 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef GRAPHEM_H
-#define GRAPHEM_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QMainWindow>
 
@@ -26,12 +26,11 @@ class InputWidget;
 class QDockWidget;
 class QTextEdit;
 
-const QString graphem_version = "Graphem 0.3";
 
-class Graphem : public QMainWindow {
+class MainWindow : public QMainWindow {
 	Q_OBJECT
 public:
-	Graphem(InputWidget *input);
+	MainWindow(InputWidget *input);
 public slots:
 	void refreshInfo();
 	void reset();

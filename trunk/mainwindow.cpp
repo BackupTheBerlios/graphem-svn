@@ -20,7 +20,7 @@
 #include "auth.h"
 #include "inputwidget.h"
 #include "generatepattern.h"
-#include "graphem.h"
+#include "mainwindow.h"
 #include "newpattern.h"
 #include "preferences.h"
 
@@ -32,12 +32,10 @@
 #include <QTextEdit>
 
 
-Graphem::Graphem(InputWidget* input):
+MainWindow::MainWindow(InputWidget* input):
 	input(input),
 	info_text(0)
 {
-
-	setWindowTitle(graphem_version);
 	setCentralWidget(input);
 
 	//menu bar
@@ -75,7 +73,7 @@ Graphem::Graphem(InputWidget* input):
 }
 
 
-void Graphem::reset()
+void MainWindow::reset()
 {
 	input->reset();
 	refreshInfo();
@@ -83,7 +81,7 @@ void Graphem::reset()
 
 
 //refreshes info text on left side
-void Graphem::refreshInfo()
+void MainWindow::refreshInfo()
 {
 	if(!input->hashLoaded()) {
 		info_dock->setWindowTitle(tr("Welcome"));
@@ -109,20 +107,19 @@ void Graphem::refreshInfo()
 }
 
 
-void Graphem::showAboutDialog()
+void MainWindow::showAboutDialog()
 {
 	QMessageBox::about(this, tr("About Graphem"),
-	tr("<center><h1>%1</h1>\
+	tr("<center><h1>Graphem 0.3</h1>\
 <h3>A small mouse gesture based authentication program and screen locker</h3>\
 <p>Documentation is available on <a href=\"http://graphem.berlios.de/\">http://graphem.berlios.de</a></p>\
 <small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
-<p>%2</p></small>")
-	.arg(graphem_version)
+<p>%1</p></small>")
 	.arg("This program is free software; you can redistribute it and/or modify<br> it under the terms of the GNU General Public License as published by<br> the Free Software Foundation; either version 2 of the License, or<br> (at your option) any later version."));
 }
 
 
-void Graphem::showGeneratePatternDialog()
+void MainWindow::showGeneratePatternDialog()
 {
 	GeneratePattern *dialog = new GeneratePattern(this);
 	if(dialog->exec() == QDialog::Accepted) {
@@ -134,7 +131,7 @@ void Graphem::showGeneratePatternDialog()
 }
 
 
-void Graphem::showNewPatternDialog()
+void MainWindow::showNewPatternDialog()
 {
 	QMessageBox msgBox(QMessageBox::Question,
 		tr("Enable touchpad mode?"),
@@ -160,14 +157,14 @@ void Graphem::showNewPatternDialog()
 }
 
 
-void Graphem::quit()
+void MainWindow::quit()
 {
 	input->quit();
 	close();
 }
 
 
-void Graphem::showPreferences()
+void MainWindow::showPreferences()
 {
 	Preferences *pref = new Preferences(this);
 	pref->exec();

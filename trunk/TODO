@@ -1,5 +1,4 @@
 0.3:
-graphem.cpp contains main window, main.cpp contains main()... make this less ambiguous
 don't save pattern when exiting dialog, allow testing
 work on encapsulaion
 create documentation
