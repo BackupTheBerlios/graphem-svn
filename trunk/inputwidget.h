@@ -41,7 +41,6 @@ struct Arrow {
 class InputWidget : public QWidget {
 	Q_OBJECT
 	friend class NewPattern;
-	friend class GeneratePattern;
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
 	void enableTouchpadMode(bool on);

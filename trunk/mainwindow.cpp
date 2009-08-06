@@ -19,7 +19,6 @@
 
 #include "auth.h"
 #include "inputwidget.h"
-#include "generatepattern.h"
 #include "mainwindow.h"
 #include "newpattern.h"
 #include "preferences.h"
@@ -42,8 +41,6 @@ MainWindow::MainWindow(InputWidget* input):
 	QMenu *file = menuBar()->addMenu(tr("&File"));
 	file->addAction(tr("&New Pattern..."), this,
 		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
-	file->addAction(tr("&Generate Random Pattern..."), this,
-		SLOT(showGeneratePatternDialog()), tr("Ctrl+G"));
 	file->addSeparator();
 	file->addAction(tr("&Preferences"), this,
 		SLOT(showPreferences()), tr("Ctrl+P"));
@@ -116,18 +113,6 @@ void MainWindow::showAboutDialog()
 <small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
 <p>%1</p></small>")
 	.arg("This program is free software; you can redistribute it and/or modify<br> it under the terms of the GNU General Public License as published by<br> the Free Software Foundation; either version 2 of the License, or<br> (at your option) any later version."));
-}
-
-
-void MainWindow::showGeneratePatternDialog()
-{
-	GeneratePattern *dialog = new GeneratePattern(this);
-	if(dialog->exec() == QDialog::Accepted) {
-		input->resetAuth();
-		refreshInfo();
-	}
-
-	delete dialog;
 }
 
 

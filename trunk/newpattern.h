@@ -30,6 +30,7 @@ class NewPattern : public QDialog {
 public:
 	NewPattern(QWidget *parent, bool touchpad_mode);
 private slots:
+	void generate();
 	void updateDisplay();
 	void save();
 private:

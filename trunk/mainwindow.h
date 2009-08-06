@@ -35,7 +35,6 @@ public slots:
 	void refreshInfo();
 	void reset();
 	void showAboutDialog();
-	void showGeneratePatternDialog();
 	void showNewPatternDialog();
 	void showPreferences();
 	void quit();

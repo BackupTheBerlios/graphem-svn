@@ -223,7 +223,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		painter.drawLine(a, end);
 
 		//print number at start
-		painter.drawText(start+end-a, QString::number(i));
+		//painter.drawText(start+end-a, QString::number(i));
 
 		a = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
 		painter.drawLine(a, end);

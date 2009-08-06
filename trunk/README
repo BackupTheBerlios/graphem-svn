@@ -20,12 +20,13 @@ Configuration
 =============
 
 The configuration window is shown when Graphem is started without any arguments.
-You can either let Graphem generate a random key pattern for you or choose your
-own, both dialogs can be found in the 'File' menu. After accepting the displayed
-pattern you should test wether it is recognized correctly in the main window.
-To increase the recognition rate, it often helps to speed up mouse movements.
-For your own key patterns you should make sure to only include strokes that are
-present each time it is drawn.
+You can now set a new key pattern via File -> New Pattern. You can either draw
+your own pattern or let Graphem generate a random key for you by clicking the
+'Generate Pattern' button.
+After accepting the displayed pattern you should test wether it is recognized
+correctly in the main window.  To increase the recognition rate, it often helps
+to speed up mouse movements.  For your own key patterns you should make sure to
+only include strokes that are present each time it is drawn.
 In the preferences dialog (File -> Preferences) you can configure the amount of
 time Graphem may spend trying to match the input to your key pattern before
 you can retry. You may want to increase the timeout for older machines or

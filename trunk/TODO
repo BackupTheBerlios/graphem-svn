@@ -1,8 +1,9 @@
 0.3:
 don't save pattern when exiting dialog, allow testing
+allow editing of unsaved pattern
+	"Test" button?
 create documentation
-	offline, HTML?
-	add that to website
+	html?
 is QCA's rng enough?
 check return codes.
 benchmark.

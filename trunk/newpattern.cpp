@@ -18,10 +18,12 @@
 */
 
 #include "auth.h"
+#include "crypto.h"
 #include "inputwidget.h"
 #include "newpattern.h"
 
 #include <QDialogButtonBox>
+#include <QInputDialog>
 #include <QLineF>
 #include <QPushButton>
 #include <QSettings>
@@ -46,6 +48,7 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 	button_box->addButton(tr("&Save"), QDialogButtonBox::AcceptRole);
+	QPushButton *generate = button_box->addButton(tr("&Generate Pattern"), QDialogButtonBox::ActionRole);
 	QPushButton *delete_last = button_box->addButton(tr("&Delete Last Stroke"), QDialogButtonBox::ActionRole);
 	QPushButton *reset = button_box->addButton(tr("&Reset"), QDialogButtonBox::ResetRole);
 	connect(button_box, SIGNAL(rejected()),
@@ -54,6 +57,8 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 		this, SLOT(save()));
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(accept()));
+	connect(generate, SIGNAL(clicked()),
+		this, SLOT(generate()));
 	connect(delete_last, SIGNAL(clicked()),
 		input, SLOT(deleteLastStroke()));
 	connect(reset, SIGNAL(clicked()),
@@ -66,6 +71,53 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	l1->addWidget(button_box);
 	l1->addWidget(status);
 	setLayout(l1);
+}
+
+
+//generate random key and display
+void NewPattern::generate()
+{
+	bool ok;
+	const int num_strokes = QInputDialog::getInteger(this, tr("Generate Random Pattern"),
+		(input->path.empty()?tr(""):tr("Warning: The current input will be erased!<br>"))+tr("Number of strokes:"),
+		8, 0, 10000, 1, &ok);
+	if(!ok)
+		return;
+	input->reset();
+
+	bool last_pen_up = true;
+	bool pen_up;
+	int last_x = 0; int last_y = 0;
+	int x, y;
+	QPoint lastpos = QPoint(Crypto::randInt(0, input->width()),
+			Crypto::randInt(0, input->height()));
+	input->path.append(Node(lastpos)); //start here 
+	for(int i = 0; i < num_strokes; i++) {
+		const int l = Crypto::randInt(30, 250);
+		x = Crypto::randInt(-1, 1);
+		y = Crypto::randInt(-1, 1);
+		QPoint pos = lastpos + l*QPoint(x, y) + 5*QPoint(y, -x);
+		//last summand is offset to avoid having strokes directly on top of each other
+
+		if(input->touchpad_mode or last_pen_up or i >= num_strokes-2) {
+			pen_up = false;
+		} else { //insert ~20% "up"-strokes
+			pen_up = (Crypto::randInt(0, 100) <= 20);
+		}
+
+		if(!input->rect().contains(pos, true) //outside input widget
+		or (last_x == x and last_y == y and !last_pen_up) //same direction as last stroke
+		or	QLineF(pos, lastpos).length() < 20 ) { //too short
+			i--;
+			continue;
+		}
+
+		input->path.append(Node(pos, pen_up));
+
+		last_x = x; last_y = y;
+		lastpos = pos;
+		last_pen_up = pen_up;
+	}
 }
 
 
@@ -83,11 +135,13 @@ void NewPattern::updateDisplay()
 		a.weight = auth.strokes.at(i).length;
 		input->arrows.append(a);
 	}
+	input->update();
 
 	status->showMessage(tr("%1 Stroke(s)").arg(auth.strokes.count()));
 }
 
 
+//TODO remove
 //save pattern to config file
 void NewPattern::save()
 {
