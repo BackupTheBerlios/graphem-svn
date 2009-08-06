@@ -31,7 +31,7 @@
 #include <iostream>
 
 void printHelp(char *arg0);
-enum WindowMode { DEFAULT, ASK, LOCK };
+enum WindowMode { CONFIG, ASK, LOCK };
 
 const QString graphem_version = "Graphem 0.3";
 
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 	QCA::Initializer crypto_init;
 	InputWidget *input = new InputWidget();
 
-	WindowMode mode = DEFAULT;
+	WindowMode mode = CONFIG;
 	int tries = 0; //ignored if mode != ASK
 
 	for(int i = 1; i < argc; i++) {
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if(mode == DEFAULT) { //show main window
+	if(mode == CONFIG) { //show main window
 		MainWindow *main = new MainWindow(input);
 		//main->setWindowIcon(QIcon("icon.png"));
 		main->setWindowTitle(graphem_version);

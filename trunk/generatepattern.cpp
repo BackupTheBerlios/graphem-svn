@@ -29,8 +29,6 @@
 #include <QSpinBox>
 #include <QLabel>
 
-#include <iostream>
-
 
 GeneratePattern::GeneratePattern(QWidget *parent):
 	QDialog(parent),

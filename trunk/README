@@ -4,6 +4,11 @@ Introduction
 Graphem is a small mouse gesture based authentication program and screen locker for X11.
 Project home page: http://graphem.berlios.de/
 
+Installation
+============
+
+Graphem requires Qt4 and QCA2 libraries...
+
 
 Configuration
 =============

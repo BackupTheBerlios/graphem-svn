@@ -22,7 +22,6 @@
 
 #include <QDialog>
 
-class Auth;
 class InputWidget;
 class QStatusBar;
 
