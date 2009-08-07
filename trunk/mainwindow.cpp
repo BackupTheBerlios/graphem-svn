@@ -33,6 +33,7 @@
 
 MainWindow::MainWindow(InputWidget* input):
 	input(input),
+	new_pattern_dialog(0),
 	info_text(0)
 {
 	setCentralWidget(input);
@@ -41,13 +42,20 @@ MainWindow::MainWindow(InputWidget* input):
 	QMenu *file = menuBar()->addMenu(tr("&File"));
 	file->addAction(tr("&New Pattern..."), this,
 		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
+	QAction *edit = file->addAction(tr("&Edit Pattern..."), this,
+		SLOT(showEditPatternDialog()), tr("Ctrl+E"));
+	edit->setEnabled(false);
 	file->addSeparator();
-	file->addAction(tr("&Preferences"), this,
-		SLOT(showPreferences()), tr("Ctrl+P"));
+	QAction *save_pattern = file->addAction(tr("&Save"), this,
+		SLOT(save()), tr("Ctrl+S"));
+	save_pattern->setEnabled(false);
+
+	file->addSeparator();
+	file->addAction(tr("&Preferences"), this, SLOT(showPreferences()));
 	file->addSeparator();
 	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
 
-		// processing timeout
+	// processing timeout
 	QMenu *help = menuBar()->addMenu(tr("&Help"));
 	help->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()), 0);
 	help->addAction(tr("&About"), this, SLOT(showAboutDialog()), 0);
@@ -61,6 +69,10 @@ MainWindow::MainWindow(InputWidget* input):
 
 	resize(600,400);
 
+	connect(this, SIGNAL(unsavedPattern(bool)),
+		edit, SLOT(setEnabled(bool)));
+	connect(this, SIGNAL(unsavedPattern(bool)),
+		save_pattern, SLOT(setEnabled(bool)));
 	connect(input->auth(), SIGNAL(passed()),
 		this, SLOT(reset()));
 	connect(input->auth(), SIGNAL(failed()),
@@ -104,6 +116,15 @@ void MainWindow::refreshInfo()
 }
 
 
+//save pattern currently being tested
+void MainWindow::save()
+{
+	if(new_pattern_dialog)
+		new_pattern_dialog->save();
+	emit unsavedPattern(false);
+}
+
+
 void MainWindow::showAboutDialog()
 {
 	QMessageBox::about(this, tr("About Graphem"),
@@ -113,6 +134,17 @@ void MainWindow::showAboutDialog()
 <small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
 <p>%1</p></small>")
 	.arg("This program is free software; you can redistribute it and/or modify<br> it under the terms of the GNU General Public License as published by<br> the Free Software Foundation; either version 2 of the License, or<br> (at your option) any later version."));
+}
+
+
+void MainWindow::showEditPatternDialog()
+{
+	if(new_pattern_dialog->exec() == QDialog::Accepted) {
+		input->resetAuth();
+		refreshInfo();
+
+		emit unsavedPattern(true);
+	}
 }
 
 
@@ -126,24 +158,21 @@ void MainWindow::showNewPatternDialog()
 	msgBox.setInformativeText(tr("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored."));
 	msgBox.addButton(tr("&Enable"), QMessageBox::YesRole);
 	msgBox.setDefaultButton(msgBox.addButton(tr("Use &Normal Mode"), QMessageBox::NoRole));
-	int ret = msgBox.exec();
+	const int ret = msgBox.exec();
 
 	if(ret == QMessageBox::Cancel)
 		return;
 	
+	delete new_pattern_dialog; //reset dialog
 	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
-	NewPattern *new_pattern_dialog = new NewPattern(this, !ret);
-	if(new_pattern_dialog->exec() == QDialog::Accepted) {
-		input->resetAuth();
-		refreshInfo();
-	}
-
-	delete new_pattern_dialog;
+	new_pattern_dialog = new NewPattern(this, !ret);
+	showEditPatternDialog();
 }
 
 
 void MainWindow::quit()
 {
+	//TODO save?
 	input->quit();
 	close();
 }

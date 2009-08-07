@@ -47,14 +47,12 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
-	button_box->addButton(tr("&Save"), QDialogButtonBox::AcceptRole);
+	button_box->addButton(tr("&Ok"), QDialogButtonBox::AcceptRole);
 	QPushButton *generate = button_box->addButton(tr("&Generate Pattern"), QDialogButtonBox::ActionRole);
 	QPushButton *delete_last = button_box->addButton(tr("&Delete Last Stroke"), QDialogButtonBox::ActionRole);
 	QPushButton *reset = button_box->addButton(tr("&Reset"), QDialogButtonBox::ResetRole);
 	connect(button_box, SIGNAL(rejected()),
 		this, SLOT(reject()));
-	connect(button_box, SIGNAL(accepted()),
-		this, SLOT(save()));
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(accept()));
 	connect(generate, SIGNAL(clicked()),
@@ -141,8 +139,6 @@ void NewPattern::updateDisplay()
 }
 
 
-//TODO remove
-//save pattern to config file
 void NewPattern::save()
 {
 	Auth auth(this);

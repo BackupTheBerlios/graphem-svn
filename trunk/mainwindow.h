@@ -23,9 +23,9 @@
 #include <QMainWindow>
 
 class InputWidget;
+class NewPattern;
 class QDockWidget;
 class QTextEdit;
-
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -34,12 +34,17 @@ public:
 public slots:
 	void refreshInfo();
 	void reset();
+	void save();
 	void showAboutDialog();
+	void showEditPatternDialog();
 	void showNewPatternDialog();
 	void showPreferences();
 	void quit();
+signals:
+	void unsavedPattern(bool);
 private:
 	InputWidget* input;
+	NewPattern* new_pattern_dialog;
 	QDockWidget* info_dock;
 	QTextEdit* info_text;
 };
