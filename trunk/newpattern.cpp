@@ -132,6 +132,22 @@ void NewPattern::prepareAuth(Auth *auth)
 }
 
 
+void NewPattern::save()
+{
+	Auth auth(this);
+	auth.preprocess(input->path);
+
+	QSettings settings;
+	QByteArray salt = Crypto::generateSalt();
+	settings.setValue("pattern_hash", Crypto::getHash(auth.strokesToString(), salt));
+	settings.setValue("touchpad_mode", auth.touchpad_mode);
+	settings.setValue("salt", salt);
+	settings.setValue("usage_total", 0);
+	settings.setValue("usage_failed", 0);
+	settings.sync();
+}
+
+
 void NewPattern::updateDisplay()
 {
 	input->arrows.clear();
@@ -149,12 +165,4 @@ void NewPattern::updateDisplay()
 	input->update();
 
 	status->showMessage(tr("%1 Stroke(s)").arg(auth.strokes.count()));
-}
-
-
-void NewPattern::save()
-{
-	Auth auth(this);
-	auth.preprocess(input->path);
-	auth.saveHash();
 }

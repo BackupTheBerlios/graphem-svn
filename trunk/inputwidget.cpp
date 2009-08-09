@@ -86,7 +86,18 @@ void InputWidget::checkFinished()
 }
 
 
-bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
+//used while recording, takes last arrow and removes all Nodes belonging to it
+void InputWidget::deleteLastStroke()
+{
+	if(arrows.isEmpty())
+		return;
+
+	Arrow a = arrows.takeLast();
+	while(a.start_node_id+1 < path.count())
+		path.removeAt(a.start_node_id+1);
+
+	update();
+}
 
 
 void InputWidget::enableTouchpadMode(bool on)
@@ -97,32 +108,7 @@ void InputWidget::enableTouchpadMode(bool on)
 }
 
 
-void InputWidget::reset()
-{
-	path.clear();
-	arrows.clear();
-	QSettings settings;
-	show_input = settings.value("show_input").toBool();
-	_auth->check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
-	enableTouchpadMode(_auth->usingTouchpadMode());
-	if(!record_pattern)
-		showMessage(tr("Pattern not recognized, please try again."), 1500);
-	update();
-}
-
-
-void InputWidget::showMessage(QString m, int msecs)
-{
-	msg_timer->stop(); //cancel timer if a timed message is being shown
-	if(m.isNull())
-		m = default_msg;
-
-	if(msg != m)
-		update(); //repaints after returning to event loop
-	msg = m;
-	if(msecs)
-		msg_timer->start(msecs);
-}
+bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
 
 
 void InputWidget::mousePressEvent(QMouseEvent* ev)
@@ -133,18 +119,6 @@ void InputWidget::mousePressEvent(QMouseEvent* ev)
 	mouse_down = true;
 
 	path.append(Node(ev->pos()));
-}
-
-
-void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
-{
-	if(pen_down or !mouse_down or touchpad_mode)
-		return;
-
-	mouse_down = false;
-
-	path.append(Node(ev->pos(), true));
-	update();
 }
 
 
@@ -160,6 +134,18 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 		update();
 	}
 	//there are some move events with pressed buttons discarded here, as some mousePress events get lost
+}
+
+
+void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
+{
+	if(pen_down or !mouse_down or touchpad_mode)
+		return;
+
+	mouse_down = false;
+
+	path.append(Node(ev->pos(), true));
+	update();
 }
 
 
@@ -254,20 +240,6 @@ void InputWidget::printData()
 }
 
 
-//used while recording, takes last arrow and removes all Nodes belonging to it
-void InputWidget::deleteLastStroke()
-{
-	if(arrows.isEmpty())
-		return;
-
-	Arrow a = arrows.takeLast();
-	while(a.start_node_id+1 < path.count())
-		path.removeAt(a.start_node_id+1);
-
-	update();
-}
-
-
 //do some cleanup, then quit
 void InputWidget::quit()
 {
@@ -277,4 +249,32 @@ void InputWidget::quit()
 
 	_auth->saveStats();
 	close();
+}
+
+
+void InputWidget::reset()
+{
+	path.clear();
+	arrows.clear();
+	QSettings settings;
+	show_input = settings.value("show_input").toBool();
+	_auth->check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
+	enableTouchpadMode(_auth->usingTouchpadMode());
+	if(!record_pattern)
+		showMessage(tr("Pattern not recognized, please try again."), 1500);
+	update();
+}
+
+
+void InputWidget::showMessage(QString m, int msecs)
+{
+	msg_timer->stop(); //cancel timer if a timed message is being shown
+	if(m.isNull())
+		m = default_msg;
+
+	if(msg != m)
+		update(); //repaints after returning to event loop
+	msg = m;
+	if(msecs)
+		msg_timer->start(msecs);
 }

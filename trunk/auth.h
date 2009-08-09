@@ -32,7 +32,7 @@
 
 class QTime;
 
-class Auth : public QObject { //TODO needs cleanup
+class Auth : public QObject {
 	Q_OBJECT
 	friend class NewPattern;
 	friend class InputWidget;
@@ -40,7 +40,6 @@ public:
 	Auth(QObject *parent = 0);
 	void loadHash();
 	void preprocess(const QList<Node> &path);
-	void saveHash();
 	void saveStats();
 	void setTries(int tries) { tries_left = tries; }
 	void setVerbose(bool on) { verbose = on; }

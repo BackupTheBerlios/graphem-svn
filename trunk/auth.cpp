@@ -42,146 +42,6 @@ Auth::Auth(QObject *parent):
 { }
 
 
-//converts strokes into a string, omits 'removed' and duplicate strokes
-QString Auth::strokesToString()
-{
-	QString result = "";
-	int lastdir = -1;
-	for(int i = 0; i < strokes.count(); i++) {
-		if(strokes.at(i).removed)
-			continue;
-		if(!strokes.at(i).up) {
-			if(strokes.at(i).direction == lastdir)	
-				continue;
-			lastdir = strokes.at(i).direction;
-		}
-		result += QString::number(strokes.at(i).direction);
-		result += (strokes.at(i).up ? '#': '_');
-	}
-	return result;
-}
-
-
-//analyses path and stores the result in strokes
-void Auth::preprocess(const QList<Node> &path)
-{
-	strokes.clear();
-	int start = 0; //start node
-	bool pen_down = true;
-
-	for(int i = 0; i < path.count(); i++) {
-		QPointF a = path.at(start).pos;
-		if(pen_down and i > 0 and path.at(i).pen_up) { //pen up, end stroke here
-			QLineF l = QLineF(a, path.at(i).pos);
-			strokes.append(Stroke(l, start));
-
-			pen_down = false;
-			start = i;
-		} else if(!pen_down and i > 1) { //add virtual stroke
-			QLineF l = QLineF(a, path.at(i).pos);
-			strokes.append(Stroke(l, start, true));
-
-			pen_down = true;
-			start = i;
-		} else if(pen_down and !path.at(i).pen_up){
-			QLineF l = QLineF(a, path.at(i).pos);
-			if(l.length() > short_limit) {
-				strokes.append(Stroke(l, start));
-				start = i;
-			}
-		}
-	}
-
-	//remove duplicate strokes
-	int lastdirection = -1; //invalid direction
-	for(int i = 0; i < strokes.count(); i++) {
-		if(strokes.at(i).up)
-			lastdirection = -1;
-		else if(strokes.at(i).direction == lastdirection) {
-			strokes[i-1] += strokes.at(i);
-			strokes.removeAt(i);
-			i--;
-		} else
-			lastdirection = strokes.at(i).direction;
-	}
-}
-
-
-bool Auth::tryPattern()
-{
-	//test unchanged
-	if(matchesAuthPattern())
-		return true;
-
-	//sort stroke indices by weight (ascending)
-	QList<int> indices;
-	for(int i = 0; i < strokes.count(); i++) {
-		int lowest = -1;
-		for(int j = 0; j < strokes.count(); j++) {
-			if((lowest == -1 or strokes.at(j).getWeight() < strokes.at(lowest).getWeight())
-			and !indices.contains(j))
-				lowest = j;
-		}
-		indices.append(lowest);
-	}
-
-	const int strokes_count = strokes.count();
-	const int permutations_count = pow(4, strokes_count);
-	int offset[strokes_count]; //stores current permutation
-	for(int i=0; i < strokes_count; i++)
-		offset[i] = 0;
-
-	for(int n = 1; n != permutations_count; n++) {
-		if(started->elapsed() > check_timeout)
-			break;
-
-		int p = 1;
-		for(int i = 0; i < strokes_count; i++) {
-			if((n % p) != 0) // all changes for this n done
-				break;
-
-			offset[i] = (offset[i]+1)%4;
-
-			int index = indices.at(i);
-			switch(offset[i]) {
-			case 0: // unchanged
-				break;
-			case 1: // remove
-				if(!strokes.at(index).up)
-					strokes[index].removed = true;
-				break;
-			case 2: // direction-1
-				strokes[index].removed = false;
-				if(strokes.at(index).direction == 0)
-					strokes[index].direction = 7;
-				else
-					strokes[index].direction--;
-				break;
-			case 3: // direction+1
-				strokes[index].direction += 2;
-				strokes[index].direction %= 8;
-				break;
-			}
-			p *= 4; // period increases by this amount as we move up the tree
-		}
-
-		if(matchesAuthPattern())
-			return true;
-	}
-	return false;
-}
-
-
-bool Auth::matchesAuthPattern()
-{
-#ifndef NO_DEBUG
-	compared_hashes_count++;
-#endif
-
-	return auth_pattern == Crypto::getHash(strokesToString(), salt);
-}
-
-
 void Auth::check()
 {
 	qDebug() << "number of strokes: " << strokes.count();
@@ -255,6 +115,61 @@ void Auth::loadHash()
 }
 
 
+bool Auth::matchesAuthPattern()
+{
+#ifndef NO_DEBUG
+	compared_hashes_count++;
+#endif
+
+	return auth_pattern == Crypto::getHash(strokesToString(), salt);
+}
+
+
+//analyses path and stores the result in strokes
+void Auth::preprocess(const QList<Node> &path)
+{
+	strokes.clear();
+	int start = 0; //start node
+	bool pen_down = true;
+
+	for(int i = 0; i < path.count(); i++) {
+		QPointF a = path.at(start).pos;
+		if(pen_down and i > 0 and path.at(i).pen_up) { //pen up, end stroke here
+			QLineF l = QLineF(a, path.at(i).pos);
+			strokes.append(Stroke(l, start));
+
+			pen_down = false;
+			start = i;
+		} else if(!pen_down and i > 1) { //add virtual stroke
+			QLineF l = QLineF(a, path.at(i).pos);
+			strokes.append(Stroke(l, start, true));
+
+			pen_down = true;
+			start = i;
+		} else if(pen_down and !path.at(i).pen_up){
+			QLineF l = QLineF(a, path.at(i).pos);
+			if(l.length() > short_limit) {
+				strokes.append(Stroke(l, start));
+				start = i;
+			}
+		}
+	}
+
+	//remove duplicate strokes
+	int lastdirection = -1; //invalid direction
+	for(int i = 0; i < strokes.count(); i++) {
+		if(strokes.at(i).up)
+			lastdirection = -1;
+		else if(strokes.at(i).direction == lastdirection) {
+			strokes[i-1] += strokes.at(i);
+			strokes.removeAt(i);
+			i--;
+		} else
+			lastdirection = strokes.at(i).direction;
+	}
+}
+
+
 void Auth::saveStats()
 {
 	if(hash_loaded and !testing_pattern) {
@@ -266,15 +181,86 @@ void Auth::saveStats()
 }
 
 
-//save hash to config, overwrite old key pattern
-void Auth::saveHash()
+//converts strokes into a string, omits 'removed' and duplicate strokes
+QString Auth::strokesToString()
 {
-	QSettings settings;
-	QByteArray salt = Crypto::generateSalt();
-	settings.setValue("pattern_hash", Crypto::getHash(strokesToString(), salt));
-	settings.setValue("touchpad_mode", touchpad_mode);
-	settings.setValue("salt", salt);
-	settings.setValue("usage_total", 0);
-	settings.setValue("usage_failed", 0);
-	settings.sync();
+	QString result = "";
+	int lastdir = -1;
+	for(int i = 0; i < strokes.count(); i++) {
+		if(strokes.at(i).removed)
+			continue;
+		if(!strokes.at(i).up) {
+			if(strokes.at(i).direction == lastdir)	
+				continue;
+			lastdir = strokes.at(i).direction;
+		}
+		result += QString::number(strokes.at(i).direction);
+		result += (strokes.at(i).up ? '#': '_');
+	}
+	return result;
+}
+
+
+bool Auth::tryPattern()
+{
+	//test unchanged
+	if(matchesAuthPattern())
+		return true;
+
+	//sort stroke indices by weight (ascending)
+	QList<int> indices;
+	for(int i = 0; i < strokes.count(); i++) {
+		int lowest = -1;
+		for(int j = 0; j < strokes.count(); j++) {
+			if((lowest == -1 or strokes.at(j).getWeight() < strokes.at(lowest).getWeight())
+			and !indices.contains(j))
+				lowest = j;
+		}
+		indices.append(lowest);
+	}
+
+	const int strokes_count = strokes.count();
+	const int permutations_count = pow(4, strokes_count);
+	int offset[strokes_count]; //stores current permutation
+	for(int i=0; i < strokes_count; i++)
+		offset[i] = 0;
+
+	for(int n = 1; n != permutations_count; n++) {
+		if(started->elapsed() > check_timeout)
+			break;
+
+		int p = 1;
+		for(int i = 0; i < strokes_count; i++) {
+			if((n % p) != 0) // all changes for this n done
+				break;
+
+			offset[i] = (offset[i]+1)%4;
+
+			int index = indices.at(i);
+			switch(offset[i]) {
+			case 0: // unchanged
+				break;
+			case 1: // remove
+				if(!strokes.at(index).up)
+					strokes[index].removed = true;
+				break;
+			case 2: // direction-1
+				strokes[index].removed = false;
+				if(strokes.at(index).direction == 0)
+					strokes[index].direction = 7;
+				else
+					strokes[index].direction--;
+				break;
+			case 3: // direction+1
+				strokes[index].direction += 2;
+				strokes[index].direction %= 8;
+				break;
+			}
+			p *= 4; // period increases by this amount as we move up the tree
+		}
+
+		if(matchesAuthPattern())
+			return true;
+	}
+	return false;
 }

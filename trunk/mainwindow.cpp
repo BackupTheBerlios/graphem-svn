@@ -79,10 +79,20 @@ MainWindow::MainWindow(InputWidget* input):
 }
 
 
-void MainWindow::reset()
+void MainWindow::quit()
 {
-	input->reset();
-	refreshInfo();
+	if(unsaved_changes) {
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "",
+			"<b>Save the new key pattern?</b>",
+			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+			QMessageBox::Save);
+		if(button == QMessageBox::Cancel)
+			return;
+		else if(button == QMessageBox::Save)
+			save();
+	}
+	input->quit();
+	close();
 }
 
 
@@ -113,12 +123,27 @@ void MainWindow::refreshInfo()
 }
 
 
+void MainWindow::reset()
+{
+	input->reset();
+	refreshInfo();
+}
+
+
 //save pattern currently being tested
 void MainWindow::save()
 {
 	Q_ASSERT(new_pattern_dialog != 0);
 	new_pattern_dialog->save();
 	setUnsavedChanges(false);
+}
+
+
+void MainWindow::setUnsavedChanges(bool b)
+{
+	unsaved_changes = b;
+	edit_action->setEnabled(b);
+	save_action->setEnabled(b);
 }
 
 
@@ -168,23 +193,6 @@ void MainWindow::showNewPatternDialog()
 }
 
 
-void MainWindow::quit()
-{
-	if(unsaved_changes) {
-		QMessageBox::StandardButton button = QMessageBox::warning(this, "",
-			"<b>Save the new key pattern?</b>",
-			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-			QMessageBox::Save);
-		if(button == QMessageBox::Cancel)
-			return;
-		else if(button == QMessageBox::Save)
-			save();
-	}
-	input->quit();
-	close();
-}
-
-
 void MainWindow::showPreferences()
 {
 	Preferences *pref = new Preferences(this);
@@ -193,12 +201,4 @@ void MainWindow::showPreferences()
 	input->reset();
 
 	delete pref;
-}
-
-
-void MainWindow::setUnsavedChanges(bool b)
-{
-	unsaved_changes = b;
-	edit_action->setEnabled(b);
-	save_action->setEnabled(b);
 }
