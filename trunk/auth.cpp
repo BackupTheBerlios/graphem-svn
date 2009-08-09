@@ -35,6 +35,7 @@ Auth::Auth(QObject *parent):
 	started(0),
 	hash_loaded(false),
 	print_pattern(false),
+	testing_pattern(false),
 	touchpad_mode(false),
 	verbose(false),
 	check_timeout(6000)
@@ -250,12 +251,13 @@ void Auth::loadHash()
 	check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
 
 	hash_loaded = true;
+	testing_pattern = false;
 }
 
 
 void Auth::saveStats()
 {
-	if(hash_loaded) {
+	if(hash_loaded and !testing_pattern) {
 		QSettings settings;
 		settings.setValue("usage_total", usage_total);
 		settings.setValue("usage_failed", usage_failed);

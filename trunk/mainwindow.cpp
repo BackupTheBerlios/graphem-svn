@@ -137,7 +137,8 @@ void MainWindow::showAboutDialog()
 void MainWindow::showEditPatternDialog()
 {
 	if(new_pattern_dialog->exec() == QDialog::Accepted) {
-		input->resetAuth();
+		new_pattern_dialog->prepareAuth(input->auth());
+		input->reset();
 		refreshInfo();
 
 		setUnsavedChanges(true);
@@ -189,7 +190,6 @@ void MainWindow::showPreferences()
 	Preferences *pref = new Preferences(this);
 	pref->exec();
 
-	input->resetAuth();
 	input->reset();
 
 	delete pref;

@@ -22,6 +22,7 @@
 
 #include <QDialog>
 
+class Auth;
 class InputWidget;
 class QStatusBar;
 
@@ -29,6 +30,7 @@ class NewPattern : public QDialog {
 	Q_OBJECT
 public:
 	NewPattern(QWidget *parent, bool touchpad_mode);
+	void prepareAuth(Auth *auth);
 	void save();
 private slots:
 	void generate();

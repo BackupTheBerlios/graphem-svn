@@ -119,6 +119,19 @@ void NewPattern::generate()
 }
 
 
+//set auth hash to new key
+void NewPattern::prepareAuth(Auth *auth)
+{
+	Auth tmp(this);
+	tmp.preprocess(input->path);
+	auth->setAuthHash(Crypto::getHash(tmp.strokesToString(), ""), "");
+
+	auth->touchpad_mode = input->touchpad_mode;
+	auth->testing_pattern = true;
+	auth->usage_total = auth->usage_failed = 0;
+}
+
+
 void NewPattern::updateDisplay()
 {
 	input->arrows.clear();

@@ -46,7 +46,6 @@ public:
 	void enableTouchpadMode(bool on);
 	Auth* auth() { return _auth; } // TODO needed?
 	bool hashLoaded();
-	void resetAuth();
 	void setDefaultMessage(QString m) { default_msg = m; }
 signals:
 	void dataReady();

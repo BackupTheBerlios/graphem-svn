@@ -61,7 +61,8 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 			Qt::QueuedConnection); //allow for repaint before checking
 		connect(_auth, SIGNAL(failed()),
 			this, SLOT(reset()));
-		resetAuth();
+		_auth->loadHash();
+		enableTouchpadMode(_auth->usingTouchpadMode());
 		QSettings settings;
 		show_input = settings.value("show_input").toBool();
 	}
@@ -102,6 +103,8 @@ void InputWidget::reset()
 	arrows.clear();
 	QSettings settings;
 	show_input = settings.value("show_input").toBool();
+	_auth->check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
+	enableTouchpadMode(_auth->usingTouchpadMode());
 	if(!record_pattern)
 		showMessage(tr("Pattern not recognized, please try again."), 1500);
 	update();
@@ -262,13 +265,6 @@ void InputWidget::deleteLastStroke()
 		path.removeAt(a.start_node_id+1);
 
 	update();
-}
-
-
-void InputWidget::resetAuth()
-{
-	_auth->loadHash();
-	enableTouchpadMode(_auth->usingTouchpadMode());
 }
 
 

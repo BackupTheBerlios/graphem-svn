@@ -35,7 +35,6 @@ class QTime;
 class Auth : public QObject { //TODO needs cleanup
 	Q_OBJECT
 	friend class NewPattern;
-	friend class GeneratePattern;
 	friend class InputWidget;
 public:
 	Auth(QObject *parent = 0);
@@ -67,6 +66,7 @@ private:
 	QTime *started;
 	bool hash_loaded;
 	bool print_pattern;
+	bool testing_pattern; //don't save stats if true
 	bool touchpad_mode;
 	bool verbose;
 	int check_timeout; //in ms
