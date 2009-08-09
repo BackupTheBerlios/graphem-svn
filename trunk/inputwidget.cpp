@@ -86,7 +86,7 @@ void InputWidget::checkFinished()
 }
 
 
-bool InputWidget::hashLoaded(){ return _auth->hash_loaded; }
+bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
 
 
 void InputWidget::enableTouchpadMode(bool on)

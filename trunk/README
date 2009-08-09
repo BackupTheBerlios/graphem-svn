@@ -27,6 +27,8 @@ After accepting the displayed pattern you should test wether it is recognized
 correctly in the main window.  To increase the recognition rate, it often helps
 to speed up mouse movements.  For your own key patterns you should make sure to
 only include strokes that are present each time it is drawn.
+When you are satisfied with the results, use File -> Save to save the new key
+pattern to disk, overwriting the previous one (if any).
 In the preferences dialog (File -> Preferences) you can configure the amount of
 time Graphem may spend trying to match the input to your key pattern before
 you can retry. You may want to increase the timeout for older machines or
