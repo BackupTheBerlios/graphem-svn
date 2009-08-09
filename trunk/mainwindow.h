@@ -24,6 +24,7 @@
 
 class InputWidget;
 class NewPattern;
+class QAction;
 class QDockWidget;
 class QTextEdit;
 
@@ -40,12 +41,15 @@ public slots:
 	void showNewPatternDialog();
 	void showPreferences();
 	void quit();
-signals:
-	void unsavedPattern(bool);
 private:
+	void setUnsavedChanges(bool b);
+
 	InputWidget* input;
 	NewPattern* new_pattern_dialog;
 	QDockWidget* info_dock;
 	QTextEdit* info_text;
+	QAction* edit_action;
+	QAction* save_action;
+	bool unsaved_changes;
 };
 #endif

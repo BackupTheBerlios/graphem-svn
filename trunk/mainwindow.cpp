@@ -42,16 +42,16 @@ MainWindow::MainWindow(InputWidget* input):
 	QMenu *file = menuBar()->addMenu(tr("&File"));
 	file->addAction(tr("&New Pattern..."), this,
 		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
-	QAction *edit = file->addAction(tr("&Edit Pattern..."), this,
+	edit_action = file->addAction(tr("&Edit Pattern..."), this,
 		SLOT(showEditPatternDialog()), tr("Ctrl+E"));
-	edit->setEnabled(false);
+
 	file->addSeparator();
-	QAction *save_pattern = file->addAction(tr("&Save"), this,
+	save_action = file->addAction(tr("&Save"), this,
 		SLOT(save()), tr("Ctrl+S"));
-	save_pattern->setEnabled(false);
 
 	file->addSeparator();
 	file->addAction(tr("&Preferences"), this, SLOT(showPreferences()));
+
 	file->addSeparator();
 	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
 
@@ -68,11 +68,8 @@ MainWindow::MainWindow(InputWidget* input):
 	addDockWidget(Qt::LeftDockWidgetArea, info_dock);
 
 	resize(600,400);
+	setUnsavedChanges(false);
 
-	connect(this, SIGNAL(unsavedPattern(bool)),
-		edit, SLOT(setEnabled(bool)));
-	connect(this, SIGNAL(unsavedPattern(bool)),
-		save_pattern, SLOT(setEnabled(bool)));
 	connect(input->auth(), SIGNAL(passed()),
 		this, SLOT(reset()));
 	connect(input->auth(), SIGNAL(failed()),
@@ -119,9 +116,9 @@ void MainWindow::refreshInfo()
 //save pattern currently being tested
 void MainWindow::save()
 {
-	if(new_pattern_dialog)
-		new_pattern_dialog->save();
-	emit unsavedPattern(false);
+	Q_ASSERT(new_pattern_dialog != 0);
+	new_pattern_dialog->save();
+	setUnsavedChanges(false);
 }
 
 
@@ -143,7 +140,7 @@ void MainWindow::showEditPatternDialog()
 		input->resetAuth();
 		refreshInfo();
 
-		emit unsavedPattern(true);
+		setUnsavedChanges(true);
 	}
 }
 
@@ -151,7 +148,7 @@ void MainWindow::showEditPatternDialog()
 void MainWindow::showNewPatternDialog()
 {
 	QMessageBox msgBox(QMessageBox::Question,
-		tr("Enable touchpad mode?"),
+		"",
 		tr("<b>Enable touchpad mode?</b>"),
 		QMessageBox::Cancel,
 		this);
@@ -172,7 +169,16 @@ void MainWindow::showNewPatternDialog()
 
 void MainWindow::quit()
 {
-	//TODO save?
+	if(unsaved_changes) {
+		QMessageBox::StandardButton button = QMessageBox::warning(this, "",
+			"<b>Save the new key pattern?</b>",
+			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+			QMessageBox::Save);
+		if(button == QMessageBox::Cancel)
+			return;
+		else if(button == QMessageBox::Save)
+			save();
+	}
 	input->quit();
 	close();
 }
@@ -187,4 +193,12 @@ void MainWindow::showPreferences()
 	input->reset();
 
 	delete pref;
+}
+
+
+void MainWindow::setUnsavedChanges(bool b)
+{
+	unsaved_changes = b;
+	edit_action->setEnabled(b);
+	save_action->setEnabled(b);
 }
