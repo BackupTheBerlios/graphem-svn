@@ -77,7 +77,8 @@ void InputWidget::checkFinished()
 		return;
 	showMessage(""); //don't show message after input started
 
-	if(path.last().time.secsTo(QTime::currentTime()) >= 1) {
+	if(path.last().time.secsTo(QTime::currentTime()) >= 1 //wait 1s after last input
+	or path.count() >= 100000) { //don't crash if input device generates too much data
 		showMessage(tr("Processing..."));
 		repaint();
 		_auth->preprocess(path);
