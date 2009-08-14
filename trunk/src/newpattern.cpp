@@ -127,6 +127,7 @@ void NewPattern::prepareAuth(Auth *auth)
 	auth->setAuthHash(Crypto::getHash(tmp.strokesToString(), ""), "");
 
 	auth->touchpad_mode = input->touchpad_mode;
+	auth->hash_loaded = true;
 	auth->testing_pattern = true;
 	auth->usage_total = auth->usage_failed = 0;
 }
