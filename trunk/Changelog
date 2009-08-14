@@ -1,9 +1,10 @@
 Graphem 0.3:
+	* Depends on QCA 2 library
 	* Allow generation of random patterns
 	* Test pattern before saving
 	* Removed --show-input option, configurable via GUI
 	* Added --ask mode - does not lock the screen and can be canceled
-	* Added .desktop file
+	* Added README and .desktop file
 
 Graphem 0.2:
 	* First beta release
