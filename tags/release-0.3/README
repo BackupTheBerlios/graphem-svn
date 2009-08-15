@@ -1,0 +1,56 @@
+Introduction
+============
+
+Graphem is a small mouse gesture based authentication program and screen locker
+for X11.
+Project home page: http://graphem.berlios.de/
+
+
+Installation
+============
+
+Graphem requires Qt4 and QCA2 libraries, please install the development
+libraries (called libqt4-dev and libqca2-dev on Debian/Ubuntu) before
+compilation via:
+	qmake-qt4
+	make
+
+
+Configuration
+=============
+
+The configuration window is shown when Graphem is started without any arguments.
+You can now set a new key pattern via File -> New Pattern. You can either draw
+your own pattern or let Graphem generate a random key for you by clicking the
+'Generate Pattern' button.
+After accepting the displayed pattern you should test wether it is recognized
+correctly in the main window.  To increase the recognition rate, it often helps
+to speed up mouse movements.  For your own key patterns you should make sure to
+only include strokes that are present each time it is drawn.
+When you are satisfied with the results, use File -> Save to save the new key
+pattern to disk, overwriting the previous one (if any).
+In the preferences dialog (File -> Preferences) you can configure the amount of
+time Graphem may spend trying to match the input to your key pattern before
+you can retry. You may want to increase the timeout for older machines or
+pariticularly long keys, for most other cases it is usually more effective to
+re-input your pattern than to do an exhaustive search.
+If you aren't concerned about 'shoulder surfing' you can also have it display
+your input while authenticating.
+
+
+Locking the screen
+==================
+
+To lock the screen, add the --lock argument when executing Graphem.
+You should test your key pattern a few times in the configuration window so
+you don't lock yourself out.
+
+
+Scripting
+=========
+
+When calling Graphem from a script, you'll want to use the --ask argument.
+The user can then enter their key pattern or press ESC to cancel the dialog.
+Return code 0 indicates success, 1 means the dialog was canceled or the number
+of possible tries was exceeded. To set the number of tries, add --tries [n]
+to the command line. The default allows an infinite number of retries.

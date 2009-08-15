@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Configure Graphem
+Comment=Set up the mouse gestures Graphem should use for authentication.
+Exec=graphem
+#Icon=
+Type=Application
+Categories=Utility;Security;
