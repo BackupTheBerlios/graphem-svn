@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 
 		if(mode == ASK) {
 			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(graphem_version));
-			new QShortcut(QKeySequence("Esc"), input, SLOT(quit()));
+			new QShortcut(QKeySequence("Esc"), input, SLOT(exit()));
 			input->auth()->setTries(tries);
 			input->showMaximized();
 		} else { //lock

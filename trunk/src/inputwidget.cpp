@@ -109,6 +109,18 @@ void InputWidget::enableTouchpadMode(bool on)
 }
 
 
+//exit with return code 1
+void InputWidget::exit()
+{
+	releaseMouse();
+	releaseKeyboard();
+	hide();
+
+	_auth->saveStats();
+	::exit(1);
+}
+
+
 bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
 
 

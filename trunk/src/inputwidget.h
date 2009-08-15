@@ -52,6 +52,7 @@ signals:
 public slots:
 	void checkFinished();
 	void deleteLastStroke();
+	void exit();
 	void printData();
 	void quit();
 	void reset();

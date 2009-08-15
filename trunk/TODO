@@ -1,9 +1,7 @@
-0.3:
-create documentation
-	html?
+0.4:
 is QCA's rng enough?
-check return codes.
-benchmark.
+	should probably use openssl, otherwise disable patten generator
+number of tries doesn't really belong into auth
 
 ?:
 l10n
