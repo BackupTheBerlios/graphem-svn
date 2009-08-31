@@ -2,6 +2,9 @@
 is QCA's rng enough?
 	should probably use openssl, otherwise disable patten generator
 number of tries doesn't really belong into auth
+integrate with windows
+	+pasword might disable Ctrl Alt Del?
+better logo & home page
 
 ?:
 l10n
