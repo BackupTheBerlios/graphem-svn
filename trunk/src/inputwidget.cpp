@@ -22,6 +22,7 @@
 
 #include <iostream>
 
+#include <QCursor>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QSettings>
@@ -40,7 +41,8 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	default_msg(tr("Please enter your key pattern.")),
 	touchpad_mode(false),
 	show_input(false),
-	record_pattern(record)
+	record_pattern(record),
+	cursor_centered(false)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -124,6 +126,7 @@ void InputWidget::exit()
 bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
 
 
+//TODO: merge with mouseMoveEvent()?
 void InputWidget::mousePressEvent(QMouseEvent* ev)
 {
 	if(pen_down or touchpad_mode)
@@ -137,6 +140,10 @@ void InputWidget::mousePressEvent(QMouseEvent* ev)
 
 void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 {
+	if(cursor_centered) { //drop event so we actually start at center
+		cursor_centered = false;
+		return;
+	}
 	if(pen_down) {
 		ev->ignore();
 		return;
@@ -278,6 +285,13 @@ void InputWidget::reset()
 	update();
 }
 
+void InputWidget::resizeEvent(QResizeEvent* /*ev*/)
+{
+	if(parent() == 0) { //center cursor for top level windows
+		cursor().setPos(width()/2, height()/2);
+		cursor_centered = true;
+	}
+}
 
 void InputWidget::showMessage(QString m, int msecs)
 {

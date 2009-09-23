@@ -33,4 +33,3 @@ add fancy graphics to auth dialog
 	fade in/out?
 maybe separate ASK/LOCK binaries - if the whole package is too large
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
-or center cursor after fail? (again, not for tablets)

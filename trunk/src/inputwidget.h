@@ -43,8 +43,8 @@ class InputWidget : public QWidget {
 	friend class NewPattern;
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
-	void enableTouchpadMode(bool on);
 	Auth* auth() { return _auth; } // TODO needed?
+	void enableTouchpadMode(bool on);
 	bool hashLoaded();
 	void setDefaultMessage(QString m) { default_msg = m; }
 signals:
@@ -62,6 +62,7 @@ protected:
 	void mousePressEvent(QMouseEvent *ev);
 	void mouseReleaseEvent(QMouseEvent *ev);
 	void paintEvent(QPaintEvent *ev);
+	void resizeEvent(QResizeEvent *ev);
 private:
 	QList<Node> path;
 	QList<Arrow> arrows; // used when recording
@@ -71,5 +72,6 @@ private:
 	QString msg, default_msg;
 	bool touchpad_mode, show_input;
 	bool record_pattern;
+	bool cursor_centered;
 };
 #endif
