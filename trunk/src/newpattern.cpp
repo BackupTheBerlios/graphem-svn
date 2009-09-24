@@ -94,8 +94,8 @@ void NewPattern::generate()
 		const int l = Crypto::randInt(30, 250);
 		x = Crypto::randInt(-1, 1);
 		y = Crypto::randInt(-1, 1);
+		//add offset to avoid having strokes directly on top of each other
 		QPoint pos = lastpos + l*QPoint(x, y) + 5*QPoint(y, -x);
-		//last summand is offset to avoid having strokes directly on top of each other
 
 		if(input->touchpad_mode or last_pen_up or i >= num_strokes-2) {
 			pen_up = false;
@@ -141,7 +141,7 @@ void NewPattern::save()
 	QSettings settings;
 	QByteArray salt = Crypto::generateSalt();
 	settings.setValue("pattern_hash", Crypto::getHash(auth.strokesToString(), salt));
-	settings.setValue("touchpad_mode", auth.touchpad_mode);
+	settings.setValue("touchpad_mode", input->touchpad_mode);
 	settings.setValue("salt", salt);
 	settings.setValue("usage_total", 0);
 	settings.setValue("usage_failed", 0);
