@@ -126,34 +126,28 @@ void InputWidget::exit()
 bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
 
 
-//TODO: merge with mouseMoveEvent()?
-void InputWidget::mousePressEvent(QMouseEvent* ev)
-{
-	if(pen_down or touchpad_mode)
-		return;
-
-	mouse_down = true;
-
-	path.append(Node(ev->pos()));
-}
-
-
 void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 {
 	if(cursor_centered) { //drop event so we actually start at center
 		cursor_centered = false;
 		return;
 	}
-	if(pen_down) {
+	/* TODO: uncomment me when we're processing tablet events
+	if(pen_down) { //ignore mouse events while pen is down
 		ev->ignore();
 		return;
+	}*/
+
+	if(!touchpad_mode) {
+		if(ev->buttons() == 0) { //no buttons pressed
+			mouse_down = false;
+			return;
+		}
+		mouse_down = true;
 	}
 
-	if(mouse_down or touchpad_mode) {
-		path.append(Node(ev->pos()));
-		update();
-	}
-	//there are some move events with pressed buttons discarded here, as some mousePress events get lost
+	path.append(Node(ev->pos()));
+	update();
 }
 
 

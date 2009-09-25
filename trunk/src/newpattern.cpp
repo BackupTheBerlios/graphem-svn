@@ -17,6 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+// TODO: add minimal stroke length
+
 #include "auth.h"
 #include "crypto.h"
 #include "inputwidget.h"

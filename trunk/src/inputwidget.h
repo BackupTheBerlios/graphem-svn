@@ -59,7 +59,6 @@ public slots:
 	void showMessage(QString m = QString(), int msecs = 0);
 protected:
 	void mouseMoveEvent(QMouseEvent *ev);
-	void mousePressEvent(QMouseEvent *ev);
 	void mouseReleaseEvent(QMouseEvent *ev);
 	void paintEvent(QPaintEvent *ev);
 	void resizeEvent(QResizeEvent *ev);
