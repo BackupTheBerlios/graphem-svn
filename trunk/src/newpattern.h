@@ -34,6 +34,7 @@ public:
 	void save();
 private slots:
 	void generate();
+	void resetInput();
 	void updateDisplay();
 private:
 	InputWidget *input;

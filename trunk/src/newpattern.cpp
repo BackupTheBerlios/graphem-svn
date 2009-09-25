@@ -18,6 +18,7 @@
 */
 
 // TODO: add minimal stroke length
+// TODO: potential bug: touchpad_mode and generated patterns?
 
 #include "auth.h"
 #include "crypto.h"
@@ -62,7 +63,7 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	connect(delete_last, SIGNAL(clicked()),
 		input, SLOT(deleteLastStroke()));
 	connect(reset, SIGNAL(clicked()),
-		input, SLOT(reset()));
+		this, SLOT(resetInput()));
 	
 	QVBoxLayout *l1 = new QVBoxLayout();
 	l1->setMargin(0);
@@ -132,6 +133,15 @@ void NewPattern::prepareAuth(Auth *auth)
 	auth->hash_loaded = true;
 	auth->testing_pattern = true;
 	auth->usage_total = auth->usage_failed = 0;
+}
+
+
+//reset input and re-enable touchpad mode if required
+void NewPattern::resetInput()
+{
+	bool touchpad = input->touchpad_mode;
+	input->reset();
+	input->enableTouchpadMode(touchpad);
 }
 
 
