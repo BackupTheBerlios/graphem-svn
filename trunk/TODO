@@ -1,11 +1,12 @@
 0.4:
+make Auth a base class
+	move statistics somewhere else
+	number of tries doesn't really belong there
 is QCA's rng enough?
 	should probably use openssl, otherwise disable patten generator
-number of tries doesn't really belong into auth
 integrate with windows
 	+pasword might disable Ctrl Alt Del?
 better logo & home page
-recommended pattern length, maybe 15?
 
 ?:
 l10n
@@ -18,7 +19,6 @@ do some benchmarking
 	test wether manual inlining makes sense
 	test if hash comparison can be optimized (QByteArray vs. QString vs ?)
 	QCryptoGraphicHash vs QCA::Hash
-make Auth a base class
 support real handwriting
 	try different algorithms for Auth module:
 	fcc-codes (current implementation):
@@ -32,5 +32,4 @@ PAM integration?
 use pattern to access encryption key, should be possible with QCA
 add fancy graphics to auth dialog
 	fade in/out?
-maybe separate ASK/LOCK binaries - if the whole package is too large
 don't show mouse cursor, maybe only record relative movements (except for tablets)?
