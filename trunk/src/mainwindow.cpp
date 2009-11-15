@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "graphem.h"
 #include "auth.h"
 #include "inputwidget.h"
 #include "mainwindow.h"
@@ -59,7 +60,7 @@ MainWindow::MainWindow(InputWidget* input):
 	QMenu *help = menuBar()->addMenu(tr("&Help"));
 	help->addAction(tr("About &Qt"), qApp, SLOT(aboutQt()), 0);
 	help->addAction(tr("&About"), this, SLOT(showAboutDialog()), 0);
-	
+
 	//info dock
 	info_text = new QTextEdit();
 	info_text->setReadOnly(true);
@@ -74,7 +75,7 @@ MainWindow::MainWindow(InputWidget* input):
 		this, SLOT(reset()));
 	connect(input->auth(), SIGNAL(failed()),
 		this, SLOT(reset()));
-		
+
 	refreshInfo();
 }
 
@@ -149,12 +150,17 @@ void MainWindow::setUnsavedChanges(bool b)
 
 void MainWindow::showAboutDialog()
 {
-	QMessageBox::about(this, tr("About Graphem"),
-	tr("<center><h1>Graphem 0.3</h1>\
+	char text[330] = "\0";
+	strcat(text, "<center><h1>");
+	strcat(text, GRAPHEM_VERSION);
+	strcat(text, "</h1>\
 <h3>A small mouse gesture based authentication program and screen locker</h3>\
 <p>Documentation is available on <a href=\"http://graphem.berlios.de/\">http://graphem.berlios.de</a></p>\
 <small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
-<p>%1</p></small>")
+<p>%1</p></small>");
+
+	QMessageBox::about(this, tr("About Graphem"),
+	tr(text)
 	.arg("This program is free software; you can redistribute it and/or modify<br> it under the terms of the GNU General Public License as published by<br> the Free Software Foundation; either version 2 of the License, or<br> (at your option) any later version."));
 }
 
@@ -185,7 +191,7 @@ void MainWindow::showNewPatternDialog()
 
 	if(ret == QMessageBox::Cancel)
 		return;
-	
+
 	delete new_pattern_dialog; //reset dialog
 	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
 	new_pattern_dialog = new NewPattern(this, !ret);

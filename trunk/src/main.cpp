@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "graphem.h"
 #include "auth.h"
 #include "crypto.h"
 #include "mainwindow.h"
@@ -32,8 +33,6 @@
 
 void printHelp(char *arg0);
 enum WindowMode { CONFIG, ASK, LOCK };
-
-const QString graphem_version = "Graphem 0.3";
 
 using namespace std;
 
@@ -88,7 +87,7 @@ int main(int argc, char* argv[])
 	if(mode == CONFIG) { //show main window
 		MainWindow *main = new MainWindow(input);
 		//main->setWindowIcon(QIcon("icon.png"));
-		main->setWindowTitle(graphem_version);
+		main->setWindowTitle(GRAPHEM_VERSION);
 		main->show();
 	} else {
 		if(!input->hashLoaded()) {
@@ -102,12 +101,12 @@ int main(int argc, char* argv[])
 		//input->setWindowIcon(QIcon("icon.png"));
 
 		if(mode == ASK) {
-			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(graphem_version));
+			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(GRAPHEM_VERSION));
 			new QShortcut(QKeySequence("Esc"), input, SLOT(exit()));
 			input->auth()->setTries(tries);
 			input->showMaximized();
 		} else { //lock
-			input->setWindowTitle(graphem_version);
+			input->setWindowTitle(GRAPHEM_VERSION);
 			input->setWindowFlags(Qt::X11BypassWindowManagerHint);
 			input->setVisible(true);
 			QDesktopWidget dw;
