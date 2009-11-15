@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 		main->show();
 	} else {
 		if(!input->hashLoaded()) {
-			cerr << "Couldn't load key pattern!\n";
+			cerr << "Couldn't load key pattern! Please start Graphem without any arguments to create one.\n";
 			return 1;
 		}
 

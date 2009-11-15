@@ -1,3 +1,8 @@
+Graphem 0.3.1:
+	* Don't show input while processing
+	* Fixed saving patterns in touchpad mode
+	* Center mouse cursor when started with --ask or --lock
+
 Graphem 0.3:
 	* Depends on QCA 2 library
 	* Allow generation of random patterns
