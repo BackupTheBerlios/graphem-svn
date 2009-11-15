@@ -1,0 +1,35 @@
+0.4:
+make Auth a base class
+	move statistics somewhere else
+	number of tries doesn't really belong there
+is QCA's rng enough?
+	should probably use openssl, otherwise disable patten generator
+integrate with windows
+	+pasword might disable Ctrl Alt Del?
+better logo & home page
+
+?:
+l10n
+estimate strength of input
+create test cases for specific inputs
+(!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
+can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
+make preprocess() suck less, use velocity to determine averaging
+do some benchmarking
+	test wether manual inlining makes sense
+	test if hash comparison can be optimized (QByteArray vs. QString vs ?)
+	QCryptoGraphicHash vs QCA::Hash
+support real handwriting
+	try different algorithms for Auth module:
+	fcc-codes (current implementation):
+		doesn't seem to be very reliable (why?)
+		- useless for handwriting, kanji
+		+ simple geometric patterns work
+	maybe something else:
+		element: cusp, straight line, loop; also store direction
+		still missing velocity, probably helpful
+PAM integration?
+use pattern to access encryption key, should be possible with QCA
+add fancy graphics to auth dialog
+	fade in/out?
+don't show mouse cursor, maybe only record relative movements (except for tablets)?
