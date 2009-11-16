@@ -11,7 +11,7 @@ QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT -D NO_DEBUG
 CONFIG += release silent
 
 VPATH += src
-HEADERS += inputwidget.h stroke.h auth.h node.h mainwindow.h newpattern.h crypto.h preferences.h
+HEADERS += inputwidget.h stroke.h auth.h node.h mainwindow.h newpattern.h crypto.h preferences.h graphem.h
 SOURCES += main.cpp inputwidget.cpp auth.cpp stroke.cpp mainwindow.cpp newpattern.cpp crypto.cpp preferences.cpp
 
 OBJECTS_DIR = src/tmp
