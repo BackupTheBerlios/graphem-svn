@@ -17,4 +17,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#define GRAPHEM_VERSION "Graphem 0.3.1"
+#include <QString>
+
+const QString GRAPHEM_VERSION = "Graphem 0.3.1"
