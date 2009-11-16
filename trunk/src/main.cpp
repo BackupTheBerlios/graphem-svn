@@ -109,13 +109,9 @@ int main(int argc, char* argv[])
 			input->setWindowTitle(GRAPHEM_VERSION);
 			input->setWindowFlags(Qt::X11BypassWindowManagerHint);
 			input->setVisible(true);
+			input->setGrab(true);
 			QDesktopWidget dw;
 			input->setGeometry(dw.screenGeometry());
-
-			input->grabKeyboard();
-			input->grabMouse();
-			input->activateWindow(); //make sure we catch keyboard events
-			input->raise();
 		}
 	}
 

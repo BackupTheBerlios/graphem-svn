@@ -42,7 +42,8 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	touchpad_mode(false),
 	show_input(false),
 	record_pattern(record),
-	cursor_centered(false)
+	cursor_centered(false),
+	do_grab(false)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -70,6 +71,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	}
 	showMessage();
 	timer->start();
+
 }
 
 
@@ -125,6 +127,28 @@ void InputWidget::exit()
 
 	_auth->saveStats();
 	::exit(1);
+}
+
+
+// get mouse/keyboard grab and focus; needs to be called after window is displayed
+void InputWidget::focus()
+{
+	if(do_grab) {
+		grabMouse();
+		grabKeyboard();
+	}
+
+	activateWindow(); //make sure we catch keyboard events
+	raise();
+}
+
+void InputWidget::showEvent(QShowEvent*)
+{
+	focus();
+
+	//when called via keyboard shortcut, keyboard grab might fail
+	//still this doesn't feel right. how can i check if the grab WORKED?
+	QTimer::singleShot(500, this, SLOT(focus()));
 }
 
 
@@ -291,6 +315,7 @@ void InputWidget::resizeEvent(QResizeEvent* /*ev*/)
 		cursor_centered = true;
 	}
 }
+
 
 void InputWidget::showMessage(QString m, int msecs)
 {

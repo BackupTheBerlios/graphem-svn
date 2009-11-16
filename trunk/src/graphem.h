@@ -19,4 +19,4 @@
 
 #include <QString>
 
-const QString GRAPHEM_VERSION = "Graphem 0.3.1";
+const QString GRAPHEM_VERSION = "Graphem 0.3.2";

@@ -1,3 +1,6 @@
+Graphem 0.3.2:
+	* When started via keyboard shortcut, keyboard grab sometimes failed
+
 Graphem 0.3.1:
 	* Don't show input while processing
 	* Fixed saving patterns in touchpad mode
