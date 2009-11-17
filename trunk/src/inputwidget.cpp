@@ -147,7 +147,7 @@ void InputWidget::showEvent(QShowEvent*)
 	focus();
 
 	//when called via keyboard shortcut, keyboard grab might fail
-	//still this doesn't feel right. how can i check if the grab WORKED?
+	//after 500ms, the key should have been released so the grab can work
 	QTimer::singleShot(500, this, SLOT(focus()));
 }
 
