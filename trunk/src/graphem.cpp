@@ -34,8 +34,6 @@
 void printHelp(char *arg0);
 enum WindowMode { CONFIG, ASK, LOCK };
 
-using namespace std;
-
 
 int main(int argc, char* argv[])
 {
@@ -78,7 +76,7 @@ int main(int argc, char* argv[])
 #endif
 
 		else {
-			cerr << "Unknown command line option '" << argv[i] << "'\n";
+			std::cerr << "Unknown command line option '" << argv[i] << "'\n";
 			printHelp(argv[0]);
 			return 1;
 		}
@@ -91,7 +89,7 @@ int main(int argc, char* argv[])
 		main->show();
 	} else {
 		if(!input->hashLoaded()) {
-			cerr << "Couldn't load key pattern! Please start Graphem without any arguments to create one.\n";
+			std::cerr << "Couldn't load key pattern! Please start Graphem without any arguments to create one.\n";
 			return 1;
 		}
 
@@ -105,11 +103,13 @@ int main(int argc, char* argv[])
 			new QShortcut(QKeySequence("Esc"), input, SLOT(exit()));
 			input->auth()->setTries(tries);
 			input->showMaximized();
-		} else { //lock
+		} else { //mode == LOCK
 			input->setWindowTitle(GRAPHEM_VERSION);
+			input->setGrab(true);
+
+			//for full screen, we strip WM decorations and resize the window manually
 			input->setWindowFlags(Qt::X11BypassWindowManagerHint);
 			input->setVisible(true);
-			input->setGrab(true);
 			QDesktopWidget dw;
 			input->setGeometry(dw.screenGeometry());
 		}
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 
 void printHelp(char *arg0)
 {
-	cout << "Usage: " << arg0 << " [options]\n\n"
+	std::cout << "Usage: " << arg0 << " [options]\n\n"
 	<< "--ask\t\t Ask for key pattern but don't give access to configuration; can be canceled\n"
 	<< "--help\t\t Show this text\n"
 	<< "--lock\t\t Lock screen (Make sure your key pattern works!)\n"
@@ -130,7 +130,7 @@ void printHelp(char *arg0)
 	<< "\n Returns 0 on success, 1 if canceled or maximum number of tries reached\n";
 
 #ifndef NO_DEBUG
-	cout << "Debug options:\n"
+	std::cout << "Debug options:\n"
 	<< "--print-data\t Prints velocity/pressure data to standard output\n"
 	<< "--print-pattern\t Prints entered pattern as a string\n";
 #endif
