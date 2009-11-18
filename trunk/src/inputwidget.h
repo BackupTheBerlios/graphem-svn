@@ -54,6 +54,7 @@ public slots:
 	void checkFinished();
 	void deleteLastStroke();
 	void exit();
+	void fade();
 	void focus();
 	void printData();
 	void quit();
@@ -76,5 +77,6 @@ private:
 	bool record_pattern;
 	bool cursor_centered;
 	bool do_grab;
+	qreal fade_to; //final opacity after fade
 };
 #endif

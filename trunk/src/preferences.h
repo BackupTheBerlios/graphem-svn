@@ -32,6 +32,7 @@ public:
 private slots:
 	void save();
 private:
+	QCheckBox *fade;
 	QCheckBox *show_input;
 	QSpinBox *check_timeout;
 };

@@ -31,5 +31,4 @@ support real handwriting
 PAM integration?
 use pattern to access encryption key, should be possible with QCA
 add fancy graphics to auth dialog
-	fade in/out?
 don't show mouse cursor, maybe only record relative movements (except for tablets)?

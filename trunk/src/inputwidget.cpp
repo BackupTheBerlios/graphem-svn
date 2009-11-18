@@ -43,7 +43,8 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	show_input(false),
 	record_pattern(record),
 	cursor_centered(false),
-	do_grab(false)
+	do_grab(false),
+	fade_to(1.0)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -130,6 +131,19 @@ void InputWidget::exit()
 }
 
 
+//fade-in effect
+void InputWidget::fade()
+{
+	const qreal fade_step = 0.1;
+	if(windowOpacity() < fade_to) {
+		setWindowOpacity(windowOpacity() + fade_step);
+		QTimer::singleShot(50, this, SLOT(fade()));
+	} else { // end fade-in
+		setWindowOpacity(fade_to);
+	}
+}
+
+
 // get mouse/keyboard grab and focus; needs to be called after window is displayed
 void InputWidget::focus()
 {
@@ -142,9 +156,17 @@ void InputWidget::focus()
 	raise();
 }
 
+
 void InputWidget::showEvent(QShowEvent*)
 {
 	focus();
+
+	//start fade-in if in LOCK-mode
+	QSettings settings;
+	if(settings.value("fade", true).toBool() and do_grab) {
+		setWindowOpacity(0.0);
+		QTimer::singleShot(50, this, SLOT(fade()));
+	}
 
 	//when called via keyboard shortcut, keyboard grab might fail
 	//after 500ms, the key should have been released so the grab can work

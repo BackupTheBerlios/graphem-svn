@@ -40,8 +40,12 @@ Preferences::Preferences(QWidget *parent):
 		this, SLOT(save()));
 
 	show_input = new QCheckBox(tr("&Show input when drawing"));
-	if(settings.value("show_input").toBool())
+	if(settings.value("show_input", false).toBool())
 		show_input->setCheckState(Qt::Checked);
+
+	fade = new QCheckBox(tr("&Fade in when locking screen"));
+	if(settings.value("fade", true).toBool())
+		fade->setCheckState(Qt::Checked);
 
 	QLabel *check_timeout_label = new QLabel(tr("&Authentication timeout"));
 	check_timeout = new QSpinBox();
@@ -53,6 +57,7 @@ Preferences::Preferences(QWidget *parent):
 	//layout
 	QVBoxLayout *l1 = new QVBoxLayout();
 	l1->addWidget(show_input);
+	l1->addWidget(fade);
 	QHBoxLayout *l2 = new QHBoxLayout();
 	l2->addWidget(check_timeout_label);
 	l2->addWidget(check_timeout);
@@ -68,6 +73,7 @@ void Preferences::save()
 {
 	QSettings settings;
 	settings.setValue("show_input", show_input->checkState() == Qt::Checked);
+	settings.setValue("fade", fade->checkState() == Qt::Checked);
 	settings.setValue("check_timeout", check_timeout->value());
 	settings.sync();
 
