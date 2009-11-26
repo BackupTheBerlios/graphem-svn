@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QSettings>
 #include <QSpinBox>
+#include <QX11Info>
 
 Preferences::Preferences(QWidget *parent):
 	QDialog(parent)
@@ -43,9 +44,16 @@ Preferences::Preferences(QWidget *parent):
 	if(settings.value("show_input", false).toBool())
 		show_input->setCheckState(Qt::Checked);
 
+#if defined Q_WS_X11 && QT_VERSION > 0x040400
+	bool enable_fading = x11Info().isCompositingManagerRunning();
+#else
+	bool enable_fading = true; //we'll just assume it works
+#endif
+
 	fade = new QCheckBox(tr("&Fade in when locking screen"));
-	if(settings.value("fade", true).toBool())
+	if(enable_fading and settings.value("fade", true).toBool())
 		fade->setCheckState(Qt::Checked);
+	fade->setEnabled(enable_fading);
 
 	QLabel *check_timeout_label = new QLabel(tr("&Authentication timeout"));
 	check_timeout = new QSpinBox();
