@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 
 		}
 
-#ifndef NO_DEBUG
+#ifndef QT_NO_DEBUG
 		else if(argv[i] == QString("--print-data")) {
 			QObject::connect(input, SIGNAL(dataReady()),
 				input, SLOT(printData()));
@@ -129,7 +129,7 @@ void printHelp(char *arg0)
 	<< "-v, --verbose\t Print success/failure messages on standard output\n"
 	<< "\n Returns 0 on success, 1 if canceled or maximum number of tries reached\n";
 
-#ifndef NO_DEBUG
+#ifndef QT_NO_DEBUG
 	std::cout << "Debug options:\n"
 	<< "--print-data\t Prints velocity/pressure data to standard output\n"
 	<< "--print-pattern\t Prints entered pattern as a string\n";

@@ -78,7 +78,7 @@ void Auth::check()
 		emit failed();
 	}
 
-#ifndef NO_DEBUG
+#ifndef QT_NO_DEBUG
 	double time = double(started->elapsed())/1000;
 	qDebug() << compared_hashes_count << " tries in " << time << "s, or " << compared_hashes_count/time << "tries/s";
 
@@ -117,7 +117,7 @@ void Auth::loadHash()
 
 bool Auth::matchesAuthPattern()
 {
-#ifndef NO_DEBUG
+#ifndef QT_NO_DEBUG
 	compared_hashes_count++;
 #endif
 
