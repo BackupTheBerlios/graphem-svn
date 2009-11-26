@@ -134,10 +134,10 @@ void InputWidget::exit()
 //fade-in effect
 void InputWidget::fade()
 {
-	const qreal fade_step = 0.1;
 	if(windowOpacity() < fade_to) {
+		qreal fade_step = fade_to/(fade_time_ms/fade_step_time_ms);
 		setWindowOpacity(windowOpacity() + fade_step);
-		QTimer::singleShot(50, this, SLOT(fade()));
+		QTimer::singleShot(fade_step_time_ms, this, SLOT(fade()));
 	} else { // end fade-in
 		setWindowOpacity(fade_to);
 	}
@@ -165,7 +165,7 @@ void InputWidget::showEvent(QShowEvent*)
 	QSettings settings;
 	if(settings.value("fade", true).toBool() and do_grab) {
 		setWindowOpacity(0.0);
-		QTimer::singleShot(50, this, SLOT(fade()));
+		QTimer::singleShot(fade_step_time_ms, this, SLOT(fade()));
 	}
 
 	//when called via keyboard shortcut, keyboard grab might fail

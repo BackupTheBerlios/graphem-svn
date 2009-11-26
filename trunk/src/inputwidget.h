@@ -67,6 +67,9 @@ protected:
 	void resizeEvent(QResizeEvent *ev);
 	void showEvent(QShowEvent *ev);
 private:
+	const static int fade_time_ms = 1500;
+	const static int fade_step_time_ms = 50;
+
 	QList<Node> path;
 	QList<Arrow> arrows; // used when recording
 	Auth *_auth;
