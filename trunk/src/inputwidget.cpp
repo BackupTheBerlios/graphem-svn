@@ -26,8 +26,10 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QSettings>
+#include <QtDebug>
 #include <QTime>
 #include <QTimer>
+#include <QX11Info>
 
 
 InputWidget::InputWidget(QWidget* parent, bool record) :
@@ -160,6 +162,13 @@ void InputWidget::focus()
 void InputWidget::showEvent(QShowEvent*)
 {
 	focus();
+
+#if defined Q_WS_X11 && QT_VERSION > 0x040400
+	if(x11Info().isCompositingManagerRunning())
+		qDebug() << "COMPOSITE! woo\n";
+	else
+		qDebug() << "no COMPOSITE\n";
+#endif
 
 	//start fade-in if in LOCK-mode
 	QSettings settings;

@@ -8,7 +8,7 @@ DEPENDPATH +=
 INCLUDEPATH += /usr/include/QtCrypto
 LIBS += -lqca
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT -D NO_DEBUG
-CONFIG += release silent
+CONFIG += debug silent
 
 VPATH += src
 OBJECTS_DIR = src/tmp
