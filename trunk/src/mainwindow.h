@@ -40,7 +40,8 @@ public slots:
 	void showEditPatternDialog();
 	void showNewPatternDialog();
 	void showPreferences();
-	void quit();
+protected:
+	void closeEvent(QCloseEvent*);
 private:
 	void setUnsavedChanges(bool b);
 

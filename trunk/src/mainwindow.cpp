@@ -25,6 +25,7 @@
 #include "preferences.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -54,7 +55,7 @@ MainWindow::MainWindow(InputWidget* input):
 	file->addAction(tr("&Preferences"), this, SLOT(showPreferences()));
 
 	file->addSeparator();
-	file->addAction(tr("&Quit"), this, SLOT(quit()), tr("Ctrl+Q"));
+	file->addAction(tr("&Quit"), this, SLOT(close()), tr("Ctrl+Q"));
 
 	// processing timeout
 	QMenu *help = menuBar()->addMenu(tr("&Help"));
@@ -80,20 +81,22 @@ MainWindow::MainWindow(InputWidget* input):
 }
 
 
-void MainWindow::quit()
+void MainWindow::closeEvent(QCloseEvent* ev)
 {
 	if(unsaved_changes) {
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "",
 			"<b>Save the new key pattern?</b>",
 			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
 			QMessageBox::Save);
-		if(button == QMessageBox::Cancel)
+		if(button == QMessageBox::Cancel) {
+			ev->ignore();
 			return;
-		else if(button == QMessageBox::Save)
+		} else if(button == QMessageBox::Save) {
 			save();
+		}
 	}
+	ev->accept();
 	input->quit();
-	close();
 }
 
 
