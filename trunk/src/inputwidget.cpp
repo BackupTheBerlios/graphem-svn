@@ -44,7 +44,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	record_pattern(record),
 	cursor_centered(false),
 	do_grab(false),
-	fade_to(1.0)
+	fade_to(0.5)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -159,7 +159,8 @@ void InputWidget::focus()
 
 void InputWidget::showEvent(QShowEvent*)
 {
-	focus();
+	if(parent() == 0)
+		focus();
 
 	//start fade-in if in LOCK-mode
 	QSettings settings;
