@@ -1,7 +1,14 @@
 0.4:
-make Auth a base class
+make Auth(Module) a base class
+	Auth gets InputWidget-pointer
+		acesses data directly
+		callback for drawing (pass QPainter?)
+		signals for status (calling exit() is ugly)
 	move statistics somewhere else
 	number of tries doesn't really belong there
+put default values for settings into constants
+	auth timeout should be 3-4s to be less annoying
+make creation of new pattern slightly more wizardish
 is QCA's rng enough?
 	should probably use openssl, otherwise disable patten generator
 integrate with windows
@@ -12,7 +19,7 @@ better logo & home page
 l10n
 estimate strength of input
 create test cases for specific inputs
-(!) search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
+search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
 can i optimize the tryPattern() algorithm so patterns are tried in order of likelihood?
 make preprocess() suck less, use velocity to determine averaging
 do some benchmarking

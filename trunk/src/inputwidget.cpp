@@ -43,8 +43,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	show_input(false),
 	record_pattern(record),
 	cursor_centered(false),
-	do_grab(false),
-	fade_to(0.5)
+	do_grab(false)
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -52,6 +51,8 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	connect(msg_timer, SIGNAL(timeout()),
 		this, SLOT(showMessage()));
 
+	QSettings settings;
+	fade_to = settings.value("window_opacity", 1.0).toDouble();
 	timer->setInterval(70); //check every 70ms
 	if(record_pattern) {
 		connect(timer, SIGNAL(timeout()),
@@ -67,12 +68,10 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 			this, SLOT(reset()));
 		_auth->loadHash();
 		enableTouchpadMode(_auth->usingTouchpadMode());
-		QSettings settings;
-		show_input = settings.value("show_input").toBool();
+		show_input = settings.value("show_input", false).toBool();
 	}
 	showMessage();
 	timer->start();
-
 }
 
 
@@ -163,10 +162,14 @@ void InputWidget::showEvent(QShowEvent*)
 		focus();
 
 	//start fade-in if in LOCK-mode
-	QSettings settings;
-	if(settings.value("fade", true).toBool() and do_grab) {
-		setWindowOpacity(0.0);
-		QTimer::singleShot(fade_step_time_ms, this, SLOT(fade()));
+	if(do_grab) {
+		QSettings settings;
+		if(settings.value("fade", true).toBool()) {
+			setWindowOpacity(0.0);
+			QTimer::singleShot(fade_step_time_ms, this, SLOT(fade()));
+		} else {
+			setWindowOpacity(fade_to);
+		}
 	}
 
 	//when called via keyboard shortcut, keyboard grab might fail

@@ -22,10 +22,14 @@
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QDialogButtonBox>
+#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QSettings>
 #include <QSpinBox>
+
+#ifdef Q_WS_X11
 #include <QX11Info>
+#endif
 
 Preferences::Preferences(QWidget *parent):
 	QDialog(parent)
@@ -40,6 +44,13 @@ Preferences::Preferences(QWidget *parent):
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(save()));
 
+	QLabel *check_timeout_label = new QLabel(tr("&Authentication timeout"));
+	check_timeout = new QSpinBox();
+	check_timeout->setRange(1, 120);
+	check_timeout->setSuffix("s");
+	check_timeout->setValue(settings.value("check_timeout", 6).toInt());
+	check_timeout_label->setBuddy(check_timeout);
+
 	show_input = new QCheckBox(tr("&Show input when drawing"));
 	if(settings.value("show_input", false).toBool())
 		show_input->setCheckState(Qt::Checked);
@@ -51,25 +62,33 @@ Preferences::Preferences(QWidget *parent):
 #endif
 
 	fade = new QCheckBox(tr("&Fade in when locking screen"));
-	if(enable_fading and settings.value("fade", true).toBool())
-		fade->setCheckState(Qt::Checked);
+	fade->setChecked(enable_fading and settings.value("fade", true).toBool());
 	fade->setEnabled(enable_fading);
 
-	QLabel *check_timeout_label = new QLabel(tr("&Authentication timeout"));
-	check_timeout = new QSpinBox();
-	check_timeout->setRange(1, 120);
-	check_timeout->setSuffix("s");
-	check_timeout->setValue(settings.value("check_timeout", 6).toInt());
-	check_timeout_label->setBuddy(check_timeout);
-	
+	QLabel *window_opacity_label = new QLabel(tr("Final window &opacity"));
+	window_opacity = new QDoubleSpinBox();
+	window_opacity->setRange(0.0, 1.0);
+	window_opacity->setValue(settings.value("window_opacity", 1.0).toDouble());
+	window_opacity->setSingleStep(0.1);
+	window_opacity_label->setBuddy(window_opacity);
+	window_opacity->setEnabled(enable_fading);
+
 	//layout
 	QVBoxLayout *l1 = new QVBoxLayout();
-	l1->addWidget(show_input);
-	l1->addWidget(fade);
+
 	QHBoxLayout *l2 = new QHBoxLayout();
 	l2->addWidget(check_timeout_label);
 	l2->addWidget(check_timeout);
 	l1->addLayout(l2);
+
+	l1->addWidget(show_input);
+
+	l1->addWidget(fade);
+	QHBoxLayout *l3 = new QHBoxLayout();
+	l3->addWidget(window_opacity_label);
+	l3->addWidget(window_opacity);
+	l1->addLayout(l3);
+
 	l1->addWidget(button_box);
 
 	setLayout(l1);
@@ -80,9 +99,10 @@ Preferences::Preferences(QWidget *parent):
 void Preferences::save()
 {
 	QSettings settings;
-	settings.setValue("show_input", show_input->checkState() == Qt::Checked);
-	settings.setValue("fade", fade->checkState() == Qt::Checked);
+	settings.setValue("show_input", show_input->isChecked());
+	settings.setValue("fade", fade->isChecked());
 	settings.setValue("check_timeout", check_timeout->value());
+	settings.setValue("window_opacity", window_opacity->value());
 	settings.sync();
 
 	accept();

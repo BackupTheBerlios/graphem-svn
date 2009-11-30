@@ -80,6 +80,6 @@ private:
 	bool record_pattern;
 	bool cursor_centered;
 	bool do_grab;
-	qreal fade_to; //final opacity after fade
+	double fade_to; //final opacity after fade
 };
 #endif
