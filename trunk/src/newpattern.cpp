@@ -51,20 +51,23 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
 	button_box->addButton(tr("&Ok"), QDialogButtonBox::AcceptRole);
-	QPushButton *generate = button_box->addButton(tr("&Generate Pattern"), QDialogButtonBox::ActionRole);
 	QPushButton *delete_last = button_box->addButton(tr("&Delete Last Stroke"), QDialogButtonBox::ActionRole);
 	QPushButton *reset = button_box->addButton(tr("&Reset"), QDialogButtonBox::ResetRole);
 	connect(button_box, SIGNAL(rejected()),
 		this, SLOT(reject()));
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(accept()));
-	connect(generate, SIGNAL(clicked()),
-		this, SLOT(generate()));
 	connect(delete_last, SIGNAL(clicked()),
 		input, SLOT(deleteLastStroke()));
 	connect(reset, SIGNAL(clicked()),
 		this, SLOT(resetInput()));
 	
+#ifndef NO_QCA
+	QPushButton *generate = button_box->addButton(tr("&Generate Pattern"), QDialogButtonBox::ActionRole);
+	connect(generate, SIGNAL(clicked()),
+		this, SLOT(generate()));
+#endif
+
 	QVBoxLayout *l1 = new QVBoxLayout();
 	l1->setMargin(0);
 	button_box->setContentsMargins(9, 0, 9, 0);
@@ -78,10 +81,14 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 //generate random key and display
 void NewPattern::generate()
 {
+#ifndef NO_QCA
 	bool ok;
+	const int num_strokes_start = 10;
+	const int num_strokes_min = 1;
+	const int num_strokes_max = 100;
 	const int num_strokes = QInputDialog::getInteger(this, tr("Generate Random Pattern"),
 		(input->path.empty()?tr(""):tr("Warning: The current input will be erased!<br>"))+tr("Number of strokes:"),
-		8, 0, 10000, 1, &ok);
+		num_strokes_start, num_strokes_min, num_strokes_max, 1, &ok);
 	if(!ok)
 		return;
 	input->reset();
@@ -119,6 +126,7 @@ void NewPattern::generate()
 		lastpos = pos;
 		last_pen_up = pen_up;
 	}
+#endif
 }
 
 

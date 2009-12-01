@@ -20,8 +20,13 @@
 #ifndef CRYPTO_H
 #define CRYPTO_H
 
+#include <QByteArray>
 #include <QCryptographicHash>
 #include <QString>
+
+#ifndef NO_QCA
+#include <QtCrypto>
+#endif
 
 namespace Crypto {
 	QByteArray generateSalt();

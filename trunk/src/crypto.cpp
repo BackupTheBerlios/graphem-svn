@@ -19,18 +19,35 @@
 
 #include "crypto.h"
 
-#include <QtCrypto>
+#include <QtGlobal>
+
+#include <climits>
+
 
 QByteArray Crypto::generateSalt()
 {
 	const int salt_bytes_count = 5;
+
+#ifndef NO_QCA
 	return QCA::Random::randomArray(salt_bytes_count).toByteArray();
+#else
+	QByteArray salt("");
+	for(int i = 0; i < salt_bytes_count; i++)
+		salt.append(char(randInt(0, 255)));
+	return salt;
+#endif
 }
+
 
 int Crypto::randInt(int min, int max)
 {
 	//in [0, UINT_MAX]
+#ifndef NO_QCA
 	const unsigned int r = QCA::Random::randomInt();
+#else
+	const unsigned int 	r = qrand();
+#endif
+
 	//in [0, 1]
 	double x = double(r)/UINT_MAX;
 

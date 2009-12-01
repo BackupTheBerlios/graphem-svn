@@ -4,11 +4,17 @@
 
 TEMPLATE = app
 TARGET = graphem
-DEPENDPATH += 
-INCLUDEPATH += /usr/include/QtCrypto
-LIBS += -lqca
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT
 CONFIG += debug silent
+
+QCA_PATH = /usr/include/QtCrypto
+exists($$QCA_PATH) {
+	INCLUDEPATH += $$QCA_PATH
+	LIBS += -lqca
+} else {
+	message("QCA library not found, disabling it")
+	DEFINES += NO_QCA
+}
 
 VPATH += src
 OBJECTS_DIR = src/tmp

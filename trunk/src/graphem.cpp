@@ -27,8 +27,8 @@
 #include <QDesktopWidget>
 #include <QShortcut>
 #include <QString>
-#include <QtCrypto>
 
+#include <cstdlib>
 #include <iostream>
 
 void printHelp(char *arg0);
@@ -41,7 +41,11 @@ int main(int argc, char* argv[])
 	app.setOrganizationName("Graphem");
 	app.setApplicationName("Graphem");
 
+#ifndef NO_QCA
 	QCA::Initializer crypto_init;
+#else
+	qsrand(time(0));
+#endif
 	InputWidget *input = new InputWidget();
 
 	WindowMode mode = CONFIG;

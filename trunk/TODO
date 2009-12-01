@@ -6,8 +6,6 @@ make Auth(Module) a base class
 		signals for status (calling exit() is ugly)
 	move statistics somewhere else
 	number of tries doesn't really belong there
-put default values for settings into constants
-	auth timeout should be 3-4s to be less annoying
 make creation of new pattern slightly more wizardish
 is QCA's rng enough?
 	should probably use openssl, otherwise disable patten generator
