@@ -18,6 +18,7 @@
 */
 
 #include "auth.h"
+#include "graphem.h"
 #include "inputwidget.h"
 
 #include <iostream>
@@ -52,7 +53,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 		this, SLOT(showMessage()));
 
 	QSettings settings;
-	fade_to = settings.value("window_opacity", 1.0).toDouble();
+	fade_to = settings.value("window_opacity", WINDOW_OPACITY).toDouble();
 	timer->setInterval(70); //check every 70ms
 	if(record_pattern) {
 		connect(timer, SIGNAL(timeout()),
@@ -68,7 +69,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 			this, SLOT(reset()));
 		_auth->loadHash();
 		enableTouchpadMode(_auth->usingTouchpadMode());
-		show_input = settings.value("show_input", false).toBool();
+		show_input = settings.value("show_input", SHOW_INPUT).toBool();
 	}
 	showMessage();
 	timer->start();
@@ -134,9 +135,9 @@ void InputWidget::exit()
 void InputWidget::fade()
 {
 	if(windowOpacity() < fade_to) {
-		qreal fade_step = fade_to/(fade_time_ms/fade_step_time_ms);
+		qreal fade_step = fade_to/(FADE_TIME/FADE_STEP_TIME);
 		setWindowOpacity(windowOpacity() + fade_step);
-		QTimer::singleShot(fade_step_time_ms, this, SLOT(fade()));
+		QTimer::singleShot(FADE_STEP_TIME, this, SLOT(fade()));
 	} else { // end fade-in
 		setWindowOpacity(fade_to);
 	}
@@ -164,9 +165,9 @@ void InputWidget::showEvent(QShowEvent*)
 	//start fade-in if in LOCK-mode
 	if(do_grab) {
 		QSettings settings;
-		if(settings.value("fade", true).toBool()) {
+		if(settings.value("fade", FADE).toBool()) {
 			setWindowOpacity(0.0);
-			QTimer::singleShot(fade_step_time_ms, this, SLOT(fade()));
+			QTimer::singleShot(FADE_STEP_TIME, this, SLOT(fade()));
 		} else {
 			setWindowOpacity(fade_to);
 		}
@@ -327,8 +328,8 @@ void InputWidget::reset()
 	path.clear();
 	arrows.clear();
 	QSettings settings;
-	show_input = settings.value("show_input").toBool();
-	_auth->check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
+	show_input = settings.value("show_input", SHOW_INPUT).toBool();
+	_auth->check_timeout = settings.value("check_timeout", CHECK_TIMEOUT).toInt() * 1000;
 	enableTouchpadMode(_auth->usingTouchpadMode());
 	if(!record_pattern)
 		showMessage(tr("Pattern not recognized, please try again."), 1500);

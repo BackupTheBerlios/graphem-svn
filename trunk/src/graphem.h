@@ -17,6 +17,20 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#ifndef GRAPHEM_H
+#define GRAPHEM_H
+
 #include <QString>
 
-const QString GRAPHEM_VERSION = "Graphem 0.3.2";
+const QString GRAPHEM_VERSION = "Graphem 0.4alpha";
+
+//default values for various settings
+const int CHECK_TIMEOUT = 4; //in s
+const bool FADE = true;
+const bool SHOW_INPUT = false;
+const double WINDOW_OPACITY = 1.0;
+const int FADE_TIME = 1500; //in ms
+const int FADE_STEP_TIME = 50; //in ms
+
+
+#endif

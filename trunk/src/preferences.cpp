@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include "graphem.h"
 #include "preferences.h"
 
 #include <QBoxLayout>
@@ -48,11 +49,11 @@ Preferences::Preferences(QWidget *parent):
 	check_timeout = new QSpinBox();
 	check_timeout->setRange(1, 120);
 	check_timeout->setSuffix("s");
-	check_timeout->setValue(settings.value("check_timeout", 6).toInt());
+	check_timeout->setValue(settings.value("check_timeout", CHECK_TIMEOUT).toInt());
 	check_timeout_label->setBuddy(check_timeout);
 
 	show_input = new QCheckBox(tr("&Show input when drawing"));
-	if(settings.value("show_input", false).toBool())
+	if(settings.value("show_input", SHOW_INPUT).toBool())
 		show_input->setCheckState(Qt::Checked);
 
 #if defined Q_WS_X11 && QT_VERSION > 0x040400
@@ -62,13 +63,13 @@ Preferences::Preferences(QWidget *parent):
 #endif
 
 	fade = new QCheckBox(tr("&Fade in when locking screen"));
-	fade->setChecked(enable_fading and settings.value("fade", true).toBool());
+	fade->setChecked(enable_fading and settings.value("fade", FADE).toBool());
 	fade->setEnabled(enable_fading);
 
 	QLabel *window_opacity_label = new QLabel(tr("Final window &opacity"));
 	window_opacity = new QDoubleSpinBox();
 	window_opacity->setRange(0.0, 1.0);
-	window_opacity->setValue(settings.value("window_opacity", 1.0).toDouble());
+	window_opacity->setValue(settings.value("window_opacity", WINDOW_OPACITY).toDouble());
 	window_opacity->setSingleStep(0.1);
 	window_opacity_label->setBuddy(window_opacity);
 	window_opacity->setEnabled(enable_fading);
