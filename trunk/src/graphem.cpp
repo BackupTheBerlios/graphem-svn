@@ -18,94 +18,62 @@
 */
 
 #include "graphem.h"
-#include "auth.h"
+//#include "auth.h"
+#include "fcc_auth.h"
 #include "crypto.h"
 #include "mainwindow.h"
 #include "inputwidget.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QSettings>
 #include <QShortcut>
 #include <QString>
 
-#include <cstdlib>
 #include <iostream>
 
-void printHelp(char *arg0);
-enum WindowMode { CONFIG, ASK, LOCK };
+Auth* Graphem::auth = 0;
 
-
-int main(int argc, char* argv[])
+Graphem::Graphem(WindowMode mode):
+	mode(mode),
+	input(new InputWidget()),
+	max_tries(0),
+	tries(0),
+	verbose(false)
 {
-	QApplication app(argc, argv);
-	app.setOrganizationName("Graphem");
-	app.setApplicationName("Graphem");
+	auth = loadAuthPlugin();
+//	std::cout << "Auth plugin '" << auth->metaObject()->className() << "' loaded.\n";;
 
-#ifndef NO_QCA
-	QCA::Initializer crypto_init;
-#else
-	qsrand(time(0));
-#endif
-	InputWidget *input = new InputWidget();
-
-	WindowMode mode = CONFIG;
-	int tries = 0; //ignored if mode != ASK
-
-	for(int i = 1; i < argc; i++) {
-		if(argv[i] == QString("--help")) {
-			printHelp(argv[0]);
-			return 0;
-		} else if(argv[i] == QString("--ask")) {
-			mode = ASK;
-		} else if(argv[i] == QString("--lock")) {
-			mode = LOCK;
-		} else if(argv[i] == QString("--tries")) {
-			if(i+1 >= argc)
-				break; //parameter not found
-
-			tries = QString(argv[i+1]).toInt();
-			i++;
-		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
-			input->auth()->setVerbose(true);
-
-		}
-
-#ifndef QT_NO_DEBUG
-		else if(argv[i] == QString("--print-data")) {
-			QObject::connect(input, SIGNAL(dataReady()),
-				input, SLOT(printData()));
-		} else if(argv[i] == QString("--print-pattern")) {
-			input->auth()->setPrintPattern(true);
-		}
-#endif
-
-		else {
-			std::cerr << "Unknown command line option '" << argv[i] << "'\n";
-			printHelp(argv[0]);
-			return 1;
-		}
-	}
+	connect(input, SIGNAL(dataReady()),
+		auth, SLOT(check()), Qt::QueuedConnection);
+	connect(input, SIGNAL(redraw(QPainter*)),
+		auth, SLOT(draw(QPainter*)), Qt::DirectConnection);
 
 	if(mode == CONFIG) { //show main window
 		MainWindow *main = new MainWindow(input);
+
+		connect(auth, SIGNAL(checkResult(bool)),
+			input, SLOT(reset()));
+
 		//main->setWindowIcon(QIcon("icon.png"));
 		main->setWindowTitle(GRAPHEM_VERSION);
 		main->show();
 	} else {
-		if(!input->hashLoaded()) {
+		if(!auth->hashLoaded()) {
 			std::cerr << "Couldn't load key pattern! Please start Graphem without any arguments to create one.\n";
-			return 1;
+			abort();
 		}
 
-		QObject::connect(input->auth(), SIGNAL(passed()),
-			input, SLOT(quit()));
+		connect(auth, SIGNAL(checkResult(bool)),
+			this, SLOT(checkResult(bool)));
 
 		//input->setWindowIcon(QIcon("icon.png"));
 
 		if(mode == ASK) {
 			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(GRAPHEM_VERSION));
-			new QShortcut(QKeySequence("Esc"), input, SLOT(exit()));
-			input->auth()->setTries(tries);
+			QShortcut *shortcut = new QShortcut(QKeySequence("Esc"), input);
+			connect(shortcut, SIGNAL(activated()),
+				this, SLOT(abort()));
 			input->showMaximized();
 		} else { //mode == LOCK
 			input->setWindowTitle(GRAPHEM_VERSION);
@@ -118,24 +86,82 @@ int main(int argc, char* argv[])
 			input->setGeometry(dw.screenGeometry());
 		}
 	}
-
-	return app.exec();
 }
 
 
-void printHelp(char *arg0)
+Graphem::~Graphem()
 {
-	std::cout << "Usage: " << arg0 << " [options]\n\n"
-	<< "--ask\t\t Ask for key pattern but don't give access to configuration; can be canceled\n"
-	<< "--help\t\t Show this text\n"
-	<< "--lock\t\t Lock screen (Make sure your key pattern works!)\n"
-	<< "--tries [n]\t Abort after [n] tries; can only be used with --ask\n"
-	<< "-v, --verbose\t Print success/failure messages on standard output\n"
-	<< "\n Returns 0 on success, 1 if canceled or maximum number of tries reached\n";
+	delete auth;
+	delete input;
+}
 
-#ifndef QT_NO_DEBUG
-	std::cout << "Debug options:\n"
-	<< "--print-data\t Prints velocity/pressure data to standard output\n"
-	<< "--print-pattern\t Prints entered pattern as a string\n";
-#endif
+
+void Graphem::checkResult(bool correct)
+{	
+	if(verbose) {
+		if(correct)
+			std::cout << "OK: Correct pattern.\n";
+		else
+			std::cout << "ERROR: Pattern not recognized.\n";
+	}
+
+	//save statistics
+	QSettings settings;
+	int usage_total = settings.value("usage_total").toInt();
+	int usage_failed = settings.value("usage_failed").toInt();
+
+	usage_total++;
+	if(!correct)
+		usage_failed++;
+
+	settings.setValue("usage_total", usage_total);
+	settings.setValue("usage_failed", usage_failed);
+	settings.sync();
+
+	//exit program?
+	if(mode != CONFIG) {
+		if(correct) {
+			quit();
+		} else {
+			tries++;
+			if(mode == ASK and max_tries != 0  //max_tries is only valid with ASK
+			and tries >= max_tries)
+				abort();
+		}
+	}
+
+	if(!correct)
+		input->reset();
+}
+
+Auth* Graphem::getAuth()
+{
+	return auth;
+}
+
+
+//returns 0 if load fails
+Auth* Graphem::loadAuthPlugin()
+{
+	return new FCC(this, input);
+}
+
+
+void Graphem::cleanup()
+{
+	input->releaseMouse();
+	input->releaseKeyboard();
+	input->close();
+}
+
+void Graphem::abort()
+{
+	cleanup();
+	qApp->exit(1);
+}
+
+void Graphem::quit()
+{
+	cleanup();
+	qApp->exit(0);
 }

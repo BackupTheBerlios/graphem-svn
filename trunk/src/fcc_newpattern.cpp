@@ -18,26 +18,38 @@
 */
 
 // TODO: add minimal stroke length
-// TODO: potential bug: touchpad_mode and generated patterns?
 
-#include "auth.h"
 #include "crypto.h"
+#include "fcc_auth.h"
 #include "inputwidget.h"
-#include "newpattern.h"
+#include "fcc_newpattern.h"
 
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QLineF>
+#include <QMessageBox>
+#include <QPainter>
 #include <QPushButton>
 #include <QSettings>
 #include <QStatusBar>
 #include <QVBoxLayout>
+#include <QtDebug>
 
-NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
-	QDialog(parent),
+
+FCCNewPattern::FCCNewPattern(QWidget *parent, Auth *auth):
+	NewPattern(parent, auth),
 	input(new InputWidget(this, true)), //InputWidget in record mode
 	status(new QStatusBar(this))
 {
+	QMessageBox msgBox(QMessageBox::Question, "", tr("<b>Enable touchpad mode?</b>"), QMessageBox::NoButton, this);
+	msgBox.setInformativeText(tr("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored."));
+	msgBox.addButton(tr("&Enable"), QMessageBox::YesRole);
+	msgBox.setDefaultButton(msgBox.addButton(tr("Use &Normal Mode"), QMessageBox::NoRole));
+	const int ret = msgBox.exec();
+
+	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
+	touchpad_mode = !ret;
+
 	resize(600,400);
 	setWindowTitle(tr("New Pattern"));
 
@@ -47,6 +59,8 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	
 	connect(input, SIGNAL(dataReady()),
 		this, SLOT(updateDisplay()));
+	connect(input, SIGNAL(redraw(QPainter*)),
+		this, SLOT(draw(QPainter*)));
 
 	QDialogButtonBox *button_box = new QDialogButtonBox(this);
 	button_box->addButton(tr("&Cancel"), QDialogButtonBox::RejectRole);
@@ -58,7 +72,7 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 	connect(button_box, SIGNAL(accepted()),
 		this, SLOT(accept()));
 	connect(delete_last, SIGNAL(clicked()),
-		input, SLOT(deleteLastStroke()));
+		this, SLOT(deleteLastStroke()));
 	connect(reset, SIGNAL(clicked()),
 		this, SLOT(resetInput()));
 	
@@ -78,8 +92,55 @@ NewPattern::NewPattern(QWidget *parent, bool touchpad_mode):
 }
 
 
+//used while recording, takes last arrow and removes all Nodes belonging to it
+void FCCNewPattern::deleteLastStroke()
+{
+	if(arrows.isEmpty())
+		return;
+
+	Arrow a = arrows.takeLast();
+	while(a.start_node+1 < input->path.count())
+		input->path.removeAt(a.start_node+1);
+
+	input->update();
+}
+
+
+// draw arrows
+void FCCNewPattern::draw(QPainter *painter)
+{
+	//approximation to 3*cos() to get rid of floating point errors
+	const int x[] = { 3, 2, 0, -2, -3, -2, 0, 2 };
+
+	for(int i=0; i < arrows.count(); i++) {
+		if(arrows.at(i).pen_up)
+			painter->setPen(Qt::red);
+		else
+			painter->setPen(Qt::white);
+
+		const int dir = arrows.at(i).direction;
+		const QPointF start = input->path.at(arrows.at(i).start_node).pos;
+		const QPointF end = start + arrows.at(i).weight * QPoint(x[dir], x[(dir+2)%8])/3;
+		const QLineF l(start, end);
+		if(l.length() == 0)
+				continue;
+
+		painter->drawLine(l);
+
+		QPointF a  = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
+		painter->drawLine(a, end);
+
+		//print number at start
+		//painter->drawText(start+end-a, QString::number(i));
+
+		a = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
+		painter->drawLine(a, end);
+	}
+}
+
+
 //generate random key and display
-void NewPattern::generate()
+void FCCNewPattern::generate()
 {
 #ifndef NO_QCA
 	bool ok;
@@ -91,7 +152,7 @@ void NewPattern::generate()
 		num_strokes_start, num_strokes_min, num_strokes_max, 1, &ok);
 	if(!ok)
 		return;
-	input->reset();
+	resetInput();
 
 	bool last_pen_up = true;
 	bool pen_up;
@@ -107,7 +168,7 @@ void NewPattern::generate()
 		//add offset to avoid having strokes directly on top of each other
 		QPoint pos = lastpos + l*QPoint(x, y) + 5*QPoint(y, -x);
 
-		if(input->touchpad_mode or last_pen_up or i >= num_strokes-2) {
+		if(touchpad_mode or last_pen_up or i >= num_strokes-2) {
 			pen_up = false;
 		} else { //insert ~20% "up"-strokes
 			pen_up = (Crypto::randInt(0, 100) <= 20);
@@ -130,60 +191,51 @@ void NewPattern::generate()
 }
 
 
-//set auth hash to new key
-void NewPattern::prepareAuth(Auth *auth)
-{
-	Auth tmp(this);
-	tmp.preprocess(input->path);
-	auth->setAuthHash(Crypto::getHash(tmp.strokesToString(), ""), "");
-
-	auth->touchpad_mode = input->touchpad_mode;
-	auth->hash_loaded = true;
-	auth->testing_pattern = true;
-	auth->usage_total = auth->usage_failed = 0;
-}
-
-
 //reset input and re-enable touchpad mode if required
-void NewPattern::resetInput()
+void FCCNewPattern::resetInput()
 {
-	bool touchpad = input->touchpad_mode;
+	arrows.clear();
 	input->reset();
-	input->enableTouchpadMode(touchpad);
+	input->enableTouchpadMode(touchpad_mode);
 }
 
 
-void NewPattern::save()
+void FCCNewPattern::save()
 {
-	Auth auth(this);
-	auth.preprocess(input->path);
+	FCC tmpauth(this, input);
+	input->enableTouchpadMode(touchpad_mode);
+	tmpauth.preprocess();
 
 	QSettings settings;
 	QByteArray salt = Crypto::generateSalt();
-	settings.setValue("pattern_hash", Crypto::getHash(auth.strokesToString(), salt));
-	settings.setValue("touchpad_mode", input->touchpad_mode);
+	settings.setValue("pattern_hash", Crypto::getHash(tmpauth.strokesToString(), salt));
+	settings.setValue("touchpad_mode", touchpad_mode);
 	settings.setValue("salt", salt);
 	settings.setValue("usage_total", 0);
 	settings.setValue("usage_failed", 0);
 	settings.sync();
+
+	qDebug() << "saved gesture " << tmpauth.strokesToString();
 }
 
 
-void NewPattern::updateDisplay()
+void FCCNewPattern::updateDisplay()
 {
-	input->arrows.clear();
-	Auth auth(this);
-	auth.preprocess(input->path);
+	arrows.clear();
+	FCC tmpauth(this, input); //this might change input->touchpad_mode
+	input->enableTouchpadMode(touchpad_mode);
+	tmpauth.preprocess();
 
-	for(int i = 0; i < auth.strokes.count(); i++) {
+	for(int i = 0; i < tmpauth.strokes.count(); i++) {
 		Arrow a;
-		a.start_node_id = auth.strokes.at(i).start_node_id;
-		a.pen_up = auth.strokes.at(i).up;
-		a.direction = auth.strokes.at(i).direction;
-		a.weight = auth.strokes.at(i).length;
-		input->arrows.append(a);
+		a.start_node = tmpauth.strokes.at(i).start_node_id;
+		a.pen_up = tmpauth.strokes.at(i).up;
+		a.direction = tmpauth.strokes.at(i).direction;
+		a.weight = int(tmpauth.strokes.at(i).length);
+		arrows.append(a);
 	}
+
 	input->update();
 
-	status->showMessage(tr("%1 Stroke(s)").arg(auth.strokes.count()));
+	status->showMessage(tr("%1 Stroke(s)").arg(tmpauth.strokes.count()));
 }

@@ -17,38 +17,38 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "stroke.h"
-
-#include <cmath>
+#ifndef FCC_STROKE_H
+#define FCC_STROKE_H
 
 #include <QLineF>
 
+/*
+stores an improved version of Freeman chain codes:
+directions are converted to integers in 0..7
+ ----x--->
+ | 3 2 1
+ y 4   0
+ | 5 6 7
+ V
 
-Stroke::Stroke(QLineF l, int start_node, bool up):
-	start_node_id(start_node),
-	up(up),
-	removed(false),
-	length(l.length())
-{
-	//actuallly this is a real valued version of direction
-	double angle = atan2(-l.dy(), l.dx()) * 4 / 3.141;
-	if(angle < 0)
-		angle += 8;
-	Q_ASSERT(angle >= 0);
+*/
 
-	direction = qRound(angle) % 8;
+class Stroke {
+public:
+	Stroke(QLineF l, int start_node, bool up = false);
+	double getWeight() const { return weight; }
+	Stroke operator+=(const Stroke &s);
 
-	weight = (1- (angle - qRound(angle))) * w_angle;
-	weight += length * w_length;
-}
+	int start_node_id;
+	short direction;
+	bool up; //no actual stroke, just moving the pen
+	bool removed;
+	double length; 
+private:
+	double weight;
 
-//add another stroke
-Stroke Stroke::operator+=(const Stroke &s)
-{
-	Q_ASSERT(direction == s.direction);
-
-	length += s.length;
-	weight += s.weight;
-
-	return *this;
-}
+	//weight factors
+	const static double w_angle = 10;
+	const static double w_length = 1;
+};
+#endif

@@ -23,8 +23,8 @@
 #include <QDialog>
 
 class QCheckBox;
+class QSlider;
 class QSpinBox;
-class QDoubleSpinBox;
 
 class Preferences : public QDialog {
 	Q_OBJECT
@@ -34,7 +34,7 @@ private slots:
 	void save();
 private:
 	QCheckBox *fade;
-	QDoubleSpinBox *window_opacity;
+	QSlider *window_opacity;
 	QCheckBox *show_input;
 	QSpinBox *check_timeout;
 };

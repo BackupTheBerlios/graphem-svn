@@ -1,3 +1,8 @@
+Graphem 0.4:
+	* Main window was shown behind other windows
+	* Add transparency & fade-in effect
+	* ...
+
 Graphem 0.3.2:
 	* When started via keyboard shortcut, keyboard grab sometimes failed
 

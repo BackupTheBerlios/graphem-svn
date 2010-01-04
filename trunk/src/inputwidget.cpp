@@ -17,13 +17,14 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "auth.h"
 #include "graphem.h"
 #include "inputwidget.h"
 
 #include <iostream>
 
+#include <QApplication>
 #include <QCursor>
+#include <QLineF>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QSettings>
@@ -33,7 +34,6 @@
 
 InputWidget::InputWidget(QWidget* parent, bool record) :
 	QWidget(parent),
-	_auth(new Auth(this)),
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
@@ -62,13 +62,6 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	} else {
 		connect(timer, SIGNAL(timeout()),
 			this, SLOT(checkFinished()));
-		connect(this, SIGNAL(dataReady()),
-			_auth, SLOT(check()),
-			Qt::QueuedConnection); //allow for repaint before checking
-		connect(_auth, SIGNAL(failed()),
-			this, SLOT(reset()));
-		_auth->loadHash();
-		enableTouchpadMode(_auth->usingTouchpadMode());
 		show_input = settings.value("show_input", SHOW_INPUT).toBool();
 	}
 	showMessage();
@@ -89,25 +82,10 @@ void InputWidget::checkFinished()
 
 		showMessage(tr("Processing..."));
 		repaint();
-		_auth->preprocess(path);
 
 		show_input = tmp;
 		emit dataReady();
 	}
-}
-
-
-//used while recording, takes last arrow and removes all Nodes belonging to it
-void InputWidget::deleteLastStroke()
-{
-	if(arrows.isEmpty())
-		return;
-
-	Arrow a = arrows.takeLast();
-	while(a.start_node_id+1 < path.count())
-		path.removeAt(a.start_node_id+1);
-
-	update();
 }
 
 
@@ -116,18 +94,6 @@ void InputWidget::enableTouchpadMode(bool on)
 	touchpad_mode = on;
 	if(!record_pattern)
 		setMouseTracking(touchpad_mode);
-}
-
-
-//exit with return code 1
-void InputWidget::exit()
-{
-	releaseMouse();
-	releaseKeyboard();
-	hide();
-
-	_auth->saveStats();
-	::exit(1);
 }
 
 
@@ -177,9 +143,6 @@ void InputWidget::showEvent(QShowEvent*)
 	//after 500ms, the key should have been released so the grab can work
 	QTimer::singleShot(500, this, SLOT(focus()));
 }
-
-
-bool InputWidget::hashLoaded() { return _auth->hash_loaded; }
 
 
 void InputWidget::mouseMoveEvent(QMouseEvent *ev)
@@ -246,47 +209,7 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 		painter.drawPath(painter_path);
 	}
 
-	// draw arrows
-	if(!record_pattern)
-		return;
-
-	//approximation to 3*cos() to get rid of floating point errors
-	const int x[] = {
-		3,
-		2,
-		0,
-		-2,
-		-3,
-		-2,
-		0,
-		2
-	};
-
-	for(int i=0; i < arrows.count(); i++) {
-		if(arrows.at(i).pen_up)
-			painter.setPen(Qt::red);
-		else
-			painter.setPen(Qt::white);
-
-		const QPointF start = path.at(arrows.at(i).start_node_id).pos;
-		const int dir = arrows.at(i).direction;
-		const QPointF end = start + arrows.at(i).weight
-			*QPoint(x[dir], x[(dir+2)%8])/3;
-		const QLineF l(start, end);
-		if(l.length() == 0)
-				continue;
-
-		painter.drawLine(l);
-
-		QPointF a  = end + QPointF(-10*(l.dy()+l.dx())/l.length(), 10*(l.dx()-l.dy())/l.length());
-		painter.drawLine(a, end);
-
-		//print number at start
-		//painter.drawText(start+end-a, QString::number(i));
-
-		a = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
-		painter.drawLine(a, end);
-	}
+	emit redraw(&painter);
 }
 
 
@@ -311,26 +234,11 @@ void InputWidget::printData()
 }
 
 
-//do some cleanup, then quit
-void InputWidget::quit()
-{
-	releaseMouse();
-	releaseKeyboard();
-	hide();
-
-	_auth->saveStats();
-	close();
-}
-
-
 void InputWidget::reset()
 {
 	path.clear();
-	arrows.clear();
 	QSettings settings;
 	show_input = settings.value("show_input", SHOW_INPUT).toBool();
-	_auth->check_timeout = settings.value("check_timeout", CHECK_TIMEOUT).toInt() * 1000;
-	enableTouchpadMode(_auth->usingTouchpadMode());
 	if(!record_pattern)
 		showMessage(tr("Pattern not recognized, please try again."), 1500);
 	update();

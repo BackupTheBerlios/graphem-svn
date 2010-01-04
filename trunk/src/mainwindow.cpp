@@ -17,8 +17,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "graphem.h"
 #include "auth.h"
+#include "graphem.h"
 #include "inputwidget.h"
 #include "mainwindow.h"
 #include "newpattern.h"
@@ -29,6 +29,7 @@
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QSettings>
 #include <QString>
 #include <QTextEdit>
 
@@ -72,11 +73,6 @@ MainWindow::MainWindow(InputWidget* input):
 	resize(600,400);
 	setUnsavedChanges(false);
 
-	connect(input->auth(), SIGNAL(passed()),
-		this, SLOT(reset()));
-	connect(input->auth(), SIGNAL(failed()),
-		this, SLOT(reset()));
-
 	refreshInfo();
 }
 
@@ -96,21 +92,21 @@ void MainWindow::closeEvent(QCloseEvent* ev)
 		}
 	}
 	ev->accept();
-	input->quit();
 }
 
 
 //refreshes info text on left side
 void MainWindow::refreshInfo()
 {
-	if(!input->hashLoaded()) {
+	if(!Graphem::getAuth()->hashLoaded()) {
 		info_dock->setWindowTitle(tr("Welcome"));
 		info_text->setText(tr("To start using Graphem, you have to set a new key pattern (File -> New Pattern).<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
 		input->setEnabled(false);
 	} else {
-		int usage_total = input->auth()->usageTotal();
-		int usage_failed = input->auth()->usageFailed();
+		QSettings settings;
+		int usage_total = settings.value("usage_total").toInt();
+		int usage_failed = settings.value("usage_failed").toInt();
 
 		info_dock->setWindowTitle(tr("Statistics"));
 		info_text->setText(tr("Total: %1 <br />\
@@ -164,11 +160,11 @@ void MainWindow::showAboutDialog()
 }
 
 
+//show the NewPattern dialog again without resetting it
 void MainWindow::showEditPatternDialog()
 {
 	if(new_pattern_dialog->exec() == QDialog::Accepted) {
-		new_pattern_dialog->prepareAuth(input->auth());
-		input->reset();
+		Graphem::getAuth()->reset();
 		refreshInfo();
 
 		setUnsavedChanges(true);
@@ -176,24 +172,13 @@ void MainWindow::showEditPatternDialog()
 }
 
 
+//create new NewPattern dialog and show it
 void MainWindow::showNewPatternDialog()
 {
-	QMessageBox msgBox(QMessageBox::Question,
-		"",
-		tr("<b>Enable touchpad mode?</b>"),
-		QMessageBox::Cancel,
-		this);
-	msgBox.setInformativeText(tr("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored."));
-	msgBox.addButton(tr("&Enable"), QMessageBox::YesRole);
-	msgBox.setDefaultButton(msgBox.addButton(tr("Use &Normal Mode"), QMessageBox::NoRole));
-	const int ret = msgBox.exec();
+	if(new_pattern_dialog)
+		delete new_pattern_dialog;
+	new_pattern_dialog = Graphem::getAuth()->newPattern();
 
-	if(ret == QMessageBox::Cancel)
-		return;
-
-	delete new_pattern_dialog; //reset dialog
-	//return value doesn't seem to be QMessageBox::Yes for enabling.. ??
-	new_pattern_dialog = new NewPattern(this, !ret);
 	showEditPatternDialog();
 }
 

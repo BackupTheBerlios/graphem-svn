@@ -17,27 +17,44 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef NEWPATTERN_H
-#define NEWPATTERN_H
+#ifndef FCC_NEWPATTERN_H
+#define FCC_NEWPATTERN_H
 
-#include <QDialog>
+#include "newpattern.h"
+
+#include <QList>
+#include <QPoint>
+#include <QWidget>
+
 
 class Auth;
 class InputWidget;
+class QPainter;
 class QStatusBar;
 
-class NewPattern : public QDialog {
+struct Arrow {
+	int start_node;
+	int direction;
+	int weight;
+	bool pen_up;
+};
+
+class FCCNewPattern : public NewPattern {
 	Q_OBJECT
 public:
-	NewPattern(QWidget *parent, bool touchpad_mode);
-	void prepareAuth(Auth *auth);
+	FCCNewPattern(QWidget *parent, Auth *auth);
 	void save();
 private slots:
+	void deleteLastStroke();
+	void draw(QPainter *painter);
 	void generate();
 	void resetInput();
 	void updateDisplay();
 private:
 	InputWidget *input;
 	QStatusBar *status;
+	bool touchpad_mode;
+
+	QList<Arrow> arrows;
 };
 #endif

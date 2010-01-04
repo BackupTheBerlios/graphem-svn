@@ -20,44 +20,34 @@
 #ifndef INPUTWIDGET_H
 #define INPUTWIDGET_H
 
+#include "auth.h"
 #include "node.h"
 
-#include <QLineF>
 #include <QList>
 #include <QString>
 #include <QWidget>
 
 
-class Auth;
+class QPainter;
 class QTimer;
-
-struct Arrow {
-	bool pen_up;
-	int start_node_id;
-	int direction;
-	int weight;
-};
 
 class InputWidget : public QWidget {
 	Q_OBJECT
-	friend class NewPattern;
 public:
 	InputWidget(QWidget *parent = 0, bool record = false);
-	Auth* auth() { return _auth; } // TODO needed?
 	void enableTouchpadMode(bool on);
-	bool hashLoaded();
 	void setDefaultMessage(QString m) { default_msg = m; }
 	void setGrab(bool on) { do_grab = on; }
+
+	QList<Node> path; //needed for Auth module
 signals:
 	void dataReady();
+	void redraw(QPainter*);
 public slots:
 	void checkFinished();
-	void deleteLastStroke();
-	void exit();
 	void fade();
 	void focus();
 	void printData();
-	void quit();
 	void reset();
 	void showMessage(QString m = QString(), int msecs = 0);
 protected:
@@ -67,9 +57,6 @@ protected:
 	void resizeEvent(QResizeEvent *ev);
 	void showEvent(QShowEvent *ev);
 private:
-	QList<Node> path;
-	QList<Arrow> arrows; // used when recording
-	Auth *_auth;
 	bool pen_down, mouse_down;
 	QTimer *timer, *msg_timer;
 	QString msg, default_msg;

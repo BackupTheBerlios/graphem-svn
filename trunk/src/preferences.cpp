@@ -23,9 +23,9 @@
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QDialogButtonBox>
-#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QSettings>
+#include <QSlider>
 #include <QSpinBox>
 
 #ifdef Q_WS_X11
@@ -36,6 +36,7 @@ Preferences::Preferences(QWidget *parent):
 	QDialog(parent)
 {
 	setWindowTitle(tr("Preferences"));
+	setMinimumSize(350, 150);
 	QSettings settings;
 
 	//set up controls
@@ -67,12 +68,16 @@ Preferences::Preferences(QWidget *parent):
 	fade->setEnabled(enable_fading);
 
 	QLabel *window_opacity_label = new QLabel(tr("Final window &opacity"));
-	window_opacity = new QDoubleSpinBox();
-	window_opacity->setRange(0.0, 1.0);
-	window_opacity->setValue(settings.value("window_opacity", WINDOW_OPACITY).toDouble());
-	window_opacity->setSingleStep(0.1);
+	window_opacity = new QSlider(Qt::Horizontal, this);
+	QLabel *window_opacity_num = new QLabel();
+	connect(window_opacity, SIGNAL(valueChanged(int)),
+		window_opacity_num, SLOT(setNum(int)));
+	window_opacity->setRange(0, 100);
+	window_opacity->setValue(100 * settings.value("window_opacity", WINDOW_OPACITY).toDouble());
+	window_opacity->setSingleStep(5);
 	window_opacity_label->setBuddy(window_opacity);
 	window_opacity->setEnabled(enable_fading);
+	//window_opacity->setValue(100 * settings.value("window_opacity", WINDOW_OPACITY).toDouble());
 
 	//layout
 	QVBoxLayout *l1 = new QVBoxLayout();
@@ -88,6 +93,7 @@ Preferences::Preferences(QWidget *parent):
 	QHBoxLayout *l3 = new QHBoxLayout();
 	l3->addWidget(window_opacity_label);
 	l3->addWidget(window_opacity);
+	l3->addWidget(window_opacity_num);
 	l1->addLayout(l3);
 
 	l1->addWidget(button_box);
@@ -103,7 +109,7 @@ void Preferences::save()
 	settings.setValue("show_input", show_input->isChecked());
 	settings.setValue("fade", fade->isChecked());
 	settings.setValue("check_timeout", check_timeout->value());
-	settings.setValue("window_opacity", window_opacity->value());
+	settings.setValue("window_opacity", window_opacity->value() / 100.0);
 	settings.sync();
 
 	accept();

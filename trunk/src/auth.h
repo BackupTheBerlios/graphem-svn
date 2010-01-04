@@ -20,57 +20,27 @@
 #ifndef AUTH_H
 #define AUTH_H
 
-#include "newpattern.h"
-#include "node.h"
-#include "stroke.h"
-
-#include <QByteArray>
-#include <QLineF>
-#include <QList>
 #include <QObject>
-#include <QString>
 
-class QTime;
+class InputWidget;
+class NewPattern;
+class QPainter;
 
 class Auth : public QObject {
 	Q_OBJECT
-	friend class NewPattern;
-	friend class InputWidget;
 public:
-	Auth(QObject *parent = 0);
-	void loadHash();
-	void preprocess(const QList<Node> &path);
-	void saveStats();
-	void setTries(int tries) { tries_left = tries; }
-	void setVerbose(bool on) { verbose = on; }
-	void setPrintPattern(bool on) { print_pattern = on; }
-	int usageFailed() { return usage_failed; }
-	int usageTotal() { return usage_total; }
-	bool usingTouchpadMode() { return touchpad_mode; }
+	Auth(QObject *parent, InputWidget *input) : QObject(parent), input(input) { }
+	virtual ~Auth() { }
+
+	virtual bool hashLoaded() = 0;
+	virtual NewPattern* newPattern() = 0; //create dialog for new pattern generation
 public slots:
-	void check();
+	virtual void check() = 0; //checks data in InputWidget
+	virtual void draw(QPainter* /*painter*/) { } // callback for drawing on InputWidget
+	virtual void reset() = 0; //reload pattern
 signals:
-	void failed();
-	void passed();
-private:
-	bool matchesAuthPattern();
-	void setAuthHash(const QByteArray &hash, const QByteArray &s) { auth_pattern = hash; salt = s; }
-	QString strokesToString();
-	bool tryPattern();
-
-	QByteArray auth_pattern, salt;
-	QList<Stroke> strokes;
-	int compared_hashes_count;
-	int tries_left;
-	QTime *started;
-	bool hash_loaded;
-	bool print_pattern;
-	bool testing_pattern; //don't save stats if true
-	bool touchpad_mode;
-	bool verbose;
-	int check_timeout; //in ms
-	int usage_total, usage_failed; //usage statistics for pattern
-
-	const static int short_limit = 10; //length limit for short strokes
+	virtual void checkResult(bool correct);
+protected:
+	InputWidget *input;
 };
 #endif

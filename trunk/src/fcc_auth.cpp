@@ -17,8 +17,11 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "auth.h"
 #include "crypto.h"
+#include "graphem.h"
+#include "fcc_auth.h"
+#include "fcc_newpattern.h"
+#include "inputwidget.h"
 
 #include <cmath>
 #include <iostream>
@@ -29,54 +32,29 @@
 #include <QtDebug>
 
 
-Auth::Auth(QObject *parent):
-	QObject(parent),
-	tries_left(0),
+FCC::FCC(QObject *parent, InputWidget *input):
+	Auth(parent, input),
 	started(0),
 	hash_loaded(false),
 	print_pattern(false),
-	testing_pattern(false),
-	touchpad_mode(false),
-	verbose(false),
-	check_timeout(6000)
-{ }
-
-
-void Auth::check()
+	touchpad_mode(false)
 {
-	qDebug() << "number of strokes: " << strokes.count();
+	reset();
+}
 
-	if(auth_pattern.isEmpty()) {
-		emit passed();
-		return;
-	}
+
+void FCC::check()
+{
+	//get strokes
+	preprocess();
+	qDebug() << "number of strokes: " << strokes.count();
 
 	compared_hashes_count = 0;
 	started = new QTime();
 	started->start();
 
-	usage_total++;
-	if(tryPattern()) {
-		if(verbose)
-			std::cout << "OK: Correct pattern.\n";
-
-		emit passed();
-	} else {
-		usage_failed++;
-		if(verbose)
-			std::cout << "ERROR: Pattern not recognized.\n";
-
-
-		if(tries_left == 1) {//this try was our last
-			saveStats();
-			exit(1);
-		}
-
-		if(tries_left != 0) //0 is for infinite amount of tries, don't decrease
-			tries_left--;
-
-		emit failed();
-	}
+	//actually check pattern
+	emit checkResult(tryPattern());
 
 #ifndef QT_NO_DEBUG
 	double time = double(started->elapsed())/1000;
@@ -90,8 +68,8 @@ void Auth::check()
 }
 
 
-//set up Auth module with hash from config file
-void Auth::loadHash()
+//set up FCC module with hash from config file
+void FCC::loadHash()
 {
 	QSettings settings;
 	if(settings.value("pattern_hash").toByteArray().isEmpty()
@@ -100,22 +78,27 @@ void Auth::loadHash()
 		return;
 	}
 
-	setAuthHash(settings.value("pattern_hash").toByteArray(), settings.value("salt").toByteArray());
+	auth_pattern = settings.value("pattern_hash").toByteArray();
+	salt = settings.value("salt").toByteArray();
+	
+	if(auth_pattern.isEmpty()) {
+		qDebug() << "auth_pattern empty, while setting !empty";
+		hash_loaded = false;
+		return;
+	}
+	hash_loaded = true;
 
 	touchpad_mode = false;
 	if(settings.value("touchpad_mode").toBool())
 		touchpad_mode = true;
+	input->enableTouchpadMode(touchpad_mode);
 
-	usage_total = settings.value("usage_total").toInt();
-	usage_failed = settings.value("usage_failed").toInt();
-	check_timeout = settings.value("check_timeout", 6).toInt() * 1000;
+	check_timeout = settings.value("check_timeout", CHECK_TIMEOUT).toInt() * 1000;
 
-	hash_loaded = true;
-	testing_pattern = false;
 }
 
 
-bool Auth::matchesAuthPattern()
+bool FCC::matchesAuthPattern()
 {
 #ifndef QT_NO_DEBUG
 	compared_hashes_count++;
@@ -125,29 +108,29 @@ bool Auth::matchesAuthPattern()
 }
 
 
-//analyses path and stores the result in strokes
-void Auth::preprocess(const QList<Node> &path)
+//analyses 'input->path' and stores the result in 'strokes'
+void FCC::preprocess()
 {
 	strokes.clear();
 	int start = 0; //start node
 	bool pen_down = true;
 
-	for(int i = 0; i < path.count(); i++) {
-		QPointF a = path.at(start).pos;
-		if(pen_down and i > 0 and path.at(i).pen_up) { //pen up, end stroke here
-			QLineF l = QLineF(a, path.at(i).pos);
+	for(int i = 0; i < input->path.count(); i++) {
+		QPointF a = input->path.at(start).pos;
+		if(pen_down and i > 0 and input->path.at(i).pen_up) { //pen up, end stroke here
+			QLineF l = QLineF(a, input->path.at(i).pos);
 			strokes.append(Stroke(l, start));
 
 			pen_down = false;
 			start = i;
 		} else if(!pen_down and i > 1) { //add virtual stroke
-			QLineF l = QLineF(a, path.at(i).pos);
+			QLineF l = QLineF(a, input->path.at(i).pos);
 			strokes.append(Stroke(l, start, true));
 
 			pen_down = true;
 			start = i;
-		} else if(pen_down and !path.at(i).pen_up){
-			QLineF l = QLineF(a, path.at(i).pos);
+		} else if(pen_down and !input->path.at(i).pen_up){
+			QLineF l = QLineF(a, input->path.at(i).pos);
 			if(l.length() > short_limit) {
 				strokes.append(Stroke(l, start));
 				start = i;
@@ -170,19 +153,8 @@ void Auth::preprocess(const QList<Node> &path)
 }
 
 
-void Auth::saveStats()
-{
-	if(hash_loaded and !testing_pattern) {
-		QSettings settings;
-		settings.setValue("usage_total", usage_total);
-		settings.setValue("usage_failed", usage_failed);
-		settings.sync();
-	}
-}
-
-
 //converts strokes into a string, omits 'removed' and duplicate strokes
-QString Auth::strokesToString()
+QString FCC::strokesToString()
 {
 	QString result = "";
 	int lastdir = -1;
@@ -201,7 +173,7 @@ QString Auth::strokesToString()
 }
 
 
-bool Auth::tryPattern()
+bool FCC::tryPattern()
 {
 	//test unchanged
 	if(matchesAuthPattern())
@@ -263,4 +235,15 @@ bool Auth::tryPattern()
 			return true;
 	}
 	return false;
+}
+
+
+NewPattern* FCC::newPattern()
+{
+	return new FCCNewPattern(0, this);
+}
+
+void FCC::reset()
+{
+	loadHash();
 }

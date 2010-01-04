@@ -17,49 +17,54 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef GRAPHEM_H
-#define GRAPHEM_H
+#ifndef FCC_AUTH_H
+#define FCC_AUTH_H
 
+#include "auth.h"
+#include "node.h"
+#include "fcc_stroke.h"
+
+#include <QByteArray>
+#include <QLineF>
+#include <QList>
 #include <QObject>
 #include <QString>
 
-const QString GRAPHEM_VERSION = "Graphem 0.4";
-enum WindowMode { CONFIG, ASK, LOCK };
+class NewPattern;
+//class FCCNewPattern;
+class QTime;
 
-//default values for various settings
-const int CHECK_TIMEOUT = 4; //in s
-const bool FADE = true;
-const bool SHOW_INPUT = false;
-const double WINDOW_OPACITY = 1.0;
-const int FADE_TIME = 1500; //in ms
-const int FADE_STEP_TIME = 50; //in ms
-
-
-class Auth;
-class InputWidget;
-
-class Graphem : public QObject {
+class FCC : public Auth {
 	Q_OBJECT
+	//Q_INTERFACES(Auth)
+	friend class FCCNewPattern;
 public:
-	Graphem(WindowMode mode);
-	~Graphem();
-	void cleanup();
-	void setMaxTries(int t) { max_tries = t; }
-	void setVerbose(bool on) { verbose = on; }
+	FCC(QObject *parent, InputWidget *input);
 
-	static Auth* getAuth();
+	bool hashLoaded() { return hash_loaded; }
+	NewPattern* newPattern();
+	void preprocess();
 public slots:
-	void abort(); //exit with status code 1
+	void check();
+	void reset();
+signals:
 	void checkResult(bool correct);
-	void quit(); //exit with status code 0
-private:
-	Auth* loadAuthPlugin();
+protected:
+	void loadHash();
+	void setPrintPattern(bool on) { print_pattern = on; }
+	bool matchesAuthPattern();
+	QString strokesToString();
+	bool tryPattern();
 
-	WindowMode mode;
-	InputWidget *input;
-	static Auth *auth;
-	int max_tries;
-	int tries;
-	bool verbose;
+	QByteArray auth_pattern, salt;
+	QList<Stroke> strokes;
+	int compared_hashes_count;
+	QTime *started;
+	bool hash_loaded;
+	bool print_pattern;
+	bool touchpad_mode;
+	int check_timeout; //in ms
+
+	const static int short_limit = 10; //length limit for short strokes
 };
 #endif
