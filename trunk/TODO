@@ -1,7 +1,6 @@
 0.4:
 s/pattern/gesture
 handle input == 0 in Auth
-fix refreshing stats in MainWindow
 fix debug options
 make creation of new pattern slightly more wizardish
 	choosing plugins?

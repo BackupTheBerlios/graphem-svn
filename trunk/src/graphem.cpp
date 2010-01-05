@@ -46,6 +46,8 @@ Graphem::Graphem(WindowMode mode):
 
 	connect(input, SIGNAL(dataReady()),
 		auth, SLOT(check()), Qt::QueuedConnection);
+	connect(auth, SIGNAL(checkResult(bool)),
+		this, SLOT(checkResult(bool)));
 	connect(input, SIGNAL(redraw(QPainter*)),
 		auth, SLOT(draw(QPainter*)), Qt::DirectConnection);
 
@@ -63,9 +65,6 @@ Graphem::Graphem(WindowMode mode):
 			std::cerr << "Couldn't load key pattern! Please start Graphem without any arguments to create one.\n";
 			abort();
 		}
-
-		connect(auth, SIGNAL(checkResult(bool)),
-			this, SLOT(checkResult(bool)));
 
 		//input->setWindowIcon(QIcon("icon.png"));
 
@@ -128,10 +127,9 @@ void Graphem::checkResult(bool correct)
 			and tries >= max_tries)
 				abort();
 		}
-	}
 
-	if(!correct)
 		input->reset();
+	}
 }
 
 Auth* Graphem::getAuth()

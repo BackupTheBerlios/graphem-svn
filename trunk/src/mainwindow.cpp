@@ -73,6 +73,9 @@ MainWindow::MainWindow(InputWidget* input):
 	resize(600,400);
 	setUnsavedChanges(false);
 
+	connect(Graphem::getAuth(), SIGNAL(checkResult(bool)),
+		this, SLOT(reset()));
+
 	refreshInfo();
 }
 
