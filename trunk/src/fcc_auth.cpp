@@ -20,7 +20,7 @@
 #include "crypto.h"
 #include "graphem.h"
 #include "fcc_auth.h"
-#include "fcc_newpattern.h"
+#include "fcc_newgesture.h"
 #include "inputwidget.h"
 
 #include <cmath>
@@ -36,7 +36,6 @@ FCC::FCC(QObject *parent, InputWidget *input):
 	Auth(parent, input),
 	started(0),
 	hash_loaded(false),
-	print_pattern(false),
 	touchpad_mode(false)
 {
 	reset();
@@ -53,15 +52,12 @@ void FCC::check()
 	started = new QTime();
 	started->start();
 
-	//actually check pattern
-	emit checkResult(tryPattern());
+	//actually check gesture
+	emit checkResult(tryGesture());
 
 #ifndef QT_NO_DEBUG
 	double time = double(started->elapsed())/1000;
 	qDebug() << compared_hashes_count << " tries in " << time << "s, or " << compared_hashes_count/time << "tries/s";
-
-	if(print_pattern)
-		qDebug() << "Input: " << strokesToString();
 #endif
 
 	delete started;
@@ -78,11 +74,11 @@ void FCC::loadHash()
 		return;
 	}
 
-	auth_pattern = settings.value("pattern_hash").toByteArray();
+	auth_gesture = settings.value("pattern_hash").toByteArray();
 	salt = settings.value("salt").toByteArray();
 	
-	if(auth_pattern.isEmpty()) {
-		qDebug() << "auth_pattern empty, while setting !empty";
+	if(auth_gesture.isEmpty()) {
+		qDebug() << "auth_gesture empty, while setting !empty";
 		hash_loaded = false;
 		return;
 	}
@@ -98,13 +94,13 @@ void FCC::loadHash()
 }
 
 
-bool FCC::matchesAuthPattern()
+bool FCC::matchesAuthGesture()
 {
 #ifndef QT_NO_DEBUG
 	compared_hashes_count++;
 #endif
 
-	return auth_pattern == Crypto::getHash(strokesToString(), salt);
+	return auth_gesture == Crypto::getHash(strokesToString(), salt);
 }
 
 
@@ -173,10 +169,10 @@ QString FCC::strokesToString()
 }
 
 
-bool FCC::tryPattern()
+bool FCC::tryGesture()
 {
 	//test unchanged
-	if(matchesAuthPattern())
+	if(matchesAuthGesture())
 		return true;
 
 	//sort stroke indices by weight (ascending)
@@ -231,16 +227,16 @@ bool FCC::tryPattern()
 			p *= 4; // period increases by this amount as we move up the tree
 		}
 
-		if(matchesAuthPattern())
+		if(matchesAuthGesture())
 			return true;
 	}
 	return false;
 }
 
 
-NewPattern* FCC::newPattern()
+NewGesture* FCC::newGesture()
 {
-	return new FCCNewPattern(0, this);
+	return new FCCNewGesture(0, this);
 }
 
 void FCC::reset()

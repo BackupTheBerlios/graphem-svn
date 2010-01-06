@@ -62,7 +62,7 @@ Graphem::Graphem(WindowMode mode):
 		main->show();
 	} else {
 		if(!auth->hashLoaded()) {
-			std::cerr << "Couldn't load key pattern! Please start Graphem without any arguments to create one.\n";
+			std::cerr << "Couldn't load key gesture! Please start Graphem without any arguments to create one.\n";
 			abort();
 		}
 
@@ -99,9 +99,9 @@ void Graphem::checkResult(bool correct)
 {	
 	if(verbose) {
 		if(correct)
-			std::cout << "OK: Correct pattern.\n";
+			std::cout << "OK: Correct gesture.\n";
 		else
-			std::cout << "ERROR: Pattern not recognized.\n";
+			std::cout << "ERROR: Gesture not recognized.\n";
 	}
 
 	//save statistics

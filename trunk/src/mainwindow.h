@@ -23,7 +23,7 @@
 #include <QMainWindow>
 
 class InputWidget;
-class NewPattern;
+class NewGesture;
 class QAction;
 class QDockWidget;
 class QTextEdit;
@@ -37,8 +37,8 @@ public slots:
 	void reset();
 	void save();
 	void showAboutDialog();
-	void showEditPatternDialog();
-	void showNewPatternDialog();
+	void showEditGestureDialog();
+	void showNewGestureDialog();
 	void showPreferences();
 protected:
 	void closeEvent(QCloseEvent*);
@@ -46,7 +46,7 @@ private:
 	void setUnsavedChanges(bool b);
 
 	InputWidget* input;
-	NewPattern* new_pattern_dialog;
+	NewGesture* new_gesture_dialog;
 	QDockWidget* info_dock;
 	QTextEdit* info_text;
 	QAction* edit_action;

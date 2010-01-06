@@ -23,7 +23,7 @@
 #include <QObject>
 
 class InputWidget;
-class NewPattern;
+class NewGesture;
 class QPainter;
 
 class Auth : public QObject {
@@ -33,11 +33,11 @@ public:
 	virtual ~Auth() { }
 
 	virtual bool hashLoaded() = 0;
-	virtual NewPattern* newPattern() = 0; //create dialog for new pattern generation
+	virtual NewGesture* newGesture() = 0; //create dialog for new gesture generation
 public slots:
 	virtual void check() = 0; //checks data in InputWidget
 	virtual void draw(QPainter* /*painter*/) { } // callback for drawing on InputWidget
-	virtual void reset() = 0; //reload pattern
+	virtual void reset() = 0; //reload gesture
 signals:
 	virtual void checkResult(bool correct);
 protected:

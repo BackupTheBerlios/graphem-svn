@@ -68,9 +68,6 @@ int main(int argc, char* argv[])
 			QObject::connect(input, SIGNAL(dataReady()),
 				input, SLOT(printData()));
 			*/
-		} else if(argv[i] == QString("--print-pattern")) {
-			//TODO
-			//input->auth()->setPrintPattern(true);
 		}
 #endif
 
@@ -92,16 +89,15 @@ int main(int argc, char* argv[])
 void printHelp(char *arg0)
 {
 	std::cout << "Usage: " << arg0 << " [options]\n\n"
-	<< "--ask\t\t Ask for key pattern but don't give access to configuration; can be canceled\n"
+	<< "--ask\t\t Ask for key gesture but don't give access to configuration; can be canceled\n"
 	<< "--help\t\t Show this text\n"
-	<< "--lock\t\t Lock screen (Make sure your key pattern works!)\n"
+	<< "--lock\t\t Lock screen (Make sure your key gesture works!)\n"
 	<< "--tries [n]\t Abort after [n] tries; can only be used with --ask\n"
 	<< "-v, --verbose\t Print success/failure messages on standard output\n"
 	<< "\n Returns 0 on success, 1 if canceled or maximum number of tries reached\n";
 
 #ifndef QT_NO_DEBUG
 	std::cout << "Debug options:\n"
-	<< "--print-data\t Prints velocity/pressure data to standard output\n"
-	<< "--print-pattern\t Prints entered pattern as a string\n";
+	<< "--print-data\t Prints velocity/pressure data to standard output\n";
 #endif
 }

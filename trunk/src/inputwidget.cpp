@@ -39,7 +39,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	timer(new QTimer(this)),
 	msg_timer(new QTimer(this)),
 	msg(""),
-	default_msg(tr("Please enter your key pattern.")),
+	default_msg(tr("Please enter your key gesture.")),
 	touchpad_mode(false),
 	show_input(false),
 	record_pattern(record),
@@ -240,7 +240,7 @@ void InputWidget::reset()
 	QSettings settings;
 	show_input = settings.value("show_input", SHOW_INPUT).toBool();
 	if(!record_pattern)
-		showMessage(tr("Pattern not recognized, please try again."), 1500);
+		showMessage(tr("Gesture not recognized, please try again."), 1500);
 	update();
 }
 

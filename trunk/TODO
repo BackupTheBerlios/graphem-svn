@@ -1,7 +1,8 @@
 0.4:
-s/pattern/gesture
+fix inconsistent naming
 handle input == 0 in Auth
-fix debug options
+NewPattern::auth needed?
+debug module
 make creation of new pattern slightly more wizardish
 	choosing plugins?
 secure storage, zero memory after use

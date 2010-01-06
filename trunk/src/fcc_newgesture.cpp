@@ -22,7 +22,7 @@
 #include "crypto.h"
 #include "fcc_auth.h"
 #include "inputwidget.h"
-#include "fcc_newpattern.h"
+#include "fcc_newgesture.h"
 
 #include <QDialogButtonBox>
 #include <QInputDialog>
@@ -36,8 +36,8 @@
 #include <QtDebug>
 
 
-FCCNewPattern::FCCNewPattern(QWidget *parent, Auth *auth):
-	NewPattern(parent, auth),
+FCCNewGesture::FCCNewGesture(QWidget *parent, Auth *auth):
+	NewGesture(parent, auth),
 	input(new InputWidget(this, true)), //InputWidget in record mode
 	status(new QStatusBar(this))
 {
@@ -51,11 +51,11 @@ FCCNewPattern::FCCNewPattern(QWidget *parent, Auth *auth):
 	touchpad_mode = !ret;
 
 	resize(600,400);
-	setWindowTitle(tr("New Pattern"));
+	setWindowTitle(tr("New Gesture"));
 
 	input->enableTouchpadMode(touchpad_mode);
 	input->setDefaultMessage("");
-	input->showMessage(tr("Enter your new pattern here."), 3000);
+	input->showMessage(tr("Enter your new gesture here."), 3000);
 	
 	connect(input, SIGNAL(dataReady()),
 		this, SLOT(updateDisplay()));
@@ -77,7 +77,7 @@ FCCNewPattern::FCCNewPattern(QWidget *parent, Auth *auth):
 		this, SLOT(resetInput()));
 	
 #ifndef NO_QCA
-	QPushButton *generate = button_box->addButton(tr("&Generate Pattern"), QDialogButtonBox::ActionRole);
+	QPushButton *generate = button_box->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
 	connect(generate, SIGNAL(clicked()),
 		this, SLOT(generate()));
 #endif
@@ -93,7 +93,7 @@ FCCNewPattern::FCCNewPattern(QWidget *parent, Auth *auth):
 
 
 //used while recording, takes last arrow and removes all Nodes belonging to it
-void FCCNewPattern::deleteLastStroke()
+void FCCNewGesture::deleteLastStroke()
 {
 	if(arrows.isEmpty())
 		return;
@@ -107,7 +107,7 @@ void FCCNewPattern::deleteLastStroke()
 
 
 // draw arrows
-void FCCNewPattern::draw(QPainter *painter)
+void FCCNewGesture::draw(QPainter *painter)
 {
 	//approximation to 3*cos() to get rid of floating point errors
 	const int x[] = { 3, 2, 0, -2, -3, -2, 0, 2 };
@@ -140,14 +140,14 @@ void FCCNewPattern::draw(QPainter *painter)
 
 
 //generate random key and display
-void FCCNewPattern::generate()
+void FCCNewGesture::generate()
 {
 #ifndef NO_QCA
 	bool ok;
 	const int num_strokes_start = 10;
 	const int num_strokes_min = 1;
 	const int num_strokes_max = 100;
-	const int num_strokes = QInputDialog::getInteger(this, tr("Generate Random Pattern"),
+	const int num_strokes = QInputDialog::getInteger(this, tr("Generate Random Gesture"),
 		(input->path.empty()?tr(""):tr("Warning: The current input will be erased!<br>"))+tr("Number of strokes:"),
 		num_strokes_start, num_strokes_min, num_strokes_max, 1, &ok);
 	if(!ok)
@@ -192,7 +192,7 @@ void FCCNewPattern::generate()
 
 
 //reset input and re-enable touchpad mode if required
-void FCCNewPattern::resetInput()
+void FCCNewGesture::resetInput()
 {
 	arrows.clear();
 	input->reset();
@@ -200,7 +200,7 @@ void FCCNewPattern::resetInput()
 }
 
 
-void FCCNewPattern::save()
+void FCCNewGesture::save()
 {
 	FCC tmpauth(this, input);
 	input->enableTouchpadMode(touchpad_mode);
@@ -219,7 +219,7 @@ void FCCNewPattern::save()
 }
 
 
-void FCCNewPattern::updateDisplay()
+void FCCNewGesture::updateDisplay()
 {
 	arrows.clear();
 	FCC tmpauth(this, input); //this might change input->touchpad_mode

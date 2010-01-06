@@ -20,7 +20,7 @@ VPATH += src
 OBJECTS_DIR = src/tmp
 MOC_DIR = src/tmp
 
-HEADERS += auth.h inputwidget.h node.h mainwindow.h crypto.h newpattern.h preferences.h graphem.h \
-	fcc_auth.h fcc_newpattern.h fcc_stroke.h
+HEADERS += auth.h inputwidget.h node.h mainwindow.h crypto.h newgesture.h preferences.h graphem.h \
+	fcc_auth.h fcc_newgesture.h fcc_stroke.h
 SOURCES += main.cpp graphem.cpp inputwidget.cpp mainwindow.cpp crypto.cpp preferences.cpp \
-	fcc_auth.cpp fcc_newpattern.cpp fcc_stroke.cpp
+	fcc_auth.cpp fcc_newgesture.cpp fcc_stroke.cpp

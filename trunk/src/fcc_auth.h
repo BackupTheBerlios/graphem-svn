@@ -30,19 +30,18 @@
 #include <QObject>
 #include <QString>
 
-class NewPattern;
-//class FCCNewPattern;
+class NewGesture;
 class QTime;
 
 class FCC : public Auth {
 	Q_OBJECT
 	//Q_INTERFACES(Auth)
-	friend class FCCNewPattern;
+	friend class FCCNewGesture;
 public:
 	FCC(QObject *parent, InputWidget *input);
 
 	bool hashLoaded() { return hash_loaded; }
-	NewPattern* newPattern();
+	NewGesture* newGesture();
 	void preprocess();
 public slots:
 	void check();
@@ -51,17 +50,15 @@ signals:
 	void checkResult(bool correct);
 protected:
 	void loadHash();
-	void setPrintPattern(bool on) { print_pattern = on; }
-	bool matchesAuthPattern();
+	bool matchesAuthGesture();
 	QString strokesToString();
-	bool tryPattern();
+	bool tryGesture();
 
-	QByteArray auth_pattern, salt;
+	QByteArray auth_gesture, salt;
 	QList<Stroke> strokes;
 	int compared_hashes_count;
 	QTime *started;
 	bool hash_loaded;
-	bool print_pattern;
 	bool touchpad_mode;
 	int check_timeout; //in ms
 

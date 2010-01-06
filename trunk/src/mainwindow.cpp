@@ -21,7 +21,7 @@
 #include "graphem.h"
 #include "inputwidget.h"
 #include "mainwindow.h"
-#include "newpattern.h"
+#include "newgesture.h"
 #include "preferences.h"
 
 #include <QApplication>
@@ -36,17 +36,17 @@
 
 MainWindow::MainWindow(InputWidget* input):
 	input(input),
-	new_pattern_dialog(0),
+	new_gesture_dialog(0),
 	info_text(0)
 {
 	setCentralWidget(input);
 
 	//menu bar
 	QMenu *file = menuBar()->addMenu(tr("&File"));
-	file->addAction(tr("&New Pattern..."), this,
-		SLOT(showNewPatternDialog()), tr("Ctrl+N"));
-	edit_action = file->addAction(tr("&Edit Pattern..."), this,
-		SLOT(showEditPatternDialog()), tr("Ctrl+E"));
+	file->addAction(tr("&New Gesture..."), this,
+		SLOT(showNewGestureDialog()), tr("Ctrl+N"));
+	edit_action = file->addAction(tr("&Edit Gesture..."), this,
+		SLOT(showEditGestureDialog()), tr("Ctrl+E"));
 
 	file->addSeparator();
 	save_action = file->addAction(tr("&Save"), this,
@@ -84,7 +84,7 @@ void MainWindow::closeEvent(QCloseEvent* ev)
 {
 	if(unsaved_changes) {
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "",
-			"<b>Save the new key pattern?</b>",
+			"<b>Save the new key gesture?</b>",
 			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
 			QMessageBox::Save);
 		if(button == QMessageBox::Cancel) {
@@ -103,7 +103,7 @@ void MainWindow::refreshInfo()
 {
 	if(!Graphem::getAuth()->hashLoaded()) {
 		info_dock->setWindowTitle(tr("Welcome"));
-		info_text->setText(tr("To start using Graphem, you have to set a new key pattern (File -> New Pattern).<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
+		info_text->setText(tr("To start using Graphem, you have to set a new key gesture (File -> New Gesture).<br />You can find a tutorial at <a href='http://graphem.berlios.de/'>http://graphem.berlios.de/</a>"));
 		input->showMessage("");
 		input->setEnabled(false);
 	} else {
@@ -120,7 +120,7 @@ void MainWindow::refreshInfo()
 			.arg(usage_failed)
 			.arg(qRound(double(usage_total - usage_failed)/usage_total*1000)/10.0));
 		input->setEnabled(true);
-		input->setDefaultMessage(tr("You can test your pattern here."));
+		input->setDefaultMessage(tr("You can test your gesture here."));
 		input->showMessage();
 	}
 }
@@ -133,11 +133,11 @@ void MainWindow::reset()
 }
 
 
-//save pattern currently being tested
+//save gesture currently being tested
 void MainWindow::save()
 {
-	Q_ASSERT(new_pattern_dialog != 0);
-	new_pattern_dialog->save();
+	Q_ASSERT(new_gesture_dialog != 0);
+	new_gesture_dialog->save();
 	setUnsavedChanges(false);
 }
 
@@ -163,10 +163,10 @@ void MainWindow::showAboutDialog()
 }
 
 
-//show the NewPattern dialog again without resetting it
-void MainWindow::showEditPatternDialog()
+//show the NewGesture dialog again without resetting it
+void MainWindow::showEditGestureDialog()
 {
-	if(new_pattern_dialog->exec() == QDialog::Accepted) {
+	if(new_gesture_dialog->exec() == QDialog::Accepted) {
 		Graphem::getAuth()->reset();
 		refreshInfo();
 
@@ -175,14 +175,14 @@ void MainWindow::showEditPatternDialog()
 }
 
 
-//create new NewPattern dialog and show it
-void MainWindow::showNewPatternDialog()
+//create new NewGesture dialog and show it
+void MainWindow::showNewGestureDialog()
 {
-	if(new_pattern_dialog)
-		delete new_pattern_dialog;
-	new_pattern_dialog = Graphem::getAuth()->newPattern();
+	if(new_gesture_dialog)
+		delete new_gesture_dialog;
+	new_gesture_dialog = Graphem::getAuth()->newGesture();
 
-	showEditPatternDialog();
+	showEditGestureDialog();
 }
 
 
