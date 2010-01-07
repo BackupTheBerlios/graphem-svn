@@ -60,18 +60,7 @@ int main(int argc, char* argv[])
 			i++;
 		} else if(argv[i] == QString("-v") or argv[i] == QString("--verbose")) {
 			verbose = true;
-		}
-
-#ifndef QT_NO_DEBUG
-		else if(argv[i] == QString("--print-data")) {
-			/* TODO
-			QObject::connect(input, SIGNAL(dataReady()),
-				input, SLOT(printData()));
-			*/
-		}
-#endif
-
-		else {
+		} else {
 			std::cerr << "Unknown command line option '" << argv[i] << "'\n";
 			printHelp(argv[0]);
 			return 1;
@@ -95,9 +84,4 @@ void printHelp(char *arg0)
 	<< "--tries [n]\t Abort after [n] tries; can only be used with --ask\n"
 	<< "-v, --verbose\t Print success/failure messages on standard output\n"
 	<< "\n Returns 0 on success, 1 if canceled or maximum number of tries reached\n";
-
-#ifndef QT_NO_DEBUG
-	std::cout << "Debug options:\n"
-	<< "--print-data\t Prints velocity/pressure data to standard output\n";
-#endif
 }

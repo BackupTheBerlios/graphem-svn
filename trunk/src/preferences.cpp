@@ -72,12 +72,12 @@ Preferences::Preferences(QWidget *parent):
 	QLabel *window_opacity_num = new QLabel();
 	connect(window_opacity, SIGNAL(valueChanged(int)),
 		window_opacity_num, SLOT(setNum(int)));
+	window_opacity_num->setMinimumWidth(30);
 	window_opacity->setRange(0, 100);
 	window_opacity->setValue(100 * settings.value("window_opacity", WINDOW_OPACITY).toDouble());
 	window_opacity->setSingleStep(5);
 	window_opacity_label->setBuddy(window_opacity);
 	window_opacity->setEnabled(enable_fading);
-	//window_opacity->setValue(100 * settings.value("window_opacity", WINDOW_OPACITY).toDouble());
 
 	//layout
 	QVBoxLayout *l1 = new QVBoxLayout();

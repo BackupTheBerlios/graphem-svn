@@ -11,7 +11,6 @@ better logo & home page
 ?:
 l10n
 estimate strength of input
-create test cases for specific inputs
 search for straight lines and assign a direction to the whole thing. should help with 22 degree lines
 make preprocess() suck less, use velocity to determine averaging
 do some benchmarking

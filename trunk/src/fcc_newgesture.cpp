@@ -31,15 +31,13 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QSettings>
-#include <QStatusBar>
 #include <QVBoxLayout>
 #include <QtDebug>
 
 
 FCCNewGesture::FCCNewGesture(QWidget *parent, Auth *auth):
 	NewGesture(parent, auth),
-	input(new InputWidget(this, true)), //InputWidget in record mode
-	status(new QStatusBar(this))
+	input(new InputWidget(this, true)) //InputWidget in record mode
 {
 	QMessageBox msgBox(QMessageBox::Question, "", tr("<b>Enable touchpad mode?</b>"), QMessageBox::NoButton, this);
 	msgBox.setInformativeText(tr("Enable this if you want to use mouse movements without clicking. When recording, you will still need to hold your mouse button down, but no \"pen up\" events will be stored."));
@@ -87,7 +85,6 @@ FCCNewGesture::FCCNewGesture(QWidget *parent, Auth *auth):
 	button_box->setContentsMargins(9, 0, 9, 0);
 	l1->addWidget(input);
 	l1->addWidget(button_box);
-	l1->addWidget(status);
 	setLayout(l1);
 }
 
@@ -106,7 +103,7 @@ void FCCNewGesture::deleteLastStroke()
 }
 
 
-// draw arrows
+// draw arrows over InputWidget
 void FCCNewGesture::draw(QPainter *painter)
 {
 	//approximation to 3*cos() to get rid of floating point errors
@@ -136,6 +133,9 @@ void FCCNewGesture::draw(QPainter *painter)
 		a = end + QPointF(10*(l.dy()-l.dx())/l.length(), -10*(l.dx()+l.dy())/l.length());
 		painter->drawLine(a, end);
 	}
+
+	painter->setPen(Qt::white);
+	painter->drawText(11, 19,(tr("%1 Stroke(s)").arg(arrows.count())));
 }
 
 
@@ -236,6 +236,4 @@ void FCCNewGesture::updateDisplay()
 	}
 
 	input->update();
-
-	status->showMessage(tr("%1 Stroke(s)").arg(tmpauth.strokes.count()));
 }

@@ -30,7 +30,6 @@
 class Auth;
 class InputWidget;
 class QPainter;
-class QStatusBar;
 
 struct Arrow {
 	int start_node;
@@ -52,7 +51,6 @@ private slots:
 	void updateDisplay();
 private:
 	InputWidget *input;
-	QStatusBar *status;
 	bool touchpad_mode;
 
 	QList<Arrow> arrows;
