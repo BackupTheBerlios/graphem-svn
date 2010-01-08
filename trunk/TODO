@@ -1,8 +1,8 @@
 0.4:
 fix inconsistent naming
-handle input == 0 in Auth
 NewPattern::auth needed?
 debug module
+fix handling of plugin load failur
 make creation of new pattern slightly more wizardish
 	choosing plugins?
 secure storage, zero memory after use
