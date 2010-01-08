@@ -19,6 +19,10 @@
 
 #include "crypto.h"
 
+#ifndef NO_QCA
+#include <QtCrypto>
+#endif
+
 #include <QtGlobal>
 
 #include <climits>

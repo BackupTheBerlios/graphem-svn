@@ -202,7 +202,8 @@ void FCCNewGesture::resetInput()
 
 void FCCNewGesture::save()
 {
-	FCC tmpauth(this, input);
+	FCC tmpauth;
+	tmpauth.setInput(input);
 	input->enableTouchpadMode(touchpad_mode);
 	tmpauth.preprocess();
 
@@ -222,7 +223,8 @@ void FCCNewGesture::save()
 void FCCNewGesture::updateDisplay()
 {
 	arrows.clear();
-	FCC tmpauth(this, input); //this might change input->touchpad_mode
+	FCC tmpauth;
+	tmpauth.setInput(input); //this might change input->touchpad_mode
 	input->enableTouchpadMode(touchpad_mode);
 	tmpauth.preprocess();
 

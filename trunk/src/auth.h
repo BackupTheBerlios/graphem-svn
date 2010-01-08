@@ -29,11 +29,12 @@ class QPainter;
 class Auth : public QObject {
 	Q_OBJECT
 public:
-	Auth(QObject *parent, InputWidget *input) : QObject(parent), input(input) { }
+	Auth() : input(0) { }
 	virtual ~Auth() { }
 
 	virtual bool hashLoaded() = 0;
 	virtual NewGesture* newGesture() = 0; //create dialog for new gesture generation
+	virtual void setInput(InputWidget *i) { input = i; }
 public slots:
 	virtual void check() = 0; //checks data in InputWidget
 	virtual void draw(QPainter* /*painter*/) { } // callback for drawing on InputWidget
@@ -43,4 +44,6 @@ signals:
 protected:
 	InputWidget *input;
 };
+
+Q_DECLARE_INTERFACE(Auth, "Graphem.Auth/0.4")
 #endif

@@ -24,22 +24,21 @@
 #include "inputwidget.h"
 
 #include <cmath>
-#include <iostream>
 
 #include <QLineF>
 #include <QSettings>
 #include <QString>
 #include <QtDebug>
+#include <QtPlugin>
+
+Q_EXPORT_PLUGIN2(fcc, FCC)
 
 
-FCC::FCC(QObject *parent, InputWidget *input):
-	Auth(parent, input),
+FCC::FCC():
 	started(0),
 	hash_loaded(false),
 	touchpad_mode(false)
-{
-	reset();
-}
+{ }
 
 
 void FCC::check()
@@ -242,4 +241,10 @@ NewGesture* FCC::newGesture()
 void FCC::reset()
 {
 	loadHash();
+}
+
+void FCC::setInput(InputWidget *i)
+{
+	Auth::setInput(i);
+	reset();
 }

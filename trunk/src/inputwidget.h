@@ -20,7 +20,6 @@
 #ifndef INPUTWIDGET_H
 #define INPUTWIDGET_H
 
-#include "auth.h"
 #include "node.h"
 
 #include <QList>

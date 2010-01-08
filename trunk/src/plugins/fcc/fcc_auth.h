@@ -35,14 +35,15 @@ class QTime;
 
 class FCC : public Auth {
 	Q_OBJECT
-	//Q_INTERFACES(Auth)
+	Q_INTERFACES(Auth)
 	friend class FCCNewGesture;
 public:
-	FCC(QObject *parent, InputWidget *input);
+	FCC();
 
 	bool hashLoaded() { return hash_loaded; }
 	NewGesture* newGesture();
 	void preprocess();
+	virtual void setInput(InputWidget *i);
 public slots:
 	void check();
 	void reset();

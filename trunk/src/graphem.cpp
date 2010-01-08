@@ -18,14 +18,14 @@
 */
 
 #include "graphem.h"
-//#include "auth.h"
-#include "fcc_auth.h"
-#include "crypto.h"
+#include "auth.h"
 #include "mainwindow.h"
 #include "inputwidget.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QDir>
+#include <QPluginLoader>
 #include <QSettings>
 #include <QShortcut>
 #include <QString>
@@ -33,6 +33,7 @@
 #include <iostream>
 
 Auth* Graphem::auth = 0;
+
 
 Graphem::Graphem(WindowMode mode):
 	mode(mode),
@@ -42,7 +43,7 @@ Graphem::Graphem(WindowMode mode):
 	verbose(false)
 {
 	auth = loadAuthPlugin();
-//	std::cout << "Auth plugin '" << auth->metaObject()->className() << "' loaded.\n";;
+
 
 	connect(input, SIGNAL(dataReady()),
 		auth, SLOT(check()), Qt::QueuedConnection);
@@ -61,7 +62,10 @@ Graphem::Graphem(WindowMode mode):
 		main->setWindowTitle(GRAPHEM_VERSION);
 		main->show();
 	} else {
-		if(!auth->hashLoaded()) {
+		if(!auth) {
+			std::cerr << "Couldn't load plugin! TODO: Add helpful suggestions\n";
+			abort(); //TODO: doesn't work here
+		} else if(!auth->hashLoaded()) {
 			std::cerr << "Couldn't load key gesture! Please start Graphem without any arguments to create one.\n";
 			abort();
 		}
@@ -141,7 +145,16 @@ Auth* Graphem::getAuth()
 //returns 0 if load fails
 Auth* Graphem::loadAuthPlugin()
 {
-	return new FCC(this, input);
+	QDir plugins_dir = QDir(qApp->applicationDirPath());
+	plugins_dir.cd("plugins");
+	std::cout << "loading " << qPrintable(plugins_dir.absoluteFilePath("libfcc.so")) << "\n";
+
+	QPluginLoader loader(plugins_dir.absoluteFilePath("libfcc.so"));
+	QObject *o = loader.instance();
+	Auth *a = qobject_cast<Auth* >(o);
+	if(a)
+		a->setInput(input);
+	return a;
 }
 
 

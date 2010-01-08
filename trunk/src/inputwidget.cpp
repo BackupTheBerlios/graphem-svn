@@ -239,7 +239,7 @@ void InputWidget::reset()
 	path.clear();
 	QSettings settings;
 	show_input = settings.value("show_input", SHOW_INPUT).toBool();
-	if(!record_pattern)
+	if(parent() == 0)
 		showMessage(tr("Gesture not recognized, please try again."), 1500);
 	update();
 }

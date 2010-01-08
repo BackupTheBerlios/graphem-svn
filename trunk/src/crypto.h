@@ -24,9 +24,6 @@
 #include <QCryptographicHash>
 #include <QString>
 
-#ifndef NO_QCA
-#include <QtCrypto>
-#endif
 
 namespace Crypto {
 	QByteArray generateSalt();
