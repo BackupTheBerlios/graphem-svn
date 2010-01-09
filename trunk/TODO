@@ -1,7 +1,5 @@
 0.4:
-fix inconsistent naming
 NewPattern::auth needed?
-fix handling of plugin load failur
 make creation of new pattern slightly more wizardish
 	choosing plugins?
 secure storage, zero memory after use

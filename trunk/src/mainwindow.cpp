@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ void MainWindow::showAboutDialog()
 	tr("<center><h1>%1</h1>\
 <h3>A small mouse gesture based authentication program and screen locker</h3>\
 <p>Documentation is available on <a href=\"http://graphem.berlios.de/\">http://graphem.berlios.de</a></p>\
-<small><p>&copy;2009 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
+<small><p>&copy;2009-2010 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;</p></small></center>\
 <p>%2</p></small>")
 	.arg(GRAPHEM_VERSION)
 	.arg("This program is free software; you can redistribute it and/or modify<br> it under the terms of the GNU General Public License as published by<br> the Free Software Foundation; either version 2 of the License, or<br> (at your option) any later version."));

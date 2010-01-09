@@ -47,6 +47,7 @@ public slots:
 	void fade();
 	void focus();
 	void reset();
+	void showFullScreen();
 	void showMessage(QString m = QString(), int msecs = 0);
 protected:
 	void mouseMoveEvent(QMouseEvent *ev);

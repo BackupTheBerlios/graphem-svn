@@ -23,7 +23,6 @@
 #include "inputwidget.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QDir>
 #include <QPluginLoader>
 #include <QSettings>
@@ -70,12 +69,7 @@ Graphem::Graphem(WindowMode mode, Auth *a):
 	} else { //mode == LOCK
 		input->setWindowTitle(GRAPHEM_VERSION);
 		input->setGrab(true);
-
-		//for full screen, we strip WM decorations and resize the window manually
-		input->setWindowFlags(Qt::X11BypassWindowManagerHint);
-		input->setVisible(true);
-		QDesktopWidget dw;
-		input->setGeometry(dw.screenGeometry());
+		input->showFullScreen();
 	}
 }
 

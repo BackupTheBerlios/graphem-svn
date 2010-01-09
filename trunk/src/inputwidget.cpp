@@ -20,16 +20,21 @@
 #include "graphem.h"
 #include "inputwidget.h"
 
-#include <iostream>
-
 #include <QApplication>
 #include <QCursor>
+#include <QDesktopWidget>
 #include <QLineF>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QResizeEvent>
 #include <QSettings>
 #include <QTime>
 #include <QTimer>
+#include <QX11Info>
+
+#include <X11/Xlib.h>
+
+#include <iostream>
 
 
 InputWidget::InputWidget(QWidget* parent, bool record) :
@@ -115,7 +120,15 @@ void InputWidget::focus()
 {
 	if(do_grab) {
 		grabMouse();
-		grabKeyboard();
+
+		// with QWidget::grabKeyboard() the keyboard grab might fail silently, so we'll use Xlibs here
+		int result;
+		do {
+			result = XGrabKeyboard(QX11Info::display(), effectiveWinId(), False, GrabModeAsync, GrabModeAsync, CurrentTime);
+
+			if(result == GrabNotViewable)
+				break; //happens with premature showEvents, will try again after window is shown
+		} while(result != GrabSuccess);
 	}
 
 	activateWindow(); //make sure we catch keyboard events
@@ -138,10 +151,6 @@ void InputWidget::showEvent(QShowEvent*)
 			setWindowOpacity(fade_to);
 		}
 	}
-
-	//when called via keyboard shortcut, keyboard grab might fail
-	//after 500ms, the key should have been released so the grab can work
-	QTimer::singleShot(500, this, SLOT(focus()));
 }
 
 
@@ -223,12 +232,31 @@ void InputWidget::reset()
 	update();
 }
 
-void InputWidget::resizeEvent(QResizeEvent* /*ev*/)
+
+void InputWidget::resizeEvent(QResizeEvent*)
 {
 	if(parent() == 0) { //center cursor for top level windows
 		cursor().setPos(width()/2, height()/2);
 		cursor_centered = true;
 	}
+
+	update();
+}
+
+
+//for full screen, we strip WM decorations and resize the window manually
+void InputWidget::showFullScreen()
+{
+	QDesktopWidget *dw = qApp->desktop();
+	setWindowFlags(Qt::X11BypassWindowManagerHint);
+	setGeometry(dw->screenGeometry());
+	setVisible(true);
+
+	//call this slot again if screen resolution changes
+	connect(dw, SIGNAL(resized(int)),
+		this, SLOT(showFullScreen()));
+
+	focus();
 }
 
 
