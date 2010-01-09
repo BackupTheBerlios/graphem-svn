@@ -46,7 +46,6 @@ public slots:
 	void checkFinished();
 	void fade();
 	void focus();
-	void printData();
 	void reset();
 	void showMessage(QString m = QString(), int msecs = 0);
 protected:

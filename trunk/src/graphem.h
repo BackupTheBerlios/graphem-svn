@@ -41,20 +41,19 @@ class InputWidget;
 class Graphem : public QObject {
 	Q_OBJECT
 public:
-	Graphem(WindowMode mode);
+	Graphem(WindowMode mode, Auth *a);
 	~Graphem();
 	void cleanup();
 	void setMaxTries(int t) { max_tries = t; }
 	void setVerbose(bool on) { verbose = on; }
 
-	static Auth* getAuth();
+	static Auth* getAuth(); //returns the main auth instance
+	static Auth* loadAuthPlugin(QString name);
 public slots:
 	void abort(); //exit with status code 1
 	void checkResult(bool correct);
 	void quit(); //exit with status code 0
 private:
-	Auth* loadAuthPlugin();
-
 	WindowMode mode;
 	InputWidget *input;
 	static Auth *auth;

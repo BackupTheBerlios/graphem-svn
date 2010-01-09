@@ -35,15 +35,15 @@
 Auth* Graphem::auth = 0;
 
 
-Graphem::Graphem(WindowMode mode):
+Graphem::Graphem(WindowMode mode, Auth *a):
 	mode(mode),
 	input(new InputWidget()),
 	max_tries(0),
 	tries(0),
 	verbose(false)
 {
-	auth = loadAuthPlugin();
-
+	auth = a;
+	auth->setInput(input);
 
 	connect(input, SIGNAL(dataReady()),
 		auth, SLOT(check()), Qt::QueuedConnection);
@@ -61,33 +61,21 @@ Graphem::Graphem(WindowMode mode):
 		//main->setWindowIcon(QIcon("icon.png"));
 		main->setWindowTitle(GRAPHEM_VERSION);
 		main->show();
-	} else {
-		if(!auth) {
-			std::cerr << "Couldn't load plugin! TODO: Add helpful suggestions\n";
-			abort(); //TODO: doesn't work here
-		} else if(!auth->hashLoaded()) {
-			std::cerr << "Couldn't load key gesture! Please start Graphem without any arguments to create one.\n";
-			abort();
-		}
+	} else if(mode == ASK) {
+		input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(GRAPHEM_VERSION));
+		QShortcut *shortcut = new QShortcut(QKeySequence("Esc"), input);
+		connect(shortcut, SIGNAL(activated()),
+			this, SLOT(abort()));
+		input->showMaximized();
+	} else { //mode == LOCK
+		input->setWindowTitle(GRAPHEM_VERSION);
+		input->setGrab(true);
 
-		//input->setWindowIcon(QIcon("icon.png"));
-
-		if(mode == ASK) {
-			input->setWindowTitle(QObject::tr("%1 - Press ESC to cancel").arg(GRAPHEM_VERSION));
-			QShortcut *shortcut = new QShortcut(QKeySequence("Esc"), input);
-			connect(shortcut, SIGNAL(activated()),
-				this, SLOT(abort()));
-			input->showMaximized();
-		} else { //mode == LOCK
-			input->setWindowTitle(GRAPHEM_VERSION);
-			input->setGrab(true);
-
-			//for full screen, we strip WM decorations and resize the window manually
-			input->setWindowFlags(Qt::X11BypassWindowManagerHint);
-			input->setVisible(true);
-			QDesktopWidget dw;
-			input->setGeometry(dw.screenGeometry());
-		}
+		//for full screen, we strip WM decorations and resize the window manually
+		input->setWindowFlags(Qt::X11BypassWindowManagerHint);
+		input->setVisible(true);
+		QDesktopWidget dw;
+		input->setGeometry(dw.screenGeometry());
 	}
 }
 
@@ -108,7 +96,7 @@ void Graphem::checkResult(bool correct)
 			std::cout << "ERROR: Gesture not recognized.\n";
 	}
 
-	//save statistics
+	//update statistics
 	QSettings settings;
 	int usage_total = settings.value("usage_total").toInt();
 	int usage_failed = settings.value("usage_failed").toInt();
@@ -142,18 +130,18 @@ Auth* Graphem::getAuth()
 }
 
 
-//returns 0 if load fails
-Auth* Graphem::loadAuthPlugin()
+//load auth plugin 'name', returns 0 if load fails
+Auth* Graphem::loadAuthPlugin(QString name)
 {
 	QDir plugins_dir = QDir(qApp->applicationDirPath());
 	plugins_dir.cd("plugins");
-	std::cout << "loading " << qPrintable(plugins_dir.absoluteFilePath("libfcc.so")) << "\n";
 
-	QPluginLoader loader(plugins_dir.absoluteFilePath("libfcc.so"));
-	QObject *o = loader.instance();
-	Auth *a = qobject_cast<Auth* >(o);
-	if(a)
-		a->setInput(input);
+	QString plugin_file = plugins_dir.absoluteFilePath("lib" + name.remove('/') + ".so");
+
+	QPluginLoader loader(plugin_file);
+	Auth* a = qobject_cast<Auth* >(loader.instance());
+	if(!a)
+		std::cout << "loading " << qPrintable(plugin_file) << "failed\n";
 	return a;
 }
 

@@ -213,27 +213,6 @@ void InputWidget::paintEvent(QPaintEvent* /*ev*/)
 }
 
 
-//print  pen_up(pressure) and velocity over time (only in debug mode)
-void InputWidget::printData()
-{
-#ifndef QT_NO_DEBUG
-	if(path.empty())
-		return;
-	std::cout << "t\tp(t)\tv(t)\n";
-	QTime start = path.at(0).time;
-	double length = 0;
-	for(int i = 0; i< path.count(); i++) {
-		if(i > 0)
-			length = QLineF(path.at(i-1).pos, path.at(i).pos).length();
-		double time = start.msecsTo(path.at(i).time);
-		std::cout << time << "\t";
-		std::cout << int(path.at(i).pen_up) << "\t";
-		std::cout << length/time << "\n";
-	}
-#endif
-}
-
-
 void InputWidget::reset()
 {
 	path.clear();

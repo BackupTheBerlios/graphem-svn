@@ -1,6 +1,6 @@
 TEMPLATE      = lib
 DESTDIR       = ../../../plugins
-TARGET        = $$qtLibraryTarget(fcc)
+TARGET        = fcc
 CONFIG       += plugin
 
 include(../../../common.pri)
