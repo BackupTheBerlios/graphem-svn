@@ -124,7 +124,7 @@ void InputWidget::focus()
 		// with QWidget::grabKeyboard() the keyboard grab might fail silently, so we'll use Xlibs here
 		int result;
 		do {
-			result = XGrabKeyboard(QX11Info::display(), effectiveWinId(), False, GrabModeAsync, GrabModeAsync, CurrentTime);
+			result = XGrabKeyboard(QX11Info::display(), winId(), False, GrabModeAsync, GrabModeAsync, CurrentTime);
 
 			if(result == GrabNotViewable)
 				break; //happens with premature showEvents, will try again after window is shown

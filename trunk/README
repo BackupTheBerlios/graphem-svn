@@ -9,11 +9,12 @@ Project home page: http://graphem.berlios.de/
 Installation
 ============
 
-Graphem requires Qt4 and QCA2 libraries, please install the development
-libraries (called libqt4-dev and libqca2-dev on Debian/Ubuntu) before
-compilation via:
+Graphem requires Qt4 and X11 libraries, please install the corresponding
+development packages (libqt4-dev and libx11-dev on Debian/Ubuntu).
+You can then compile via:
 	qmake-qt4
 	make
+Please note that additional features may also require QCA2 (libqca2-dev).
 
 
 Configuration
