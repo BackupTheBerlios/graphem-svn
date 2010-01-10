@@ -1,6 +1,6 @@
 #common settings for qmake
 
-CONFIG += release silent
+CONFIG += release silent x11
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT
 
 QCA_PATH = /usr/include/QtCrypto
