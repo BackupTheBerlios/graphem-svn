@@ -118,9 +118,6 @@ void InputWidget::fade()
 // get mouse/keyboard grab and focus; needs to be called after window is displayed
 void InputWidget::focus()
 {
-	activateWindow(); //make sure we catch keyboard events
-	raise();
-
 	if(do_grab) {
 		// with QWidget::grabKeyboard() the keyboard grab might fail silently, so we'll use Xlibs here
 		int result;
@@ -134,19 +131,19 @@ void InputWidget::focus()
 
 		grabMouse();
 	}
+
+	activateWindow(); //make sure we catch keyboard events
+	raise();
 }
 
 
 void InputWidget::showEvent(QShowEvent*)
 {
-
-	if(parent() == 0)
-		focus();
-
 	//start fade-in if in LOCK-mode
 	if(do_grab) {
 		QSettings settings;
-		if(settings.value("fade", FADE).toBool()) {
+		if(settings.value("fade", FADE).toBool()
+		and windowOpacity() >= fade_to) { //no fade in progress
 			setWindowOpacity(0.0);
 			QTimer::singleShot(FADE_STEP_TIME, this, SLOT(fade()));
 		} else {

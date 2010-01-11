@@ -3,10 +3,11 @@ NewPattern::auth needed?
 make creation of new pattern slightly more wizardish
 	choosing plugins?
 plugins really shouldn't depend on InputWidget
-switching resolution sometimes results in white screen
-maybe ignore spontaneous showEvents?
 secure storage, zero memory after use
 better logo & home page
+resolution change issues:
+	window not in front
+	white screen
 
 ?:
 l10n

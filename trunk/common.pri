@@ -1,6 +1,6 @@
 #common settings for qmake
 
-CONFIG += release silent
+CONFIG += debug silent
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT
 LIBS += -lX11
 

@@ -53,7 +53,7 @@ MainWindow::MainWindow(InputWidget* input):
 		SLOT(save()), tr("Ctrl+S"));
 
 	file->addSeparator();
-	file->addAction(tr("&Preferences"), this, SLOT(showPreferences()));
+	file->addAction(tr("&Preferences"), this, SLOT(showPreferences()), tr("Ctrl+P"));
 
 	file->addSeparator();
 	file->addAction(tr("&Quit"), this, SLOT(close()), tr("Ctrl+Q"));
