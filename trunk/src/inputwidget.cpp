@@ -118,26 +118,28 @@ void InputWidget::fade()
 // get mouse/keyboard grab and focus; needs to be called after window is displayed
 void InputWidget::focus()
 {
-	if(do_grab) {
-		grabMouse();
+	activateWindow(); //make sure we catch keyboard events
+	raise();
 
+	if(do_grab) {
 		// with QWidget::grabKeyboard() the keyboard grab might fail silently, so we'll use Xlibs here
 		int result;
 		do {
 			result = XGrabKeyboard(QX11Info::display(), winId(), False, GrabModeAsync, GrabModeAsync, CurrentTime);
 
-			if(result == GrabNotViewable)
-				break; //happens with premature showEvents, will try again after window is shown
+			if(result == GrabNotViewable) {
+				return; //happens with premature showEvents, will try again after window is shown
+			}
 		} while(result != GrabSuccess);
-	}
 
-	activateWindow(); //make sure we catch keyboard events
-	raise();
+		grabMouse();
+	}
 }
 
 
 void InputWidget::showEvent(QShowEvent*)
 {
+
 	if(parent() == 0)
 		focus();
 
