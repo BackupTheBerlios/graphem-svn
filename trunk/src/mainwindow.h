@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ public slots:
 	void refreshInfo();
 	void reset();
 	void save();
+	void setUnsavedChanges(bool b);
 	void showAboutDialog();
 	void showEditGestureDialog();
 	void showNewGestureDialog();
@@ -43,7 +44,6 @@ public slots:
 protected:
 	void closeEvent(QCloseEvent*);
 private:
-	void setUnsavedChanges(bool b);
 
 	InputWidget* input;
 	NewGesture* new_gesture_dialog;

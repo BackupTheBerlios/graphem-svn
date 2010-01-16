@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ const bool SHOW_INPUT = false;
 const double WINDOW_OPACITY = 1.0;
 const int FADE_TIME = 1500; //in ms
 const int FADE_STEP_TIME = 50; //in ms
+
 
 
 class Auth;

@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ protected:
 	void showEvent(QShowEvent *ev);
 private:
 	bool pen_down, mouse_down;
-	QTimer *timer, *msg_timer;
+	QTimer *timer;
 	QString msg, default_msg;
 	bool touchpad_mode, show_input;
 	bool record_pattern;

@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -81,7 +81,6 @@ FCCNewGesture::FCCNewGesture(QWidget *parent, Auth *auth):
 #endif
 
 	QVBoxLayout *l1 = new QVBoxLayout();
-	l1->setMargin(0);
 	button_box->setContentsMargins(9, 0, 9, 0);
 	l1->addWidget(input);
 	l1->addWidget(button_box);
@@ -157,14 +156,14 @@ void FCCNewGesture::generate()
 	bool last_pen_up = true;
 	bool pen_up;
 	int last_x = 0; int last_y = 0;
-	int x, y;
 	QPoint lastpos = QPoint(Crypto::randInt(0, input->width()),
 			Crypto::randInt(0, input->height()));
 	input->path.append(Node(lastpos)); //start here 
 	for(int i = 0; i < num_strokes; i++) {
 		const int l = Crypto::randInt(30, 250);
-		x = Crypto::randInt(-1, 1);
-		y = Crypto::randInt(-1, 1);
+		const int x = Crypto::randInt(-1, 1);
+		const int y = Crypto::randInt(-1, 1);
+
 		//add offset to avoid having strokes directly on top of each other
 		QPoint pos = lastpos + l*QPoint(x, y) + 5*QPoint(y, -x);
 
@@ -203,8 +202,8 @@ void FCCNewGesture::resetInput()
 void FCCNewGesture::save()
 {
 	FCC tmpauth;
-	tmpauth.setInput(input);
-	input->enableTouchpadMode(touchpad_mode);
+	tmpauth.setInput(input); //this might change input->touchpad_mode
+	input->enableTouchpadMode(touchpad_mode); //so we'll reset it
 	tmpauth.preprocess();
 
 	QSettings settings;
@@ -222,12 +221,12 @@ void FCCNewGesture::save()
 
 void FCCNewGesture::updateDisplay()
 {
-	arrows.clear();
 	FCC tmpauth;
 	tmpauth.setInput(input); //this might change input->touchpad_mode
-	input->enableTouchpadMode(touchpad_mode);
+	input->enableTouchpadMode(touchpad_mode); //so we'll reset it
 	tmpauth.preprocess();
 
+	arrows.clear();
 	for(int i = 0; i < tmpauth.strokes.count(); i++) {
 		Arrow a;
 		a.start_node = tmpauth.strokes.at(i).start_node_id;

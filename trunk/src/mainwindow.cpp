@@ -67,6 +67,7 @@ MainWindow::MainWindow(InputWidget* input):
 	info_text = new QTextEdit();
 	info_text->setReadOnly(true);
 	info_dock = new QDockWidget(this);
+	info_dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	info_dock->setWidget(info_text);
 	addDockWidget(Qt::LeftDockWidgetArea, info_dock);
 
@@ -84,7 +85,7 @@ void MainWindow::closeEvent(QCloseEvent* ev)
 {
 	if(unsaved_changes) {
 		QMessageBox::StandardButton button = QMessageBox::warning(this, "",
-			"<b>Save the new key gesture?</b>",
+			tr("<b>Save the new key gesture?</b>"),
 			QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
 			QMessageBox::Save);
 		if(button == QMessageBox::Cancel) {
@@ -108,8 +109,8 @@ void MainWindow::refreshInfo()
 		input->setEnabled(false);
 	} else {
 		QSettings settings;
-		int usage_total = settings.value("usage_total").toInt();
-		int usage_failed = settings.value("usage_failed").toInt();
+		const int usage_total = settings.value("usage_total").toInt();
+		const int usage_failed = settings.value("usage_failed").toInt();
 
 		info_dock->setWindowTitle(tr("Statistics"));
 		info_text->setText(tr("Total: %1 <br />\
@@ -191,7 +192,7 @@ void MainWindow::showPreferences()
 	Preferences *pref = new Preferences(this);
 	pref->exec();
 
-	input->reset();
+	input->reset(); //reload settings
 
 	delete pref;
 }

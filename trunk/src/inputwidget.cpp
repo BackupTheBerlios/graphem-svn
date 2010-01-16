@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 	pen_down(false),
 	mouse_down(false),
 	timer(new QTimer(this)),
-	msg_timer(new QTimer(this)),
 	msg(""),
 	default_msg(tr("Please enter your key gesture.")),
 	touchpad_mode(false),
@@ -53,9 +52,6 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 {
 	setMinimumSize(300,200);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-	msg_timer->setSingleShot(true);
-	connect(msg_timer, SIGNAL(timeout()),
-		this, SLOT(showMessage()));
 
 	QSettings settings;
 	fade_to = settings.value("window_opacity", WINDOW_OPACITY).toDouble();
@@ -76,7 +72,7 @@ InputWidget::InputWidget(QWidget* parent, bool record) :
 
 void InputWidget::checkFinished()
 {
-	if(path.isEmpty() or path.count() == 1) //we need at least 2 events
+	if(path.count() < 2) //not enough events
 		return;
 	showMessage(""); //don't show message after input started
 
@@ -139,8 +135,7 @@ void InputWidget::focus()
 
 void InputWidget::showEvent(QShowEvent*)
 {
-	//start fade-in if in LOCK-mode
-	if(do_grab) {
+	if(do_grab) { //start fade-in if in LOCK-mode
 		QSettings settings;
 		if(settings.value("fade", FADE).toBool()
 		and windowOpacity() >= fade_to) { //no fade in progress
@@ -226,7 +221,7 @@ void InputWidget::reset()
 	path.clear();
 	QSettings settings;
 	show_input = settings.value("show_input", SHOW_INPUT).toBool();
-	if(parent() == 0)
+	//if(parent() == 0) //TODO: remove this after testing
 		showMessage(tr("Gesture not recognized, please try again."), 1500);
 	update();
 }
@@ -261,7 +256,6 @@ void InputWidget::showFullScreen()
 
 void InputWidget::showMessage(QString m, int msecs)
 {
-	msg_timer->stop(); //cancel timer if a timed message is being shown
 	if(m.isNull())
 		m = default_msg;
 
@@ -269,5 +263,5 @@ void InputWidget::showMessage(QString m, int msecs)
 		update(); //repaints after returning to event loop
 	msg = m;
 	if(msecs)
-		msg_timer->start(msecs);
+		QTimer::singleShot(msecs, this, SLOT(showMessage()));
 }

@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,29 +67,18 @@ void FCC::check()
 void FCC::loadHash()
 {
 	QSettings settings;
-	if(settings.value("pattern_hash").toByteArray().isEmpty()
-	or settings.value("salt").toByteArray().isEmpty()) {
-		hash_loaded = false;
-		return;
-	}
 
 	auth_gesture = settings.value("pattern_hash").toByteArray();
 	salt = settings.value("salt").toByteArray();
 	
-	if(auth_gesture.isEmpty()) {
-		qDebug() << "auth_gesture empty, while setting !empty";
-		hash_loaded = false;
+	hash_loaded = !auth_gesture.isEmpty() and !salt.isEmpty();
+	if(!hash_loaded)
 		return;
-	}
-	hash_loaded = true;
 
-	touchpad_mode = false;
-	if(settings.value("touchpad_mode").toBool())
-		touchpad_mode = true;
+	touchpad_mode = settings.value("touchpad_mode", false).toBool();
 	input->enableTouchpadMode(touchpad_mode);
 
 	check_timeout = settings.value("check_timeout", CHECK_TIMEOUT).toInt() * 1000;
-
 }
 
 
@@ -136,14 +125,15 @@ void FCC::preprocess()
 	//remove duplicate strokes
 	int lastdirection = -1; //invalid direction
 	for(int i = 0; i < strokes.count(); i++) {
-		if(strokes.at(i).up)
+		if(strokes.at(i).up) {
 			lastdirection = -1;
-		else if(strokes.at(i).direction == lastdirection) {
+		} else if(strokes.at(i).direction == lastdirection) {
 			strokes[i-1] += strokes.at(i);
 			strokes.removeAt(i);
 			i--;
-		} else
+		} else {
 			lastdirection = strokes.at(i).direction;
+		}
 	}
 }
 
@@ -203,7 +193,7 @@ bool FCC::tryGesture()
 
 			offset[i] = (offset[i]+1)%4;
 
-			int index = indices.at(i);
+			const int index = indices.at(i);
 			switch(offset[i]) {
 			case 0: // unchanged
 				break;
@@ -233,15 +223,11 @@ bool FCC::tryGesture()
 }
 
 
-NewGesture* FCC::newGesture()
-{
-	return new FCCNewGesture(0, this);
-}
+NewGesture* FCC::newGesture() { return new FCCNewGesture(0, this); }
 
-void FCC::reset()
-{
-	loadHash();
-}
+
+void FCC::reset() { loadHash(); }
+
 
 void FCC::setInput(InputWidget *i)
 {

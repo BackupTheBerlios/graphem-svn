@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,10 +19,9 @@
 
 #include "fcc_stroke.h"
 
-#include <cmath>
-
 #include <QLineF>
 
+#include <cmath>
 
 Stroke::Stroke(QLineF l, int start_node, bool up):
 	start_node_id(start_node),

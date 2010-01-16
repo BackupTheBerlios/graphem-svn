@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 			if(i+1 >= argc)
 				break; //parameter not found
 
-			plugin = QString(argv[i+1]);
+			plugin = argv[i+1];
 			i++;
 		} else if(argv[i] == QString("--tries")) {
 			if(i+1 >= argc)
@@ -86,6 +86,7 @@ int main(int argc, char* argv[])
 			return 1;
 		} else {
 			std::cerr << "Couldn't load plugin, but we're in CONFIG mode ... TODO\n";
+			return 1; //TODO: handle this somehow
 		}
 	}
 

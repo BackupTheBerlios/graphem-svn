@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,11 +41,14 @@ Graphem::Graphem(WindowMode mode, Auth *a):
 	tries(0),
 	verbose(false)
 {
+	//set static pointer to auth module
 	auth = a;
 	auth->setInput(input);
 
+	//QueuedConnection so GUI can be updated before check() is called
 	connect(input, SIGNAL(dataReady()),
 		auth, SLOT(check()), Qt::QueuedConnection);
+
 	connect(auth, SIGNAL(checkResult(bool)),
 		this, SLOT(checkResult(bool)));
 	connect(input, SIGNAL(redraw(QPainter*)),
@@ -53,9 +56,6 @@ Graphem::Graphem(WindowMode mode, Auth *a):
 
 	if(mode == CONFIG) { //show main window
 		MainWindow *main = new MainWindow(input);
-
-		connect(auth, SIGNAL(checkResult(bool)),
-			input, SLOT(reset()));
 
 		//main->setWindowIcon(QIcon("icon.png"));
 		main->setWindowTitle(GRAPHEM_VERSION);
@@ -124,7 +124,7 @@ Auth* Graphem::getAuth()
 }
 
 
-//load auth plugin 'name', returns 0 if load fails
+//returns pointer to auth plugin 'name', 0 if loading fails
 Auth* Graphem::loadAuthPlugin(QString name)
 {
 	QDir plugins_dir = QDir(qApp->applicationDirPath());

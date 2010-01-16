@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009-2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,9 +38,13 @@ Debug::Debug()
 	QDir plugins_dir = QDir(qApp->applicationDirPath());
 	plugins_dir.cd("plugins");
 
-	QPluginLoader loader(plugins_dir.absoluteFilePath("libfcc.so"));
+	QString plugin_file = plugins_dir.absoluteFilePath("libfcc.so");
+
+	QPluginLoader loader(plugin_file);
 	auth = qobject_cast<Auth* >(loader.instance());
-	
+	if(!auth)
+		std::cout << "loading " << qPrintable(plugin_file) << "failed\n";
+
 	if(auth)
 		connect(auth, SIGNAL(checkResult(bool)), this, SIGNAL(checkResult(bool)));
 }
@@ -60,7 +64,7 @@ void Debug::check()
 			length = QLineF(input->path.at(i-1).pos, input->path.at(i).pos).length();
 		double time = start.msecsTo(input->path.at(i).time);
 		std::cout << time << "\t";
-		std::cout << int(input->path.at(i).pen_up) << "\t";
+		std::cout << int(input->path.at(i).pressure) << "\t";
 		std::cout << length/time << "\n";
 	}
 

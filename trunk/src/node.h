@@ -1,6 +1,6 @@
 /*
     Graphem
-    Copyright (C) 2009 Christian Pulvermacher
+    Copyright (C) 2009-2010 Christian Pulvermacher
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,16 +24,19 @@
 #include <QTime>
 
 struct Node {
-	Node(QPointF pos, bool pen_up = false) :
+	Node(QPointF pos, bool pen_up = false, qreal pressure = 1.0) :
 		pos(pos),
 		time(QTime::currentTime()),
-		pen_up(pen_up)
-		//pressure(pressure)
-	{ }
+		pen_up(pen_up),
+		pressure(pressure)
+	{
+		if(pen_up)
+			pressure = 0.0;
+	}
 
 	QPointF pos;
 	QTime time;
 	bool pen_up;
-	//qreal pressure; //currently unused
+	qreal pressure;
 };
 #endif
