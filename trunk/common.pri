@@ -4,14 +4,6 @@ CONFIG += debug silent
 QMAKE_CXXFLAGS_RELEASE += -D QT_NO_DEBUG -D QT_NO_DEBUG_OUTPUT
 LIBS += -lX11
 
-#seems to be necessary on 64bit architecture
-unix {
-	ARCH = $$system(uname -i)
-	contains( ARCH, x86_64 ) {
-		CXXFLAGS += -fPIC
-	}
-}
-
 QCA_PATH = /usr/include/QtCrypto
 exists($$QCA_PATH) {
 	INCLUDEPATH += $$QCA_PATH
