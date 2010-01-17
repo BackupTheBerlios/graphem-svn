@@ -3,12 +3,12 @@ NewPattern::auth needed?
 make creation of new pattern slightly more wizardish
 	choosing plugins?
 plugins really shouldn't depend on InputWidget
+improve FCC's preprocess()
 secure storage, zero memory after use
 better logo & home page
 resolution change issues:
 	window not in front
 	white screen
--fpic required on 64bit arch?
 
 ?:
 l10n
