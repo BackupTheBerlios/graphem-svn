@@ -24,11 +24,11 @@
 #include <QTime>
 
 struct Node {
-	Node(QPointF pos, bool pen_up = false, qreal pressure = 1.0) :
+	Node(QPointF pos, bool pen_up = false, qreal p = 1.0) :
 		pos(pos),
 		time(QTime::currentTime()),
 		pen_up(pen_up),
-		pressure(pressure)
+		pressure(p)
 	{
 		if(pen_up)
 			pressure = 0.0;

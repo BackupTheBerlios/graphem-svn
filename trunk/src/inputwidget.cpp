@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QResizeEvent>
 #include <QSettings>
+#include <QTabletEvent>
 #include <QTime>
 #include <QTimer>
 #include <QX11Info>
@@ -154,11 +155,10 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 		cursor_centered = false;
 		return;
 	}
-	/* TODO: uncomment me when we're processing tablet events
 	if(pen_down) { //ignore mouse events while pen is down
 		ev->ignore();
 		return;
-	}*/
+	}
 
 	if(!touchpad_mode) {
 		if(ev->buttons() == 0) { //no buttons pressed
@@ -175,7 +175,7 @@ void InputWidget::mouseMoveEvent(QMouseEvent *ev)
 
 void InputWidget::mouseReleaseEvent(QMouseEvent* ev)
 {
-	if(pen_down or !mouse_down or touchpad_mode)
+	if(touchpad_mode or !mouse_down or pen_down)
 		return;
 
 	mouse_down = false;
@@ -221,8 +221,8 @@ void InputWidget::reset()
 	path.clear();
 	QSettings settings;
 	show_input = settings.value("show_input", SHOW_INPUT).toBool();
-	//if(parent() == 0) //TODO: remove this after testing
-		showMessage(tr("Gesture not recognized, please try again."), 1500);
+
+	showMessage(tr("Gesture not recognized, please try again."), 1500);
 	update();
 }
 
@@ -264,4 +264,25 @@ void InputWidget::showMessage(QString m, int msecs)
 	msg = m;
 	if(msecs)
 		QTimer::singleShot(msecs, this, SLOT(showMessage()));
+}
+
+
+void InputWidget::tabletEvent(QTabletEvent *ev)
+{
+	if(ev->pressure() > 0) {
+		path.append(Node(ev->pos(), false, ev->pressure()));
+		pen_down = true;
+
+		update();
+	} else {
+		if(touchpad_mode) {
+			ev->ignore();
+			return;
+		}
+
+		if(pen_down) //record pen up
+			path.append(Node(ev->pos(), true));
+		pen_down = false;
+	}
+	ev->accept();
 }

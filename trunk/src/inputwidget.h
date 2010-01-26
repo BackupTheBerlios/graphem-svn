@@ -55,6 +55,7 @@ protected:
 	void paintEvent(QPaintEvent *ev);
 	void resizeEvent(QResizeEvent *ev);
 	void showEvent(QShowEvent *ev);
+	void tabletEvent(QTabletEvent *ev);
 private:
 	bool pen_down, mouse_down;
 	QTimer *timer;

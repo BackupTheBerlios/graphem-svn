@@ -21,6 +21,7 @@
 #include "inputwidget.h"
 
 #include <QApplication>
+#include <QColor>
 #include <QDir>
 #include <QPainter>
 #include <QPen>
@@ -58,14 +59,15 @@ void Debug::check()
 		return;
 	std::cout << "t\tp(t)\tv(t)\n";
 	QTime start = input->path.at(0).time;
-	double length = 0;
-	for(int i = 0; i< input->path.count(); i++) {
-		if(i > 0)
-			length = QLineF(input->path.at(i-1).pos, input->path.at(i).pos).length();
+	for(int i = 1; i< input->path.count(); i++) {
 		double time = start.msecsTo(input->path.at(i).time);
+		double length = QLineF(input->path.at(i-1).pos, input->path.at(i).pos).length();
+		double v = length / input->path.at(i-1).time.msecsTo(input->path.at(i).time);
+		double pressure = (input->path.at(i-1).pressure + input->path.at(i).pressure)/2;
+
 		std::cout << time << "\t";
-		std::cout << int(input->path.at(i).pressure) << "\t";
-		std::cout << length/time << "\n";
+		std::cout << pressure << "\t";
+		std::cout << v << "\n";
 	}
 
 	auth->check();
@@ -95,16 +97,15 @@ void Debug::draw(QPainter* painter)
 		return;
 
 	QPen pen;
-	pen.setColor(Qt::yellow);
-	QTime start = input->path.at(0).time;
-	double length = 0;
-	for(int i = 0; i< input->path.count(); i++) {
-		if(i > 0)
-			length = QLineF(input->path.at(i-1).pos, input->path.at(i).pos).length();
-		double v = length / start.msecsTo(input->path.at(i).time);
-		if(v != v or v > 0.1)
+	for(int i = 1; i< input->path.count(); i++) {
+		double length = QLineF(input->path.at(i-1).pos, input->path.at(i).pos).length();
+		double v = length / input->path.at(i-1).time.msecsTo(input->path.at(i).time);
+		double pressure = (input->path.at(i-1).pressure + input->path.at(i).pressure)/2;
+		if(v != v)
 			continue;
-		pen.setWidth(500*v);
+
+		pen.setColor(QColor(255 - v*13, 13*v, 0));
+		pen.setWidth(10*pressure);
 		painter->setPen(pen);
 		painter->drawLine(input->path.at(i-1).pos, input->path.at(i).pos);
 	}
